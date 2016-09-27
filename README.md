@@ -1,0 +1,2 @@
+# IFJ2016
+Projekt VUT FIT - IFJ 2016
