@@ -1,3 +1,6 @@
 language: c
 
 compiler: gcc
+
+notifications:
+  slack: ifj2016:sdsVuFXNAzsTxQhRol3Ex1bt
