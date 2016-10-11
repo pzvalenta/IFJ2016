@@ -6,8 +6,8 @@
 #define BASE_STRING_SIZE 4
 
 // returns pointer to an array of chars BASE_STRING_SIZE long
-char *newString(){
-	char *ret = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
+char *newString(int size){
+	char *ret = (char *) malloc(size*sizeof(char));
 	if (ret == NULL) return NULL;
 	return ret;
 }
@@ -24,4 +24,10 @@ char *resizeString(char *string){
 	} 
 	else 
 		return ret;
+}
+
+char *copyString(char *old){
+	char *ret = newString(strlen(old));
+	strcpy(ret, old);
+	return ret;
 }
