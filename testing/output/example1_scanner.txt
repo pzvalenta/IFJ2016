@@ -1,0 +1,28 @@
+obsah tokenu pri kazdem volani getToken()
+vstup test/input/example1.java
+
+id	data
+203 N/A
+101 token->s->name='Main' (ukazatel do tabulky symbolu)
+503 N/A
+214 N/A
+211 N/A
+101 token->s->name='x'
+507 N/A
+214 N/A
+216 N/A
+101 token->s->name='run'
+501 N/A
+502 N/A
+503 N/A
+213 N/A
+101 token->s->name='str1'
+401 N/A
+507 N/A //konec sedmeho radku
+
+a tak dále...
+
+V případě, že znova objevíme identifikátor, který je už v tabulce symbolů, neměli bychom vytvářet novou položku, ale vracet odkaz na starou
+
+
+
