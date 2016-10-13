@@ -1,0 +1,18 @@
+#!/bin/sh
+
+
+#argument - jmeno programu
+#vstup .in soubor
+#ocekavany vystup - stejne jmeno jako vstup  .out 
+
+	
+for name in $(find . -type f | grep ".in")
+do
+	rm comp.tmp
+	./$1 $name >>comp.tmp
+	echo --------------------------------$name-------------------------------------
+	echo ----OCEKAVANY VYSTUP-----------------------------------VYSTUP PROGRAMU----------
+	diff -y ".$(cut -d "." -f2 <<<$name).out" "./comp.tmp"
+	echo \n
+	echo ------------------------------------------------------------------------------
+done
