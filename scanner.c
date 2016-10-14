@@ -18,10 +18,13 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "scanner.h"
+#include "token.h"
 
 #define TABLE_SIZE  32 // pocet prvku v tabulce klicovych slov
 #define KEYWORDS    17 // pocet klicovych slov
 #define MAX_ESCAPE  377 // maximalni hodnota escape sekvence
+#define START       800 // pocatecni nastaveni tokenu (id)
+
 
 //SEZNAM STAVU:
 enum {
@@ -36,48 +39,49 @@ enum {
     S_STRING,
     S_BL_COMM,  // /*..*/
     S_ESCAPE,
+    S_ESCAPE_N,
+    S_ESCAPE_N2,
     S_NUM_DOT,
     S_NUM_DOT_NUM,
     S_NUM_EX,
     S_NUM_EX_NUM,
 };
 
-int line = 1; //pocitadlo radku
-
-const char* keywords[TABLE_SIZE] = { //tabulka klicovych slov - PREDELAT NA MALA PISMENA!!!!!
-  "BOOLEAN"		,"BREAK"	,"CLASS",
-  "CONTINUE"	,"DO"       ,"DOUBLE",
-  "ELSE"        ,"FALSE"	,"FOR",
-  "IF"		    ,"INT"	    ,"RETURN",
-  "STRING"	    ,"STATIC"	,"TRUE",
-  "VOID"	    ,"WHILE",
-};
-
-int init_string(T_STRING* s) //DODELAT!!!!!
-{
-/*Funkce pro inicializaci stringu. Vytvori pamet o velikost SIZE. Return 0 v pripade uspechu*/
-
-	/*if ( (s->string = (char*)malloc(DAVKA)) == NULL )
-	{//pokud se alokace nepodarila
-		return 1;
+Token *newToken(){
+	Token *ret = malloc(sizeof(Token));
+	if (ret == NULL){
+		fprintf(stderr,"Not enought memory, can't alloc.\n");
+		return NULL;
 	}
-
-	/*s->string[0] = '\0';
-	s->alloc_size = DAVKA;              ????
-	s->lenght = 0;
-	*/
-
-	return 0;
+	ret->id = NULL;
+	return ret;
 }
 
 
-Token * getToken(FILE *file)
+
+const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
+  "boolean"		,"break"	,"class",
+  "continue"	,"do"       ,"double",
+  "else"        ,"false"	,"for",
+  "if"		    ,"int"	    ,"return",
+  "String"	    ,"static"	,"true",
+  "void"	    ,"while",
+};
+
+
+
+Token * getToken(FILE* file)
 {
+
+
     Token *ret = newToken();
+
     int current_char; //aktualne nacitany znak
     int state = S_START; //pocatek automatu
 
-    // udelat vychozi stav tokenu
+
+    (*ret).id = START;
+    (*ret).data.i = NULL;
 
     while (1){
 
@@ -104,19 +108,52 @@ Token * getToken(FILE *file)
             return ret;
         }
         else if (current_char == '-'){
-            return T_MINUS;
+            ret->id = T_MINUS;
+            return ret;
         }
         else if (current_char == '*'){
-            return T_MUL;
+            ret->id = T_MUL;
+            return ret;
         }
         else if (current_char == '('){
-            return T_LBRACKET;
+            ret->id = T_LBRACKET;
+            return ret;
         }
         else if (current_char == ')'){
-            return T_RBRACKET;
+            ret->id = T_RBRACKET;
+            return ret;
+        }
+        else if (current_char == '{'){
+            ret->id = T_LCBRACKET;
+            return ret;
+        }
+        else if (current_char == '}'){
+            ret->id = T_RCBRACKET;
+            return ret;
+        }
+        else if (current_char == '['){
+            ret->id = T_LSBRACKET;
+            return ret;
+        }
+        else if (current_char == ']'){
+            ret->id = T_RSBRACKET;
+            return ret;
+        }
+        else if (current_char == ';'){
+            ret->id = T_SEMICLN;
+            return ret;
+        }
+        else if (current_char == ','){
+            ret->id = T_COMMA;
+            return ret;
+        }
+        else if (current_char == '.'){
+            ret->id = T_DOT;
+            return ret;
         }
         else if (current_char == 'EOF'){
-            return T_END;
+            ret->id = T_END;
+            return ret;
         }
 
 /*..............................................*/
@@ -145,28 +182,33 @@ Token * getToken(FILE *file)
         }
 
 
-
+/*..............................................*/
 
 
 
 
     case S_GREATER:
         if (current_char == '='){
-            return T_GEQUAL; // >=
+            ret->id = T_GEQUAL; // >=
+            return ret;
         }
         else if (current_char == '\n'){
-            return T_GREAT; // >
+            ret->id = T_GREAT; // >
+            return ret;
         }
     case S_LESS:
         if (current_char == '='){
-            return T_LEQUAL; // <=
+            ret->id = T_LEQUAL;
+            return ret; // <=
         }
         else if (current_char == '\n'){
-            return T_LESS; // <
+            ret->id = T_LESS;
+            return ret; // <
         }
     case S_EXCLAIM:
         if (current_char == '='){
-            return T_EXCLAIM; // !=
+            ret->id = T_EXCLAIM;
+            return ret; // !=
         }
         else if (current_char == '\n'){
             goto Error_lex;     //pokud za vykricnikem nic neni
@@ -175,32 +217,37 @@ Token * getToken(FILE *file)
 
     case S_EQUAL:
         if (current_char == '='){
-            return T_EQUAL; // ==
+            ret->id = T_EQUAL;
+            return ret; // ==
         }
         else if (current_char == '\n'){
-           return T_ADD;        // =
+           ret->id = T_ADD;
+            return ret;        // =
         }
 /*................KOMENTARE.................*/
     case S_SLASH: // /
         if (current_char == '/'){ // // - radkovy komentar
-            return T_LN_COMM;
+            current_char = getc(file);
+        /*****DOPLNIT****/
+
         }
         else if (current_char == '*'){  // /* - zacatek blokoveho komentare
             state = S_BL_COMM;
         }
         else if (current_char == '\n'){ // pouze lomitko
-            return T_SLASH;     // /
+            ret->id = T_SLASH;
+            return ret;     // /
             // uvolnit string
         }
 
 
     case S_BL_COMM: // /*
         // kdyz je komentar, scanner ho ignoruje -> rozpoznat a jit na start
-        while (1) {//nekonecny cyklus nacitani dalsich znaku
-        current_char = getc(FILE); //nacitani znaku
+        while (1) {     //nekonecny cyklus nacitani dalsich znaku
+        current_char = getc(file); //nacitani znaku
             if (current_char == '*'){ /* pokud se dalsi nacteny znak bude rovnat hvezdicce,
                 otestujeme, zda se dalsi znak rovna /. Pokud ano, ukoncime cyklus*/
-                current_char = getc(FILE);
+                current_char = getc(file);
                 if (current_char == '/'){
                     break;
             }
@@ -223,28 +270,96 @@ Token * getToken(FILE *file)
         if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_'){
             // pridat do retezce, jinak error
             // ERROR
+            state = S_IDENT;
         }
-        else if(){
+        else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
+                (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
+                current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
+                current_char == '{'|| current_char == '}'|| current_char == '['|| current_char == ']' ){ //
+           // neni identifikator
+            ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
+                for (int a = 1; a < KEYWORDS; a++){
+                    if ((strcmp(, klicova_slova[a])) /****JAK POZNAT TO, CO MAM NACTENO***/
+                        { //je to klicove slovo
+                        ret->id = T_KEY + a; //vrati presny odkaz na dane klicove slovo
+                        return ret;
+
+                        }
+                }
 
         }
 /*........................STRING......................*/
     case S_STRING: // "
-        while (1){
-            current_char = getc(FILE); // nekonecne nacitani dalsich znaku
+
             if (current_char == '"'){
-                return T_STRING;
+                ret->id = T_STRING;
+                return ret;
             }
-            else if (current_char == '\\'){
+            else if (current_char == '\\'){ // "..\
                 state = S_ESCAPE;
             }
-        }
+            else {
+                // string
+                state = S_STRING; //dokud bude nacitat string, tak cykli
+            }
+
+            break;
+
 /*........................ESCAPE......................*/
     case S_ESCAPE:
+        if (current_char == 'n'){
+            // pridat do stringu
+            state = S_STRING;
+        }
+        else if (current_char == 't'){
+            // pridat do stringu
+            state = S_STRING;
+        }
+         else if (current_char == '\\'){
+            // pridat do stringu
+            state = S_STRING;
+        }
+         else if (current_char == '\"'){
+            // pridat do stringu
+            state = S_STRING;
+        }
+         else if (current_char == 't'){
+            // pridat do stringu
+            state = S_STRING;
+        }
+        else if (isdigit(current_char) < 4){ // je to cislo, mensi
+
+            state = S_ESCAPE_N;
+
+        }
+        else{
+            //error
+        }
+
+    case S_ESCAPE_N:
+        if (isdigit(current_char) < 8){ // \0-30-7
+
+            state = S_ESCAPE_N2;
+        }
+        else {
+            //error
+        }
+
+    case S_ESCAPE_N2:
+        if (isdigit(current_char) < 8){ // \0-30-70-7
+            //
+            state = S_STRING;
+        }
+        else {
+            //error
+        }
+
 /*.........................CISLO......................*/
     case S_NUM: // cislo
         if (isdigit(current_char) != 0 ) {
             //pridani do retezce
-            // jinak error
+            // ERROR
+            state = S_NUM;
         }
         else if (current_char == '.'){  // desetinna tecka
             //pridani do retezce
@@ -252,17 +367,16 @@ Token * getToken(FILE *file)
             state = S_NUM_DOT;
         }
         else if (current_char == 'e' || current_char == 'E'){ // exponent
+             //pridani do retezce
+            // jinak error
             state = S_NUM_EX;
         }
-         else if (current_char == '+' || current_char == '-' || current_char == '*' ||
-                 current_char == '/' || current_char == '>' || current_char == '<' ||
-                 current_char == '=' || isspace(c) != 0) {  // znaky, ktere mohou jit za cislem
-            /***DOPLNIT***/
 
-        // uvolnit string
-        }
         else {
-            //vypis erroru
+            ungetc(current_char, file);
+            ret->id = T_NUMBER_I;
+            return ret;
+
         }
         break;
 
@@ -284,21 +398,17 @@ Token * getToken(FILE *file)
         if (isdigit(current_char) != 0 ) { // test na cislo
             // pridani do retezce
             //jinak error
+            state = S_NUM_DOT_NUM;
         }
         else if ( (current_char == 'e') || (current_char = 'E')){
             // pridani do retezce
             //jinak error
             state = S_NUM_EX;
         }
-        else if (current_char == '+' || current_char == '-' || current_char == '*' ||
-                 current_char == '/' || current_char == '>' || current_char == '<' ||
-                 current_char == '=' || isspace(c) != 0) {  // znaky, ktere mohou jit za cislem
-            /***DOPLNIT***/
-
-            // uvolnit string
-        }
         else {
-            //vypis erroru
+          ungetc(current_char, file);
+          ret->id = T_NUMBER_D;
+            return ret;
         }
         break;
 
@@ -316,14 +426,13 @@ Token * getToken(FILE *file)
         if (isdigit(current_char) != 0) {
             state = S_NUM_EX_NUM; // dokud budou nacitana cisla - cyklus
         }
-        else if (current_char == 'EOF'){
-            return T_NUMBER_D;
-            // DOPLNIT
+        else {
+            ungetc(current_char, file);
+            ret->id = T_NUMBER_D;
+            return ret;
             // UVOLNIT PAMET
         }
-        else {
-            //ERROR
-        }
+
         break;
 
 
@@ -332,23 +441,13 @@ Token * getToken(FILE *file)
 
     } // konec switch
 
-    typedef struct{
-	char id; //na to nase id nam staci jeden byte
-	union{ //union zabira tolik mista v pameti jako jeho nejvetsi prvek, smi se pouzit jenom jeden
-		long i; //int
-		double f; //float
-		char * s; //string
-		//pomoci tohoto pointeru budeme predavat bud text, nebo ukazatel do tabulky hodnot
-	};
-} Token;
-
 
 
     } // konec while
 
 
 Error_lex: //chyba
-//zde budou kroky, ktere se maji provest v pripade chyby
+
 
 
 // vratit token, uvolnit posledni string
@@ -360,6 +459,6 @@ Error_lex: //chyba
 
 
 
-return ;
+return ret;
 }
 
