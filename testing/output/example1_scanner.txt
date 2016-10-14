@@ -19,7 +19,7 @@ id	data
 507 N/A
 101 token->s->name='str1'
 401 N/A
-303 "Toto je nejaky text"
+303 token->data.s="Toto je nejaky text"
 507 N/A //konec sedmeho radku
 
 a tak dále...
