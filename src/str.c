@@ -13,17 +13,17 @@ struct _String{
 
 
 // returns pointer to an array of chars BASE_STRING_SIZE long
-String *newString(int size){
+String *newString(){
 	String *ret = (String *) malloc(sizeof(String));
 	if (ret == NULL) return NULL;
 
-	ret->data = (char *) malloc(sizeof(char));
+	ret->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
 	if (ret->data == NULL){
 		return NULL;
 		destroyString(ret);
 	}
 
-	ret->size = size;
+	ret->size = BASE_STRING_SIZE;
 	ret->len = 0;
 	return ret;
 }
