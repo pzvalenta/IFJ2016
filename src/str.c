@@ -49,6 +49,6 @@ String *newString(int size){
 // }
 
 //TODO
-void appendChar(String *str){
+void appendChar(String *str, char c){
 
 }
