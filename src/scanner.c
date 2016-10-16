@@ -47,15 +47,7 @@ enum {
     S_NUM_EX_NUM,
 };
 
-Token *newToken(){
-	Token *ret = malloc(sizeof(Token));
-	if (ret == NULL){
-		fprintf(stderr,"Not enought memory, can't alloc.\n");
-		return NULL;
-	}
-	ret->id = NULL;
-	return ret;
-}
+
 
 
 
@@ -461,4 +453,3 @@ Error_lex: //chyba
 
 return ret;
 }
-
