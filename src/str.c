@@ -1,15 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "str.h"
 
 #define BASE_STRING_SIZE 4
 
-struct _String{
-	int len;
-	int size;
-	char * data;
-};
+
 
 
 // returns pointer to an array of chars BASE_STRING_SIZE long
@@ -31,27 +28,25 @@ String *newString(){
 }
 
 void resizeString(String *string){
-	size = string->size;
-	len = string->len;
-	char *new = (char *) realloc(string, 2*size));
-	if (new == NULL){
-		char *new2 = (char *) malloc(2*size); //TODO je toto nunte?
+	int size = string->size;
+	int len = string->len;
+	realloc(string, 2*size*sizeof(char));
+	if (string == NULL){
+		char *new2 = (char *) malloc(2*size*sizeof(char)); //TODO je toto nunte?
 		if (new2 == NULL)
 			return NULL; //TODO handle error
 		else {
 			strcpy(new2, string->data);
-			destroyStringData(string);
-			str->data = new2;
-			str->size = 2*size;
-			str->len = len;
+			destroyStringData(string); //TODO je toto nutne?
+			string->data = new2;
+			string->size = 2*size;
+			string->len = len;
 			return;
 		}
 	}
 	else {
-		destroyStringData(string);
-		str->data = new;
-		str->size = 2*size;
-		str->len = len;
+		string->size = 2*size;
+		string->len = len;
 		return;
 	}
 }
@@ -61,7 +56,9 @@ void appendChar(String *str, char c){
 	if (str->len + 1 >= str->size) resizeString(str);
 
 	str->data[str->len++] = c;
-	str->data[len] = '\0';
+	str->data[str->len] = '\0';
+
+	//TODO realloc on string end
 }
 
 void destroyStringData(String *string){

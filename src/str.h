@@ -1,7 +1,11 @@
 #ifndef HEADER_STRING
 #define HEADER_STRING
 
-typedef struct _String String;
+typedef struct _String{
+	int len;
+	int size;
+	char * data;
+} String;
 
 String *newString(void);
 
