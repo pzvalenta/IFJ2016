@@ -17,27 +17,27 @@
 
 #define START       		255 // pocatecni nastaveni tokenu (id)
 
-#define T_IDENT         011
-#define T_KEY           020
+#define T_IDENT          11
+#define T_KEY            20
 
-#define T_NUMBER_I      041
-#define T_NUMBER_D      042
-#define T_STRING        043
+#define T_NUMBER_I       41
+#define T_NUMBER_D       42
+#define T_STRING         43
 
 
-#define T_END           001
+#define T_END             1
 
-#define T_ADD           051
-#define T_EQUAL         052
-#define T_PLUS          053
-#define T_GREAT         055
-#define T_GEQUAL        056
-#define T_MINUS         057
-#define T_LESS          059
-#define T_LEQUAL        060
-#define T_MUL           061
-#define T_EXCLAIM       064
-#define T_SLASH         065
+#define T_ADD            51
+#define T_EQUAL          52
+#define T_PLUS           53
+#define T_GREAT          55
+#define T_GEQUAL         56
+#define T_MINUS          57
+#define T_LESS           59
+#define T_LEQUAL         60
+#define T_MUL            61
+#define T_EXCLAIM        64
+#define T_SLASH          65
 
 #define T_LBRACKET      101
 #define T_RBRACKET      102
