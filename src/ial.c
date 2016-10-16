@@ -1,9 +1,9 @@
 #include <stdio.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 
 #include "ial.h"
 #include "str.h"
-
+#include "token.h"
 
 // Symbol Table implementation
 
@@ -24,14 +24,14 @@ struct _SymTableNode{
 SymTableNode *newSymTableNode(Token *token, char *str){
 	SymTableNode *ret = malloc(sizeof(SymTableNode));
 	if (ret == NULL){
-		fprintf("Not enought memory, can't alloc.\n");
+		fprintf(stderr, "Not enought memory, can't alloc.\n");
 		return NULL;
 	}
-	
+
 	ret->name = copyString(str);
 	ret->id = token->id;
 	ret->data = NULL;
-	
+
 	ret->left = NULL;
 	ret->right = NULL;
 }
@@ -42,14 +42,14 @@ SymTableNode *insertSymTableNode(SymTableNode *root, SymTableNode *node){
 		root = node;
 		return root;
 	}
-		
+
 	if (strcmp(node->name, root->name) > 0)
 		root->right = insert(root->right, node)
 	else if (strcmp(node->name, root->name) < 0)
 		root->left = insert(root->left, node)
 	else
 		fprintf("Error, equal node keys.\n",stderr)
-	
+
 	return root;
 }
 
@@ -65,7 +65,7 @@ SymTableNode *searchSymTable(SymTableNode *root, char *exp){
 	if (a == 0) return root;
 	else if (a > 0) return searchSymTable(root->right, exp);
 	else return searchSymTable(root->left, exp);
-	
+
 	return NULL; // not found
 }
 
@@ -82,7 +82,7 @@ SymStackItem *newSymStackItem(){
 		fprintf("Not enought memory, can't alloc.\n");
 		return NULL;
 	}
-	
+
 	ret->table = NULL;
 	ret->next = NULL;
 }
@@ -98,4 +98,3 @@ SymStackItem *popSymStackItem(SymSackItem *stack){
 	ret->next = NULL;
 	return ret;
 }
-

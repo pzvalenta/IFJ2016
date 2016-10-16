@@ -3,23 +3,15 @@
 #include "str.h"
 #include "scanner.h"
 
-struct _Token{
-	char id; // na to nase id nam staci jeden byte
-	union{ // union zabira tolik mista v pameti jako jeho nejvetsi prvek, smi se pouzit jenom jeden
-		long i; // int
-		double f; // float
-		char * s; // string
-		// pomoci tohoto pointeru budeme predavat bud text, nebo ukazatel do tabulky hodnot
-	} data;
-};
+
 
 Token *newToken(){
 	Token *ret = (String *) malloc(sizeof(Token));
 	if (ret == NULL){
 		fprintf("Not enought memory, can't alloc.\n",stderr);
-		return NULL;
+		return NULL; //TODO handle error
 	}
-	ret->id = NULL;
+	ret->id = -1;
 	return ret;
 }
 
@@ -31,5 +23,6 @@ void destroyToken(Token *token){
 		else if (token->id == T_IDENT)
 			destroySimTableNode(token->s);
 		free(token);
+		token = NULL;
 	}
 }
