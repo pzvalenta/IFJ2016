@@ -15,40 +15,63 @@ struct _String{
 // returns pointer to an array of chars BASE_STRING_SIZE long
 String *newString(){
 	String *ret = (String *) malloc(sizeof(String));
-	if (ret == NULL) return NULL;
+	if (ret == NULL) return NULL; //TODO handle error
 
 	ret->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
 	if (ret->data == NULL){
-		return NULL;
+		return NULL; //TODO handle error
 		destroyString(ret);
 	}
+	else
+		ret->data[0]='\0';
 
 	ret->size = BASE_STRING_SIZE;
 	ret->len = 0;
 	return ret;
 }
 
-// doubles the size of a char array
-// char *resizeString(char *string){
-// 	char *ret = (char *) realloc(string, 2*(strlen(string)+1));
-// 	if (ret == NULL){
-// 		char *ret2 = (char *) malloc(2*(strlen(string)+1)); //TODO je toto nunte?
-// 		if (ret2 == NULL)
-// 			return NULL;
-// 		else
-// 			return ret2;
-// 	}
-// 	else
-// 		return ret;
-// }
+void resizeString(String *string){
+	size = string->size;
+	len = string->len;
+	char *new = (char *) realloc(string, 2*size));
+	if (new == NULL){
+		char *new2 = (char *) malloc(2*size); //TODO je toto nunte?
+		if (new2 == NULL)
+			return NULL; //TODO handle error
+		else {
+			strcpy(new2, string->data);
+			destroyStringData(string);
+			str->data = new2;
+			str->size = 2*size;
+			str->len = len;
+			return;
+		}
+	}
+	else {
+		destroyStringData(string);
+		str->data = new;
+		str->size = 2*size;
+		str->len = len;
+		return;
+	}
+}
 
-// char *copyString(char *old){
-// 	char *ret = newString(strlen(old));
-// 	strcpy(ret, old);
-// 	return ret;
-// }
 
-//TODO
 void appendChar(String *str, char c){
+	if (str->len + 1 >= str->size) resizeString(str);
 
+	str->data[str->len++] = c;
+	str->data[len] = '\0';
+}
+
+void destroyStringData(String *string){
+	free(string->data);
+	string->data = NULL;
+	string->len = -1;
+	string->size = -1;
+}
+
+void destroyString(String *string){
+	destroyStringData(string);
+	free(string);
 }

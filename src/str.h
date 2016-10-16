@@ -1,10 +1,20 @@
 #ifndef HEADER_STRING
 #define HEADER_STRING
 
-// returns pointer to an array of chars BASE_STRING_SIZE long
-char *newString();
+typedef struct _String String;
 
-// doubles the size of a char array
-char *resizeString(char *string);
+String *newString(void);
+
+void resizeString(String *string);
+
+void appendChar(String *str, char c);
+
+void destroyStringData(String *string);
+
+void destroyString(String *string);
+
+
+
+
 
 #endif
