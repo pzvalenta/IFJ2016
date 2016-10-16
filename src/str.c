@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "str.h"
 
 #define BASE_STRING_SIZE 4
@@ -51,7 +47,6 @@ void resizeString(String *string){
 	}
 }
 
-
 void appendChar(String *str, char c){
 	if (str->len + 1 >= str->size) resizeString(str);
 
@@ -71,4 +66,16 @@ void destroyStringData(String *string){
 void destroyString(String *string){
 	destroyStringData(string);
 	free(string);
+}
+
+String *copyString(String* old){
+	String *new = newString();
+
+	if (old->size > BASE_STRING_SIZE)
+		realloc(new->data, old->size*sizeof(char)); //TODO handle error
+
+	new->size = old->size;
+	new->len = old->len;
+	strcpy(new->data, old->data);
+	return new;
 }
