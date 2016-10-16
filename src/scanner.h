@@ -15,36 +15,38 @@
 #ifndef SCANNER
 #define SCANNER
 
-#define T_IDENT         101
-#define T_KEY           200
+#define START       		255 // pocatecni nastaveni tokenu (id)
 
-#define T_NUMBER_I      301
-#define T_NUMBER_D      302
-#define T_STRING        303
+#define T_IDENT         011
+#define T_KEY           020
+
+#define T_NUMBER_I      041
+#define T_NUMBER_D      042
+#define T_STRING        043
 
 
 #define T_END           001
 
-#define T_EQUAL         401
-#define T_ADD           402
-#define T_PLUS          403
-#define T_GREAT         405
-#define T_GEQUAL        406
-#define T_MINUS         407
-#define T_LESS          409
-#define T_LEQUAL        410
-#define T_MUL           411
-#define T_EXCLAIM       414
-#define T_SLASH         415
+#define T_ADD           051
+#define T_EQUAL         052
+#define T_PLUS          053
+#define T_GREAT         055
+#define T_GEQUAL        056
+#define T_MINUS         057
+#define T_LESS          059
+#define T_LEQUAL        060
+#define T_MUL           061
+#define T_EXCLAIM       064
+#define T_SLASH         065
 
-#define T_LBRACKET      501
-#define T_RBRACKET      502
-#define T_LCBRACKET     503
-#define T_RCBRACKET     504
-#define T_LSBRACKET     505
-#define T_RSBRACKET     506
-#define T_SEMICLN       507
-#define T_COMMA         508
-#define T_DOT           509
+#define T_LBRACKET      101
+#define T_RBRACKET      102
+#define T_LCBRACKET     103
+#define T_RCBRACKET     104
+#define T_LSBRACKET     105
+#define T_RSBRACKET     106
+#define T_SEMICLN       107
+#define T_COMMA         108
+#define T_DOT           109
 
 #endif // SCANNER

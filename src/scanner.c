@@ -22,8 +22,7 @@
 
 #define TABLE_SIZE  32 // pocet prvku v tabulce klicovych slov
 #define KEYWORDS    17 // pocet klicovych slov
-#define MAX_ESCAPE  377 // maximalni hodnota escape sekvence
-#define START       800 // pocatecni nastaveni tokenu (id)
+//#define MAX_ESCAPE  377 // maximalni hodnota escape sekvence //TODO overflow error. musi to byt mensi jak 255
 
 
 //SEZNAM STAVU:
