@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include "scanner.h"
 #include "token.h"
 
@@ -72,7 +73,7 @@ Token * getToken(FILE* file)
 
 
     (*ret).id = START;
-    (*ret).data.i = NULL;
+    (*ret).data.s = NULL;
 
     while (1){
 
@@ -142,7 +143,7 @@ Token * getToken(FILE* file)
             ret->id = T_DOT;
             return ret;
         }
-        else if (current_char == 'EOF'){
+        else if (current_char == EOF){
             ret->id = T_END;
             return ret;
         }
@@ -269,14 +270,16 @@ Token * getToken(FILE* file)
                 current_char == '{'|| current_char == '}'|| current_char == '['|| current_char == ']' ){ //
            // neni identifikator
             ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
-                for (int a = 1; a < KEYWORDS; a++){
-                    if ((strcmp(, klicova_slova[a])) /****JAK POZNAT TO, CO MAM NACTENO***/
-                        { //je to klicove slovo
-                        ret->id = T_KEY + a; //vrati presny odkaz na dane klicove slovo
-                        return ret;
 
-                        }
-                }
+              //TODO uncomment
+                // for (int a = 1; a < KEYWORDS; a++){
+                //     if ((strcmp(, klicova_slova[a])) /****JAK POZNAT TO, CO MAM NACTENO***/
+                //         { //je to klicove slovo
+                //         ret->id = T_KEY + a; //vrati presny odkaz na dane klicove slovo
+                //         return ret;
+                //
+                //         }
+                // }
 
         }
 /*........................STRING......................*/
@@ -286,7 +289,7 @@ Token * getToken(FILE* file)
                 ret->id = T_STRING;
                 return ret;
             }
-            else if (current_char == '\\'){ // "..\
+            else if (current_char == '\\'){ /*   "..\    */
                 state = S_ESCAPE;
             }
             else {
