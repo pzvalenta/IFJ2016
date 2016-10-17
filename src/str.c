@@ -66,6 +66,7 @@ void destroyStringData(String *string){
 void destroyString(String *string){
 	destroyStringData(string);
 	free(string);
+	string = NULL;
 }
 
 String *copyString(String* old){
