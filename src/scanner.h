@@ -15,6 +15,8 @@
 #ifndef SCANNER
 #define SCANNER
 
+#include "str.h"
+
 #define START       		255 // pocatecni nastaveni tokenu (id)
 
 #define T_IDENT          11
