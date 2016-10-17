@@ -31,11 +31,13 @@ SymTableNode *insertSymTableNode(SymTableNode *root, SymTableNode *node){
 		root->right = insertSymTableNode(root->right, node);
 	else if (cmp < 0)
 		root->left = insertSymTableNode(root->left, node);
-	else
-		fprintf(stderr,"Error, equal node keys.\n");
-
+	else { //already in table
+		printf("%s already in table, root->name->data = %s, root pointer %p, node pointer %p\n", node->name->data, root->name->data, root, node);
+		destroySymTableNode(node);
+	}
 	return root;
 }
+
 
 void deleteSymTableNode(SymTableNode *root, SymTableNode *node){
 	if (root == NULL || node == NULL) return NULL;
