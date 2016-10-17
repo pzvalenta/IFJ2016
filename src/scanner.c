@@ -47,8 +47,31 @@ enum {
     S_NUM_EX_NUM,
 };
 
+// returns pointer to an array of chars BASE_STRING_SIZE long
+String *newString(){
+	String *ret = (String *) malloc(sizeof(String));
+	if (ret == NULL) return NULL; //TODO handle error
 
+	ret->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
+	if (ret->data == NULL){
+		return NULL; //TODO handle error
+		destroyString(ret);
+	}
+	else
+		ret->data[0]='\0';
 
+	ret->size = BASE_STRING_SIZE;
+	ret->len = 0;
+	return ret;
+}
+void appendChar(String *str, char c){
+	if (str->len + 1 >= str->size) resizeString(str);
+
+	str->data[str->len++] = c;
+	str->data[str->len] = '\0';
+
+	//TODO realloc on string end
+}
 
 
 const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
@@ -89,10 +112,13 @@ Token * getToken(FILE* file)
         }
         else if ( (isalpha(current_char)) != 0 || current_char == '$' || current_char == '_'){
             //zacina znakem, dolarem nebo podtrzitkem
-           //alokovat pamet
+           String *ident_string = newString();
+           
            state = S_IDENT;
         }
         else if (isdigit(current_char) != 0) { //pokud to je cislo
+           String *number_string = newString();
+            
             state = S_NUM;
         }
         else if (current_char == '+'){
@@ -163,13 +189,13 @@ Token * getToken(FILE* file)
             state = S_EQUAL;
         }
         else if (current_char == '/'){
-            //alokovat pamet (init string)
-            //pokud neni pamet -> error
+            String *comm_string = newString();
 
             state = S_SLASH;
             //alokovat pamet (add char)
         }
         else if (current_char == '"'){
+            String *string = newString();
             state = S_STRING;
         }
 
@@ -219,9 +245,14 @@ Token * getToken(FILE* file)
 /*................KOMENTARE.................*/
     case S_SLASH: // /
         if (current_char == '/'){ // // - radkovy komentar
-            current_char = getc(file);
-        /*****DOPLNIT****/
-
+            do{
+                if (current_char != '\n' || current_char != EOF){
+                    break;
+                }
+              current_char = getc(file);  
+            }while (current_char != '\n' || current_char != EOF);
+          destroyString(comm_string);  
+        
         }
         else if (current_char == '*'){  // /* - zacatek blokoveho komentare
             state = S_BL_COMM;
@@ -229,7 +260,7 @@ Token * getToken(FILE* file)
         else if (current_char == '\n'){ // pouze lomitko
             ret->id = T_SLASH;
             return ret;     // /
-            // uvolnit string
+            destroyString();
         }
 
 
@@ -243,16 +274,17 @@ Token * getToken(FILE* file)
                 if (current_char == '/'){
                     break;
             }
+            }
             else if (current_char == EOF){
                 // vypsat chybovou hlasku na stderr
                 goto Error_lex;
             }
 
-            }
+            
 
 
         }
-        //uvolneni string
+        destroyString(comm_string);
         state = S_START;
         break;
 
@@ -260,7 +292,7 @@ Token * getToken(FILE* file)
 
     case S_IDENT: // identifikator nebo klicove slovo -> zacina znakem, podtrzitkem nebo dolarem
         if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_'){
-            // pridat do retezce, jinak error
+           appendChar(ident_string, current_char);
             // ERROR
             state = S_IDENT;
         }
@@ -282,6 +314,10 @@ Token * getToken(FILE* file)
                 // }
 
         }
+        else {
+            goto Error_lex;
+        }
+        break;
 /*........................STRING......................*/
     case S_STRING: // "
 
@@ -293,7 +329,7 @@ Token * getToken(FILE* file)
                 state = S_ESCAPE;
             }
             else {
-                // string
+                appendChar(string, current_char);
                 state = S_STRING; //dokud bude nacitat string, tak cykli
             }
 
@@ -302,23 +338,23 @@ Token * getToken(FILE* file)
 /*........................ESCAPE......................*/
     case S_ESCAPE:
         if (current_char == 'n'){
-            // pridat do stringu
+            appendChar(string, current_char);
             state = S_STRING;
         }
         else if (current_char == 't'){
-            // pridat do stringu
+             appendChar(string, current_char);
             state = S_STRING;
         }
          else if (current_char == '\\'){
-            // pridat do stringu
+             appendChar(string, current_char);
             state = S_STRING;
         }
          else if (current_char == '\"'){
-            // pridat do stringu
+             appendChar(string, current_char);
             state = S_STRING;
         }
          else if (current_char == 't'){
-            // pridat do stringu
+             appendChar(string, current_char);
             state = S_STRING;
         }
         else if (isdigit(current_char) < 4){ // je to cislo, mensi
@@ -327,41 +363,45 @@ Token * getToken(FILE* file)
 
         }
         else{
-            //error
+            goto Error_lex;
         }
-
+        break;
+        
+        
     case S_ESCAPE_N:
         if (isdigit(current_char) < 8){ // \0-30-7
 
             state = S_ESCAPE_N2;
         }
         else {
-            //error
+            goto Error_lex;
         }
-
+        break;
+        
+        
     case S_ESCAPE_N2:
         if (isdigit(current_char) < 8){ // \0-30-70-7
             //
             state = S_STRING;
         }
         else {
-            //error
+            goto Error_lex;
         }
-
+        break;
 /*.........................CISLO......................*/
     case S_NUM: // cislo
         if (isdigit(current_char) != 0 ) {
-            //pridani do retezce
+            appendChar(number_string, current_char);
             // ERROR
             state = S_NUM;
         }
         else if (current_char == '.'){  // desetinna tecka
-            //pridani do retezce
+           appendChar(number_string, current_char);
             // jinak error
             state = S_NUM_DOT;
         }
         else if (current_char == 'e' || current_char == 'E'){ // exponent
-             //pridani do retezce
+            appendChar(number_string, current_char);
             // jinak error
             state = S_NUM_EX;
         }
@@ -378,7 +418,7 @@ Token * getToken(FILE* file)
 
     case S_NUM_DOT: // 0-9.
         if (isdigit(current_char) != 0 ) { // test na cislo
-            // pridani do retezce
+             appendChar(number_string, current_char);
             //jinak error
             state = S_NUM_DOT_NUM;
         }
@@ -390,12 +430,12 @@ Token * getToken(FILE* file)
 
     case S_NUM_DOT_NUM: // 0-9.0-9
         if (isdigit(current_char) != 0 ) { // test na cislo
-            // pridani do retezce
+             appendChar(number_string, current_char);
             //jinak error
             state = S_NUM_DOT_NUM;
         }
         else if ( (current_char == 'e') || (current_char = 'E')){
-            // pridani do retezce
+             appendChar(number_string, current_char);
             //jinak error
             state = S_NUM_EX;
         }
@@ -409,6 +449,8 @@ Token * getToken(FILE* file)
     case S_NUM_EX: //0-9eE || 0-9.0-9Ee
         if (current_char == '+' || current_char == '-' || (isdigit(current_char)) != 0) {
             // dalsi znak je +,- nebo dalsi cislo
+            appendChar(number_string, current_char);
+            
             state = S_NUM_EX_NUM;
         }
         else {
@@ -419,12 +461,13 @@ Token * getToken(FILE* file)
     case S_NUM_EX_NUM: //0-9eE+-0-9 || 0-9.0-9Ee+-0-9
         if (isdigit(current_char) != 0) {
             state = S_NUM_EX_NUM; // dokud budou nacitana cisla - cyklus
+            appendChar(number_string, current_char);
         }
         else {
             ungetc(current_char, file);
             ret->id = T_NUMBER_D;
             return ret;
-            // UVOLNIT PAMET
+            destroyString(number_string);
         }
 
         break;
