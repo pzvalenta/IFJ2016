@@ -42,7 +42,7 @@ enum {
     S_NUM_EX_NUM,
 };
 
-
+String *string = NULL;
 
 
 const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
@@ -54,7 +54,10 @@ const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
   "void"	    ,"while",
 };
 
-
+int isWhiteSpace(char c){
+  if(c == ' ' || c == '\t') return 1; //.......
+  else return 0;
+}
 
 Token * getToken(FILE* file)
 {
@@ -83,12 +86,12 @@ Token * getToken(FILE* file)
         }
         else if ( (isalpha(current_char)) != 0 || current_char == '$' || current_char == '_'){
             //zacina znakem, dolarem nebo podtrzitkem
-           String *ident_string = newString();
-
+           string = newString();
+           appendChar(string, current_char);
            state = S_IDENT;
         }
         else if (isdigit(current_char) != 0) { //pokud to je cislo
-           String *number_string = newString();
+           string = newString();
 
             state = S_NUM;
         }
@@ -113,6 +116,7 @@ Token * getToken(FILE* file)
             return ret;
         }
         else if (current_char == '{'){
+            //printf("debug, {\n");
             ret->id = T_LCBRACKET;
             return ret;
         }
@@ -148,6 +152,7 @@ Token * getToken(FILE* file)
 /*..............................................*/
 
         else if (current_char == '>'){
+            //printf("debug, char: %c\n", current_char);
             state = S_GREATER;
         }
         else if (current_char == '<'){
@@ -164,10 +169,10 @@ Token * getToken(FILE* file)
             //alokovat pamet (add char)
         }
         else if (current_char == '"'){
-            String *string = newString();
+            string = newString();
             state = S_STRING;
         }
-
+        break;
 
 /*..............................................*/
 
@@ -181,8 +186,10 @@ Token * getToken(FILE* file)
         }
         else if (current_char == '\n'){
             ret->id = T_GREAT; // >
+            //printf("DEBUG GREAT\n");
             return ret;
         }
+        break;
     case S_LESS:
         if (current_char == '='){
             ret->id = T_LEQUAL;
@@ -192,6 +199,7 @@ Token * getToken(FILE* file)
             ret->id = T_LESS;
             return ret; // <
         }
+        break;
     case S_EXCLAIM:
         if (current_char == '='){
             ret->id = T_EXCLAIM;
@@ -207,10 +215,12 @@ Token * getToken(FILE* file)
             ret->id = T_EQUAL;
             return ret; // ==
         }
-        else if (current_char == '\n'){
+        else if (isWhiteSpace(current_char)){
            ret->id = T_ADD;
             return ret;        // =
         }
+        break;
+
 /*................KOMENTARE.................*/
     case S_SLASH: // /
         if (current_char == '/'){ // // - radkovy komentar
@@ -228,6 +238,7 @@ Token * getToken(FILE* file)
             ret->id = T_SLASH;
             return ret;     // /
         }
+        break;
 
 
     case S_BL_COMM: // /*
@@ -257,11 +268,10 @@ Token * getToken(FILE* file)
 
     case S_IDENT: // identifikator nebo klicove slovo -> zacina znakem, podtrzitkem nebo dolarem
         if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_'){
-           appendChar(ident_string, current_char);
+           appendChar(string, current_char);
             // ERROR
             state = S_IDENT;
         }
-        gsasd
         else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
                 (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
                 current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
@@ -269,19 +279,22 @@ Token * getToken(FILE* file)
            // neni identifikator
             ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
 
-                 for (int a = 1; a < KEYWORDS; a++){
-                     if ((strcmp(ident_string, klicova_slova[a])) /****JAK POZNAT TO, CO MAM NACTENO***/
+                 for (int a = 0; a < KEYWORDS; a++){
+                      //printf("DEBUG %s\n", string->data);
+                     if ((strcmp(string->data, klicova_slova[a])) == 0) /****JAK POZNAT TO, CO MAM NACTENO***/
                          { //je to klicove slovo
-                         ret->id = T_KEY + a; //vrati presny odkaz na dane klicove slovo
-                         destroyString(ident_string);
+                           //printf("Comparing with %s\n", klicova_slova[a]);
+                         ret->id = T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
+                         destroyString(string);
                          return ret;
 
                          }
                  }
         ret->id = T_IDENT;
 
-        SymTableNode *node = newSymTableNode(ret, ident_string);
+        SymTableNode *node = newSymTableNode(ret, string);
         root = insertSymTableNode(root, node);
+        ret->data.s = (String *)node;
         return ret;
         }
         else {
@@ -290,7 +303,6 @@ Token * getToken(FILE* file)
         break;
 /*........................STRING......................*/
     case S_STRING: // "
-
             if (current_char == '"'){
                 ret->id = T_STRING;
                 return ret;
@@ -300,6 +312,7 @@ Token * getToken(FILE* file)
             }
             else {
                 appendChar(string, current_char);
+
                 state = S_STRING; //dokud bude nacitat string, tak cykli
             }
 
@@ -361,17 +374,17 @@ Token * getToken(FILE* file)
 /*.........................CISLO......................*/
     case S_NUM: // cislo
         if (isdigit(current_char) != 0 ) {
-            appendChar(number_string, current_char);
+            appendChar(string, current_char);
             // ERROR
             state = S_NUM;
         }
         else if (current_char == '.'){  // desetinna tecka
-           appendChar(number_string, current_char);
+           appendChar(string, current_char);
             // jinak error
             state = S_NUM_DOT;
         }
         else if (current_char == 'e' || current_char == 'E'){ // exponent
-            appendChar(number_string, current_char);
+            appendChar(string, current_char);
             // jinak error
             state = S_NUM_EX;
         }
@@ -388,7 +401,7 @@ Token * getToken(FILE* file)
 
     case S_NUM_DOT: // 0-9.
         if (isdigit(current_char) != 0 ) { // test na cislo
-             appendChar(number_string, current_char);
+             appendChar(string, current_char);
             //jinak error
             state = S_NUM_DOT_NUM;
         }
@@ -400,12 +413,12 @@ Token * getToken(FILE* file)
 
     case S_NUM_DOT_NUM: // 0-9.0-9
         if (isdigit(current_char) != 0 ) { // test na cislo
-             appendChar(number_string, current_char);
+             appendChar(string, current_char);
             //jinak error
             state = S_NUM_DOT_NUM;
         }
         else if ( (current_char == 'e') || (current_char = 'E')){
-             appendChar(number_string, current_char);
+             appendChar(string, current_char);
             //jinak error
             state = S_NUM_EX;
         }
@@ -419,7 +432,7 @@ Token * getToken(FILE* file)
     case S_NUM_EX: //0-9eE || 0-9.0-9Ee
         if (current_char == '+' || current_char == '-' || (isdigit(current_char)) != 0) {
             // dalsi znak je +,- nebo dalsi cislo
-            appendChar(number_string, current_char);
+            appendChar(string, current_char);
 
             state = S_NUM_EX_NUM;
         }
@@ -431,13 +444,13 @@ Token * getToken(FILE* file)
     case S_NUM_EX_NUM: //0-9eE+-0-9 || 0-9.0-9Ee+-0-9
         if (isdigit(current_char) != 0) {
             state = S_NUM_EX_NUM; // dokud budou nacitana cisla - cyklus
-            appendChar(number_string, current_char);
+            appendChar(string, current_char);
         }
         else {
             ungetc(current_char, file);
             ret->id = T_NUMBER_D;
             return ret;
-            destroyString(number_string);
+            destroyString(string);
         }
 
         break;
