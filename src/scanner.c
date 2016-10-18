@@ -113,12 +113,12 @@ Token * getToken(FILE* file)
         else if ( (isalpha(current_char)) != 0 || current_char == '$' || current_char == '_'){
             //zacina znakem, dolarem nebo podtrzitkem
            String *ident_string = newString();
-           
+
            state = S_IDENT;
         }
         else if (isdigit(current_char) != 0) { //pokud to je cislo
            String *number_string = newString();
-            
+
             state = S_NUM;
         }
         else if (current_char == '+'){
@@ -249,10 +249,10 @@ Token * getToken(FILE* file)
                 if (current_char != '\n' || current_char != EOF){
                     break;
                 }
-              current_char = getc(file);  
+              current_char = getc(file);
             }while (current_char != '\n' || current_char != EOF);
-          destroyString(comm_string);  
-        
+          destroyString(comm_string);
+
         }
         else if (current_char == '*'){  // /* - zacatek blokoveho komentare
             state = S_BL_COMM;
@@ -280,7 +280,7 @@ Token * getToken(FILE* file)
                 goto Error_lex;
             }
 
-            
+
 
 
         }
@@ -303,16 +303,20 @@ Token * getToken(FILE* file)
            // neni identifikator
             ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
 
-              //TODO uncomment
-                // for (int a = 1; a < KEYWORDS; a++){
-                //     if ((strcmp(, klicova_slova[a])) /****JAK POZNAT TO, CO MAM NACTENO***/
-                //         { //je to klicove slovo
-                //         ret->id = T_KEY + a; //vrati presny odkaz na dane klicove slovo
-                //         return ret;
-                //
-                //         }
-                // }
-
+                 for (int a = 1; a < KEYWORDS; a++){
+                     if ((strcmp(ident_string, klicova_slova[a])) /****JAK POZNAT TO, CO MAM NACTENO***/
+                         { //je to klicove slovo
+                         ret->id = T_KEY + a; //vrati presny odkaz na dane klicove slovo
+                         destroyString(ident_string);
+                         return ret;
+                
+                         }
+                 }
+        ret->id = T_IDENT;
+        SymTableNode *root = NULL;
+        SymTableNode *node = newSymTableNode(ret, ident_string);
+        root = insertSymTableNode(root, node);
+        return ret;
         }
         else {
             goto Error_lex;
@@ -366,8 +370,8 @@ Token * getToken(FILE* file)
             goto Error_lex;
         }
         break;
-        
-        
+
+
     case S_ESCAPE_N:
         if (isdigit(current_char) < 8){ // \0-30-7
 
@@ -377,8 +381,8 @@ Token * getToken(FILE* file)
             goto Error_lex;
         }
         break;
-        
-        
+
+
     case S_ESCAPE_N2:
         if (isdigit(current_char) < 8){ // \0-30-70-7
             //
@@ -450,7 +454,7 @@ Token * getToken(FILE* file)
         if (current_char == '+' || current_char == '-' || (isdigit(current_char)) != 0) {
             // dalsi znak je +,- nebo dalsi cislo
             appendChar(number_string, current_char);
-            
+
             state = S_NUM_EX_NUM;
         }
         else {
