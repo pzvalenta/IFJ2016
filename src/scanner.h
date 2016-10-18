@@ -20,8 +20,8 @@
 #include <ctype.h>
 #include <string.h>
 #include "str.h"
-#include "ial.h"
 #include "token.h"
+#include "ial.h"
 
 
 #define START       		255 // pocatecni nastaveni tokenu (id)
@@ -57,5 +57,7 @@
 #define T_SEMICLN       107
 #define T_COMMA         108
 #define T_DOT           109
+
+Token *getToken(FILE *file);
 
 #endif // SCANNER
