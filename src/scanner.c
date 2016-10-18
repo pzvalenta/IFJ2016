@@ -261,7 +261,6 @@ Token * getToken(FILE* file)
             // ERROR
             state = S_IDENT;
         }
-        affsfa
         else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
                 (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
                 current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
