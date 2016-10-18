@@ -15,7 +15,14 @@
 #ifndef SCANNER
 #define SCANNER
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
 #include "str.h"
+#include "ial.h"
+#include "token.h"
+
 
 #define START       		255 // pocatecni nastaveni tokenu (id)
 

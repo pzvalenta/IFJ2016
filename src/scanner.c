@@ -14,12 +14,7 @@
 
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
 #include "scanner.h"
-#include "token.h"
 
 #define TABLE_SIZE  32 // pocet prvku v tabulce klicovych slov
 #define KEYWORDS    17 // pocet klicovych slov
@@ -47,31 +42,7 @@ enum {
     S_NUM_EX_NUM,
 };
 
-// returns pointer to an array of chars BASE_STRING_SIZE long
-String *newString(){
-	String *ret = (String *) malloc(sizeof(String));
-	if (ret == NULL) return NULL; //TODO handle error
 
-	ret->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
-	if (ret->data == NULL){
-		return NULL; //TODO handle error
-		destroyString(ret);
-	}
-	else
-		ret->data[0]='\0';
-
-	ret->size = BASE_STRING_SIZE;
-	ret->len = 0;
-	return ret;
-}
-void appendChar(String *str, char c){
-	if (str->len + 1 >= str->size) resizeString(str);
-
-	str->data[str->len++] = c;
-	str->data[str->len] = '\0';
-
-	//TODO realloc on string end
-}
 
 
 const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
@@ -189,8 +160,6 @@ Token * getToken(FILE* file)
             state = S_EQUAL;
         }
         else if (current_char == '/'){
-            String *comm_string = newString();
-
             state = S_SLASH;
             //alokovat pamet (add char)
         }
@@ -251,8 +220,6 @@ Token * getToken(FILE* file)
                 }
               current_char = getc(file);
             }while (current_char != '\n' || current_char != EOF);
-          destroyString(comm_string);
-
         }
         else if (current_char == '*'){  // /* - zacatek blokoveho komentare
             state = S_BL_COMM;
@@ -260,7 +227,6 @@ Token * getToken(FILE* file)
         else if (current_char == '\n'){ // pouze lomitko
             ret->id = T_SLASH;
             return ret;     // /
-            destroyString();
         }
 
 
@@ -284,7 +250,6 @@ Token * getToken(FILE* file)
 
 
         }
-        destroyString(comm_string);
         state = S_START;
         break;
 
