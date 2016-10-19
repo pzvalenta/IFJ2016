@@ -9,6 +9,10 @@ int main(void){
   for(int i = 0; 1; i++){
     Token *token = getToken(file);
     if (token->id == 1) break;
+    if (token->id == T_IDENT){
+      SymTableNode * node = (SymTableNode *) token->data.s;
+      printf("identifikator: %s\n", node->name->data);
+    }
     printf("%d  %d\n",i, token->id);
 
   }
