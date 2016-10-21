@@ -25,7 +25,7 @@
 #define KEYWORDS    17 // pocet klicovych slov
 //#define MAX_ESCAPE  377 // maximalni hodnota escape sekvence //TODO overflow error. musi to byt mensi jak 255
 
-SymTableNode *root = NULL;
+
 //SEZNAM STAVU:
 enum {
     S_START = 0,
@@ -309,11 +309,11 @@ Token * getToken(FILE* file)
                          ret->id = T_KEY + a; //vrati presny odkaz na dane klicove slovo
                          destroyString(ident_string);
                          return ret;
-
+                
                          }
                  }
         ret->id = T_IDENT;
-
+        SymTableNode *root = NULL;
         SymTableNode *node = newSymTableNode(ret, ident_string);
         root = insertSymTableNode(root, node);
         return ret;
