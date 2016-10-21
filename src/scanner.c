@@ -21,6 +21,11 @@
 //#define MAX_ESCAPE  377 // maximalni hodnota escape sekvence //TODO overflow error. musi to byt mensi jak 255
 
 SymTableNode *root = NULL;
+FILE* file;
+
+void set_file(FILE *source){
+file = source;
+}
 //SEZNAM STAVU:
 enum {
     S_START = 0,
@@ -59,7 +64,7 @@ int isWhiteSpace(char c){
   else return 0;
 }
 
-Token * getToken(FILE* file)
+Token * getToken()
 {
 
 
