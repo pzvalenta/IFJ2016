@@ -1,0 +1,86 @@
+NO	ID
+1	23	N/A
+2	11	node->name->data: 'Main'
+3	103	N/A
+4	34	N/A
+5	36	N/A
+6	11	node->name->data: 'run'
+7	101	N/A
+8	102	N/A
+9	103	N/A
+10	31	N/A
+11	11	node->name->data: 'a'
+12	107	N/A
+13	11	node->name->data: 'ifj16'
+14	109	N/A
+15	11	node->name->data: 'print'
+16	101	N/A
+17	43	token->data.s :"Zadejte cislo pro vypocet faktorialu: "
+18	102	N/A
+19	107	N/A
+20	11	node->name->data: 'a'
+21	51	N/A
+22	11	node->name->data: 'ifj16'
+23	109	N/A
+24	11	node->name->data: 'readInt'
+25	101	N/A
+26	102	N/A
+27	107	N/A
+28	31	N/A
+29	11	node->name->data: 'vysl'
+30	107	N/A
+31	30	N/A
+32	101	N/A
+33	11	node->name->data: 'a'
+34	59	N/A
+35	43	token->data.s :"(null)"
+36	102	N/A
+37	103	N/A
+38	11	node->name->data: 'ifj16'
+39	109	N/A
+40	11	node->name->data: 'print'
+41	101	N/A
+42	43	token->data.s :"Faktorial nelze spocitat!\n"
+43	102	N/A
+44	107	N/A
+45	104	N/A
+46	27	N/A
+47	103	N/A
+48	11	node->name->data: 'vysl'
+49	51	N/A
+50	41	token->data.i :'1'
+51	107	N/A
+52	37	N/A
+53	101	N/A
+54	11	node->name->data: 'a'
+55	55	N/A
+56	43	token->data.s :"(null)"
+57	102	N/A
+58	103	N/A
+59	11	node->name->data: 'vysl'
+60	51	N/A
+61	11	node->name->data: 'vysl'
+62	61	N/A
+63	11	node->name->data: 'a'
+64	107	N/A
+65	11	node->name->data: 'a'
+66	51	N/A
+67	11	node->name->data: 'a'
+68	57	N/A
+69	41	token->data.i :'1'
+70	107	N/A
+71	104	N/A
+72	11	node->name->data: 'ifj16'
+73	109	N/A
+74	11	node->name->data: 'print'
+75	101	N/A
+76	43	token->data.s :"Vysledek je: "
+77	53	N/A
+78	11	node->name->data: 'vysl'
+79	53	N/A
+80	43	token->data.s :"\n"
+81	102	N/A
+82	107	N/A
+83	104	N/A
+84	104	N/A
+85	104	N/A

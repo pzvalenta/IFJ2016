@@ -1,0 +1,112 @@
+NO	ID
+1	23	N/A
+2	11	node->name->data: 'Game'
+3	103	N/A
+4	34	N/A
+5	36	N/A
+6	11	node->name->data: 'play'
+7	101	N/A
+8	33	N/A
+9	11	node->name->data: 'str'
+10	102	N/A
+11	103	N/A
+12	11	node->name->data: 'ifj16'
+13	109	N/A
+14	11	node->name->data: 'print'
+15	101	N/A
+16	43	token->data.s :"Zadejte nejakou posloupnost vsech malych pismen a-h, "
+17	102	N/A
+18	107	N/A
+19	11	node->name->data: 'ifj16'
+20	109	N/A
+21	11	node->name->data: 'print'
+22	101	N/A
+23	43	token->data.s :"pricemz se pismena nesmeji v posloupnosti opakovat:"
+24	102	N/A
+25	107	N/A
+26	11	node->name->data: 'str'
+27	51	N/A
+28	11	node->name->data: 'ifj16'
+29	109	N/A
+30	11	node->name->data: 'readString'
+31	101	N/A
+32	102	N/A
+33	107	N/A
+34	11	node->name->data: 'str'
+35	51	N/A
+36	11	node->name->data: 'ifj16'
+37	109	N/A
+38	11	node->name->data: 'sort'
+39	101	N/A
+40	11	node->name->data: 'str'
+41	102	N/A
+42	107	N/A
+43	31	N/A
+44	11	node->name->data: 'cmp'
+45	51	N/A
+46	11	node->name->data: 'ifj16'
+47	109	N/A
+48	11	node->name->data: 'compare'
+49	101	N/A
+50	11	node->name->data: 'str'
+51	108	N/A
+52	43	token->data.s :"abcdefgh"
+53	102	N/A
+54	107	N/A
+55	30	N/A
+56	101	N/A
+57	11	node->name->data: 'cmp'
+58	64	N/A
+59	43	token->data.s :"(null)"
+60	103	N/A
+61	37	N/A
+62	101	N/A
+63	11	node->name->data: 'cmp'
+64	64	N/A
+65	43	token->data.s :"(null)"
+66	102	N/A
+67	103	N/A
+68	11	node->name->data: 'ifj16'
+69	109	N/A
+70	11	node->name->data: 'print'
+71	101	N/A
+72	43	token->data.s :"Spatne zadana posloupnost, zkuste znovu:"
+73	102	N/A
+74	107	N/A
+75	11	node->name->data: 'str'
+76	51	N/A
+77	11	node->name->data: 'ifj16'
+78	109	N/A
+79	11	node->name->data: 'readString'
+80	101	N/A
+81	102	N/A
+82	107	N/A
+83	11	node->name->data: 'str'
+84	51	N/A
+85	11	node->name->data: 'ifj16'
+86	109	N/A
+87	11	node->name->data: 'sort'
+88	101	N/A
+89	11	node->name->data: 'str'
+90	102	N/A
+91	107	N/A
+92	11	node->name->data: 'cmp'
+93	51	N/A
+94	11	node->name->data: 'ifj16'
+95	109	N/A
+96	11	node->name->data: 'compare'
+97	101	N/A
+98	11	node->name->data: 'str'
+99	108	N/A
+100	43	token->data.s :"abcdefgh"
+101	102	N/A
+102	107	N/A
+103	104	N/A
+104	104	N/A
+105	27	N/A
+106	103	N/A
+107	104	N/A
+108	32	N/A
+109	107	N/A
+110	104	N/A
+111	104	N/A

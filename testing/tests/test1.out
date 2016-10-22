@@ -1,0 +1,63 @@
+NO	ID
+1	23	N/A
+2	11	node->name->data: 'Main'
+3	103	N/A
+4	34	N/A
+5	31	N/A
+6	11	node->name->data: 'a'
+7	107	N/A
+8	34	N/A
+9	36	N/A
+10	11	node->name->data: 'run'
+11	101	N/A
+12	102	N/A
+13	103	N/A
+14	33	N/A
+15	11	node->name->data: 'str1'
+16	107	N/A
+17	11	node->name->data: 'str1'
+18	51	N/A
+19	43	token->data.s="Toto je nejaky text"
+20	107	N/A 
+21	33	N/A
+22	11	node->name->data: 'str2'
+23	107	N/A
+24	11	node->name->data: 'str2'
+25	51	N/A
+26	11	node->name->data: 'str1'
+27	53	N/A
+28	43	token->data.s=", ktery jeste trochu obohatime"
+29	107	N/A
+30	11	node->name->data: 'Main'
+31	109	N/A
+32	11	node->name->data: 'x'
+33	51	N/A
+34	11	node->name->data: 'ifj16'
+35	109	N/A
+36	11	node->name->data: 'find'
+37	101	N/A
+38	11	node->name->data: 'str2'
+39	108	N/A
+40	43	token->data.s="text"
+41	102	N/A
+42	107	N/A
+43	11	node->name->data: 'ifj16'
+44	109	N/A
+45	11	node->name->data: 'print'
+46	101	N/A
+47	43	token->data.s="Pozice retezce \"text\" v retezci str2: "
+48	53	N/A
+49	11	node->name->data: 'x'
+50	53	N/A
+51	43	token->data.s="\n"
+52	102	N/A
+53	107	N/A
+54	11	node->name->data: 'Game'
+55	10	N/A
+56	11	node->name->data: 'play'
+57	101	N/A
+58	11	node->name->data: 'str1'
+59	102	N/A
+60	107	N/A
+61	104	N/A
+62	104	N/A
