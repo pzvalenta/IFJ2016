@@ -5,13 +5,13 @@ BODY --> STATEMENT BODY
 BODY --> METHOD BODY
 BODY --> CLASS BODY
 
-CLASS --> id {CLASS_BODY}  // teoreticky to muze byt rovnou {BODY}, ale asi nepotrebujeme nested classes
+CLASS --> class id { CLASS_BODY }  // teoreticky to muze byt rovnou { BODY }, ale asi nepotrebujeme nested classes
 
 CLASS_BODY --> epsilon
 CLASS_BODY --> STATEMENT_LIST CLASS_BODY
 CLASS_BODY --> METHOD CLASS_BODY
 
-METHOD --> TYPE id (PARAM) {STATEMENT_LIST}
+METHOD --> TYPE id ( PARAM ) { STATEMENT_LIST }
 
 PARAM --> epsilon
 PARAM --> id PARAMETER
@@ -24,8 +24,8 @@ STATEMENT --> epsilon
 STATEMENT --> STATEMENT STATEMENT
 STATEMENT --> id = EXPRESSION ;
 STATEMENT --> return EXPRESSION ;
-STATEMENT --> if (EXPRESSION) {STATEMENT_LIST} else {STATEMENT_LIST}
-STATEMENT --> while (EXPRESSION) {STATEMENT_LIST}
+STATEMENT --> if ( EXPRESSION ) { STATEMENT_LIST } else { STATEMENT_LIST }
+STATEMENT --> while ( EXPRESSION ) { STATEMENT_LIST }
 
 
 STATEMENT --> id = id (PARAM) ;
@@ -45,4 +45,4 @@ EXPRESSION --> EXPRESSION == EXPRESSION
 EXPRESSION --> !EXPRESSION
 
 EXPRESSION --> ( EXPRESSION )
-EXPRESSION --> id (PARAM)
+EXPRESSION --> id ( PARAM )
