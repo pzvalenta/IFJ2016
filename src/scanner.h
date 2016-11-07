@@ -31,21 +31,21 @@
 
 
 #define T_KEY            20
-#define T_BOOL           21
+#define T_BOOL           21 //rozsireni
 #define T_BREAK          22
-#define T_CLASS          23 
-#define T_CONTINUE       24
+#define T_CLASS          23
+#define T_CONTINUE       24 //rozsireni
 #define T_DO             25
 #define T_DOUBLE         26
 #define T_ELSE           27
-#define T_FALSE          28
-#define T_FOR            29
+#define T_FALSE          28 //rozsireni
+#define T_FOR            29 //rozsireni
 #define T_IF             30
 #define T_INT            31
 #define T_RETURN         32
 #define T_STRING         33
-#define T_STATIC         34
-#define T_TRUE           35
+#define T_STATIC         34 //rozsireni ?
+#define T_TRUE           35 //rozsireni
 #define T_VOID           36
 #define T_WHILE          37
 
