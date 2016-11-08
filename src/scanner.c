@@ -14,18 +14,22 @@
 
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
 #include "scanner.h"
-#include "token.h"
 
 #define TABLE_SIZE  32 // pocet prvku v tabulce klicovych slov
 #define KEYWORDS    17 // pocet klicovych slov
 //#define MAX_ESCAPE  377 // maximalni hodnota escape sekvence //TODO overflow error. musi to byt mensi jak 255
 
+<<<<<<< HEAD
 
+=======
+SymTableNode *root = NULL;
+FILE* file;
+
+void set_file(FILE *source){
+file = source;
+}
+>>>>>>> origin/master
 //SEZNAM STAVU:
 enum {
     S_START = 0,
@@ -47,31 +51,7 @@ enum {
     S_NUM_EX_NUM,
 };
 
-// returns pointer to an array of chars BASE_STRING_SIZE long
-String *newString(){
-	String *ret = (String *) malloc(sizeof(String));
-	if (ret == NULL) return NULL; //TODO handle error
-
-	ret->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
-	if (ret->data == NULL){
-		return NULL; //TODO handle error
-		destroyString(ret);
-	}
-	else
-		ret->data[0]='\0';
-
-	ret->size = BASE_STRING_SIZE;
-	ret->len = 0;
-	return ret;
-}
-void appendChar(String *str, char c){
-	if (str->len + 1 >= str->size) resizeString(str);
-
-	str->data[str->len++] = c;
-	str->data[str->len] = '\0';
-
-	//TODO realloc on string end
-}
+String *string = NULL;
 
 
 const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
@@ -83,9 +63,12 @@ const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
   "void"	    ,"while",
 };
 
+int isWhiteSpace(char c){
+  if(c == ' ' || c == '\t') return 1; //.......
+  else return 0;
+}
 
-
-Token * getToken(FILE* file)
+Token * getToken()
 {
 
 
@@ -112,12 +95,12 @@ Token * getToken(FILE* file)
         }
         else if ( (isalpha(current_char)) != 0 || current_char == '$' || current_char == '_'){
             //zacina znakem, dolarem nebo podtrzitkem
-           String *ident_string = newString();
-
+           string = newString();
+           appendChar(string, current_char);
            state = S_IDENT;
         }
         else if (isdigit(current_char) != 0) { //pokud to je cislo
-           String *number_string = newString();
+           string = newString();
 
             state = S_NUM;
         }
@@ -142,6 +125,7 @@ Token * getToken(FILE* file)
             return ret;
         }
         else if (current_char == '{'){
+            //printf("debug, {\n");
             ret->id = T_LCBRACKET;
             return ret;
         }
@@ -177,6 +161,7 @@ Token * getToken(FILE* file)
 /*..............................................*/
 
         else if (current_char == '>'){
+            //printf("debug, char: %c\n", current_char);
             state = S_GREATER;
         }
         else if (current_char == '<'){
@@ -189,16 +174,14 @@ Token * getToken(FILE* file)
             state = S_EQUAL;
         }
         else if (current_char == '/'){
-            String *comm_string = newString();
-
             state = S_SLASH;
             //alokovat pamet (add char)
         }
         else if (current_char == '"'){
-            String *string = newString();
+            string = newString();
             state = S_STRING;
         }
-
+        break;
 
 /*..............................................*/
 
@@ -212,8 +195,10 @@ Token * getToken(FILE* file)
         }
         else if (current_char == '\n'){
             ret->id = T_GREAT; // >
+            //printf("DEBUG GREAT\n");
             return ret;
         }
+        break;
     case S_LESS:
         if (current_char == '='){
             ret->id = T_LEQUAL;
@@ -223,6 +208,7 @@ Token * getToken(FILE* file)
             ret->id = T_LESS;
             return ret; // <
         }
+        break;
     case S_EXCLAIM:
         if (current_char == '='){
             ret->id = T_EXCLAIM;
@@ -238,10 +224,12 @@ Token * getToken(FILE* file)
             ret->id = T_EQUAL;
             return ret; // ==
         }
-        else if (current_char == '\n'){
+        else if (isWhiteSpace(current_char)){
            ret->id = T_ADD;
             return ret;        // =
         }
+        break;
+
 /*................KOMENTARE.................*/
     case S_SLASH: // /
         if (current_char == '/'){ // // - radkovy komentar
@@ -251,8 +239,6 @@ Token * getToken(FILE* file)
                 }
               current_char = getc(file);
             }while (current_char != '\n' || current_char != EOF);
-          destroyString(comm_string);
-
         }
         else if (current_char == '*'){  // /* - zacatek blokoveho komentare
             state = S_BL_COMM;
@@ -260,8 +246,8 @@ Token * getToken(FILE* file)
         else if (current_char == '\n'){ // pouze lomitko
             ret->id = T_SLASH;
             return ret;     // /
-            destroyString();
         }
+        break;
 
 
     case S_BL_COMM: // /*
@@ -284,7 +270,6 @@ Token * getToken(FILE* file)
 
 
         }
-        destroyString(comm_string);
         state = S_START;
         break;
 
@@ -292,7 +277,7 @@ Token * getToken(FILE* file)
 
     case S_IDENT: // identifikator nebo klicove slovo -> zacina znakem, podtrzitkem nebo dolarem
         if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_'){
-           appendChar(ident_string, current_char);
+           appendChar(string, current_char);
             // ERROR
             state = S_IDENT;
         }
@@ -303,19 +288,27 @@ Token * getToken(FILE* file)
            // neni identifikator
             ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
 
-                 for (int a = 1; a < KEYWORDS; a++){
-                     if ((strcmp(ident_string, klicova_slova[a])) /****JAK POZNAT TO, CO MAM NACTENO***/
+                 for (int a = 0; a < KEYWORDS; a++){
+                      //printf("DEBUG %s\n", string->data);
+                     if ((strcmp(string->data, klicova_slova[a])) == 0) /****JAK POZNAT TO, CO MAM NACTENO***/
                          { //je to klicove slovo
-                         ret->id = T_KEY + a; //vrati presny odkaz na dane klicove slovo
-                         destroyString(ident_string);
+                           //printf("Comparing with %s\n", klicova_slova[a]);
+                         ret->id = T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
+                         destroyString(string);
                          return ret;
                 
                          }
                  }
         ret->id = T_IDENT;
+<<<<<<< HEAD
         SymTableNode *root = NULL;
         SymTableNode *node = newSymTableNode(ret, ident_string);
+=======
+
+        SymTableNode *node = newSymTableNode(ret, string);
+>>>>>>> origin/master
         root = insertSymTableNode(root, node);
+        ret->data.s = (String *)node;
         return ret;
         }
         else {
@@ -324,7 +317,6 @@ Token * getToken(FILE* file)
         break;
 /*........................STRING......................*/
     case S_STRING: // "
-
             if (current_char == '"'){
                 ret->id = T_STRING;
                 return ret;
@@ -334,6 +326,7 @@ Token * getToken(FILE* file)
             }
             else {
                 appendChar(string, current_char);
+
                 state = S_STRING; //dokud bude nacitat string, tak cykli
             }
 
@@ -395,17 +388,17 @@ Token * getToken(FILE* file)
 /*.........................CISLO......................*/
     case S_NUM: // cislo
         if (isdigit(current_char) != 0 ) {
-            appendChar(number_string, current_char);
+            appendChar(string, current_char);
             // ERROR
             state = S_NUM;
         }
         else if (current_char == '.'){  // desetinna tecka
-           appendChar(number_string, current_char);
+           appendChar(string, current_char);
             // jinak error
             state = S_NUM_DOT;
         }
         else if (current_char == 'e' || current_char == 'E'){ // exponent
-            appendChar(number_string, current_char);
+            appendChar(string, current_char);
             // jinak error
             state = S_NUM_EX;
         }
@@ -422,7 +415,7 @@ Token * getToken(FILE* file)
 
     case S_NUM_DOT: // 0-9.
         if (isdigit(current_char) != 0 ) { // test na cislo
-             appendChar(number_string, current_char);
+             appendChar(string, current_char);
             //jinak error
             state = S_NUM_DOT_NUM;
         }
@@ -434,12 +427,12 @@ Token * getToken(FILE* file)
 
     case S_NUM_DOT_NUM: // 0-9.0-9
         if (isdigit(current_char) != 0 ) { // test na cislo
-             appendChar(number_string, current_char);
+             appendChar(string, current_char);
             //jinak error
             state = S_NUM_DOT_NUM;
         }
         else if ( (current_char == 'e') || (current_char = 'E')){
-             appendChar(number_string, current_char);
+             appendChar(string, current_char);
             //jinak error
             state = S_NUM_EX;
         }
@@ -453,7 +446,7 @@ Token * getToken(FILE* file)
     case S_NUM_EX: //0-9eE || 0-9.0-9Ee
         if (current_char == '+' || current_char == '-' || (isdigit(current_char)) != 0) {
             // dalsi znak je +,- nebo dalsi cislo
-            appendChar(number_string, current_char);
+            appendChar(string, current_char);
 
             state = S_NUM_EX_NUM;
         }
@@ -465,13 +458,13 @@ Token * getToken(FILE* file)
     case S_NUM_EX_NUM: //0-9eE+-0-9 || 0-9.0-9Ee+-0-9
         if (isdigit(current_char) != 0) {
             state = S_NUM_EX_NUM; // dokud budou nacitana cisla - cyklus
-            appendChar(number_string, current_char);
+            appendChar(string, current_char);
         }
         else {
             ungetc(current_char, file);
             ret->id = T_NUMBER_D;
             return ret;
-            destroyString(number_string);
+            destroyString(string);
         }
 
         break;

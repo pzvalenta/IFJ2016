@@ -23,28 +23,37 @@ String *newString(){
 	return ret;
 }
 
-void resizeString(String *string){
+String *resizeString(String *string){
 	int size = string->size;
 	int len = string->len;
-	realloc(string, 2*size*sizeof(char));
-	if (string == NULL){
-		char *new2 = (char *) malloc(2*size*sizeof(char)); //TODO je toto nunte?
-		if (new2 == NULL)
-			return NULL; //TODO handle error
-		else {
-			strcpy(new2, string->data);
-			destroyStringData(string); //TODO je toto nutne?
-			string->data = new2;
-			string->size = 2*size;
-			string->len = len;
-			return;
-		}
-	}
-	else {
+	char *new = realloc(string->data, 2*size*sizeof(char));
+	if (new == NULL) printf("ERROR\n");
+	// if (string == NULL){
+	// 	// char *new2 = (char *) malloc(2*size*sizeof(char)); //TODO je toto nunte?
+	// 	// if (new2 == NULL)
+	// 	// {
+	// 	// 	printf("ERROR\n");
+	// 	// 	return NULL; //TODO handle error
+	// 	// }
+	// 	// else {
+	// 	// 	strcpy(new2, string->data);
+	// 	// 	destroyStringData(string); //TODO je toto nutne?
+	// 	// 	string->data = new2;
+	// 	// 	string->size = 2*size;
+	// 	// 	string->len = len;
+	// 	// 	return;
+	// 	// }
+	// 	printf("ERROR\n");
+	// 	string->size = 2*size;
+	// 	string->len = len;
+	// 	return ret;
+	// }
+	// else {
+	string->data = new;
 		string->size = 2*size;
 		string->len = len;
-		return;
-	}
+		return string;
+	// }
 }
 
 void appendChar(String *str, char c){

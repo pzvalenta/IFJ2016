@@ -1,0 +1,53 @@
+class Main
+{
+  static void run()
+  {
+    int a;
+    ifj16.print("Zad");
+    a = ifj16.readInt();
+    int vysl;
+    if (a < 0) { 
+      ifj16.print("Fak!\n");
+  }
+    else {
+      vysl = 1;
+      while (a > 0) {
+      vysl = vysl * a;
+      a = a - 1;
+      }
+      ifj16.print("Vysledek je: " + vysl + "\n");
+    }
+    
+                boolean b1 = true;
+                boolean b2 = false;
+    
+    for(int var =0; var < 5 ; var++)
+{
+        ifj2016.print(“Var is : “ + var);
+ 
+        if(var == 3)
+                break;
+}        
+          String str1;
+          str1 = "Toto je nejaky text";
+         double d=10.10;
+             int k,l,m,n,p;
+             k=0; 
+             l=1; 
+             m=2; 
+             n=3; 
+             p=4; 
+   
+             k=k/l;
+          
+             if(m >= 3)
+                break; 
+            if(n <= 3)
+                break;  
+               if(p != 3)
+                continue; 
+                  
+            return a;
+    }
+    
+}
