@@ -56,10 +56,10 @@ String *string = NULL;
 
 const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
   "boolean"		,"break"	,"class",
-  "continue"	,"do"       ,"double",
-  "else"        ,"false"	,"for",
-  "if"		    ,"int"	    ,"return",
-  "String"	    ,"static"	,"true",
+  "continue"	,"do"     ,"double",
+  "else"      ,"false"	,"for",
+  "if"		    ,"int"	  ,"return",
+  "String"	  ,"static"	,"true",
   "void"	    ,"while",
 };
 
@@ -72,14 +72,14 @@ Token * getToken()
 {
 
 
-    Token *ret = newToken();
+    //Token *ret = newToken();
 
     int current_char; //aktualne nacitany znak
     int state = S_START; //pocatek automatu
 
 
-    (*ret).id = START;
-    (*ret).data.s = NULL;
+    //(*ret).id = START;
+    //(*ret).data.s = NULL;
 
     while (1){
 
@@ -101,61 +101,47 @@ Token * getToken()
         }
         else if (isdigit(current_char) != 0) { //pokud to je cislo
            string = newString();
-
-            state = S_NUM;
+           state = S_NUM;
         }
         else if (current_char == '+'){
-            ret->id = T_PLUS;
-            return ret;
+          return T_PLUS;
         }
         else if (current_char == '-'){
-            ret->id = T_MINUS;
-            return ret;
+          return T_MINUS;
         }
         else if (current_char == '*'){
-            ret->id = T_MUL;
-            return ret;
+          return T_MUL;
         }
         else if (current_char == '('){
-            ret->id = T_LBRACKET;
-            return ret;
+          return T_LBRACKET;
         }
         else if (current_char == ')'){
-            ret->id = T_RBRACKET;
-            return ret;
+          return T_RBRACKET;
         }
         else if (current_char == '{'){
             //printf("debug, {\n");
-            ret->id = T_LCBRACKET;
-            return ret;
+            return T_LCBRACKET;
         }
         else if (current_char == '}'){
-            ret->id = T_RCBRACKET;
-            return ret;
+            return T_RCBRACKET;
         }
         else if (current_char == '['){
-            ret->id = T_LSBRACKET;
-            return ret;
+            return T_LSBRACKET;
         }
         else if (current_char == ']'){
-            ret->id = T_RSBRACKET;
-            return ret;
+            return T_RSBRACKET;
         }
         else if (current_char == ';'){
-            ret->id = T_SEMICLN;
-            return ret;
+            return T_SEMICLN;
         }
         else if (current_char == ','){
-            ret->id = T_COMMA;
-            return ret;
+            return T_COMMA;
         }
         else if (current_char == '.'){
-            ret->id = T_DOT;
-            return ret;
+            return T_DOT;
         }
         else if (current_char == EOF){
-            ret->id = T_END;
-            return ret;
+            return T_END;
         }
 
 /*..............................................*/
@@ -181,7 +167,9 @@ Token * getToken()
             string = newString();
             state = S_STRING;
         }
+        return E_LEX;
         break;
+
 
 /*..............................................*/
 
@@ -190,43 +178,37 @@ Token * getToken()
 
     case S_GREATER:
         if (current_char == '='){
-            ret->id = T_GEQUAL; // >=
-            return ret;
+            return T_GEQUAL; // >=
         }
         else if (current_char == '\n'){
-            ret->id = T_GREAT; // >
-            //printf("DEBUG GREAT\n");
-            return ret;
+            return T_GREAT; // >
         }
         break;
+
     case S_LESS:
         if (current_char == '='){
-            ret->id = T_LEQUAL;
-            return ret; // <=
+            return T_LEQUAL; // <=
         }
         else if (current_char == '\n'){
-            ret->id = T_LESS;
-            return ret; // <
+            return T_LESS; // <
         }
         break;
+
     case S_EXCLAIM:
         if (current_char == '='){
-            ret->id = T_EXCLAIM;
-            return ret; // !=
+            return T_EXCLAIM; // !=
         }
         else if (current_char == '\n'){
-            goto Error_lex;     //pokud za vykricnikem nic neni
+            return E_LEX;     //pokud za vykricnikem nic neni
         }
         break;
 
     case S_EQUAL:
         if (current_char == '='){
-            ret->id = T_EQUAL;
-            return ret; // ==
+            return T_EQUAL; // ==
         }
         else if (isWhiteSpace(current_char)){
-           ret->id = T_ADD;
-            return ret;        // =
+            return T_ADD;        // =
         }
         break;
 
@@ -244,8 +226,7 @@ Token * getToken()
             state = S_BL_COMM;
         }
         else if (current_char == '\n'){ // pouze lomitko
-            ret->id = T_SLASH;
-            return ret;     // /
+            return T_SLASH;     // /
         }
         break;
 
@@ -263,7 +244,7 @@ Token * getToken()
             }
             else if (current_char == EOF){
                 // vypsat chybovou hlasku na stderr
-                goto Error_lex;
+                return E_LEX;
             }
 
 
@@ -277,15 +258,15 @@ Token * getToken()
 
     case S_IDENT: // identifikator nebo klicove slovo -> zacina znakem, podtrzitkem nebo dolarem
         if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_'){
+          // test, zda je to alfanumericky znak, dolar nebo podtrzitko - pak je to identifikator
            appendChar(string, current_char);
-            // ERROR
-            state = S_IDENT;
+           state = S_IDENT;
         }
         else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
                 (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
                 current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
                 current_char == '{'|| current_char == '}'|| current_char == '['|| current_char == ']' ){ //
-           // neni identifikator
+           // neni identifikator - testy na nepovolene znaky
             ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
 
                  for (int a = 0; a < KEYWORDS; a++){
@@ -293,13 +274,13 @@ Token * getToken()
                      if ((strcmp(string->data, klicova_slova[a])) == 0) /****JAK POZNAT TO, CO MAM NACTENO***/
                          { //je to klicove slovo
                            //printf("Comparing with %s\n", klicova_slova[a]);
-                         ret->id = T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
-                         destroyString(string);
-                         return ret;
-                
+                           destroyString(string);
+                           return T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
+
                          }
+                  return T_IDENT; // byl to identifikator
                  }
-        ret->id = T_IDENT;
+        //ret->id = T_IDENT;
 <<<<<<< HEAD
         SymTableNode *root = NULL;
         SymTableNode *node = newSymTableNode(ret, ident_string);
@@ -308,18 +289,17 @@ Token * getToken()
         SymTableNode *node = newSymTableNode(ret, string);
 >>>>>>> origin/master
         root = insertSymTableNode(root, node);
-        ret->data.s = (String *)node;
-        return ret;
+        //ret->data.s = (String *)node;
+
         }
         else {
-            goto Error_lex;
+            return E_LEX; // chyba
         }
         break;
 /*........................STRING......................*/
     case S_STRING: // "
             if (current_char == '"'){
-                ret->id = T_STRING;
-                return ret;
+                return T_STRING_L; // "string"
             }
             else if (current_char == '\\'){ /*   "..\    */
                 state = S_ESCAPE;
@@ -330,6 +310,7 @@ Token * getToken()
                 state = S_STRING; //dokud bude nacitat string, tak cykli
             }
 
+            // TODO return E_LEX; ???
             break;
 
 /*........................ESCAPE......................*/
@@ -360,7 +341,7 @@ Token * getToken()
 
         }
         else{
-            goto Error_lex;
+            return E_LEX;
         }
         break;
 
@@ -371,7 +352,7 @@ Token * getToken()
             state = S_ESCAPE_N2;
         }
         else {
-            goto Error_lex;
+            return E_LEX;
         }
         break;
 
@@ -382,7 +363,7 @@ Token * getToken()
             state = S_STRING;
         }
         else {
-            goto Error_lex;
+            return E_LEX;
         }
         break;
 /*.........................CISLO......................*/
@@ -405,8 +386,7 @@ Token * getToken()
 
         else {
             ungetc(current_char, file);
-            ret->id = T_NUMBER_I;
-            return ret;
+            return T_NUMBER_I;
 
         }
         break;
@@ -420,7 +400,7 @@ Token * getToken()
             state = S_NUM_DOT_NUM;
         }
         else {
-            //ERROR
+            return E_LEX;
         }
         break;
 
@@ -438,8 +418,7 @@ Token * getToken()
         }
         else {
           ungetc(current_char, file);
-          ret->id = T_NUMBER_D;
-            return ret;
+            return T_NUMBER_D;
         }
         break;
 
@@ -462,8 +441,7 @@ Token * getToken()
         }
         else {
             ungetc(current_char, file);
-            ret->id = T_NUMBER_D;
-            return ret;
+            return T_NUMBER_D;
             destroyString(string);
         }
 
@@ -477,21 +455,12 @@ Token * getToken()
 
 
 
-    } // konec while
-
-
-Error_lex: //chyba
+  } // konec while
 
 
 
 // vratit token, uvolnit posledni string
 
 
-
-
-
-
-
-
-return ret;
+// return ret;
 }

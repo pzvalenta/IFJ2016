@@ -24,12 +24,12 @@
 #include "ial.h"
 
 
-#define START       		255 // pocatecni nastaveni tokenu (id)
-#define E_OK                1
+#define START       		 255 // pocatecni nastaveni tokenu (id)
+#define E_OK             1
 
 #define T_IDENT          11
 
-
+//klicova slova
 #define T_KEY            20
 #define T_BOOL           21 //rozsireni
 #define T_BREAK          22
@@ -51,34 +51,34 @@
 
 
 
-#define T_NUMBER_I       41
-#define T_NUMBER_D       42
-#define T_STRING         43
+#define T_NUMBER_I       41 //celociselny literal
+#define T_NUMBER_D       42 //desetinny literal
+#define T_STRING_L       43 //retezcovy literal
 
 
 #define T_END            10
 
-#define T_ADD            51
-#define T_EQUAL          52
-#define T_PLUS           53
-#define T_GREAT          55
-#define T_GEQUAL         56
-#define T_MINUS          57
-#define T_LESS           59
-#define T_LEQUAL         60
-#define T_MUL            61
-#define T_EXCLAIM        64
-#define T_SLASH          65
+#define T_ADD            51 // =
+#define T_EQUAL          52 // ==
+#define T_PLUS           53 // +
+#define T_GREAT          55 // >
+#define T_GEQUAL         56 // >=
+#define T_MINUS          57 // -
+#define T_LESS           59 // <
+#define T_LEQUAL         60 // <=
+#define T_MUL            61 // *
+#define T_EXCLAIM        64 // !=
+#define T_SLASH          65 // /
 
-#define T_LBRACKET      81
-#define T_RBRACKET      82
-#define T_LCBRACKET     83
-#define T_RCBRACKET     84
-#define T_LSBRACKET     85
-#define T_RSBRACKET     86
-#define T_SEMICLN       87
-#define T_COMMA         88
-#define T_DOT           89
+#define T_LBRACKET      81 // (
+#define T_RBRACKET      82 // )
+#define T_LCBRACKET     83 // {
+#define T_RCBRACKET     84 // }
+#define T_LSBRACKET     85 // [
+#define T_RSBRACKET     86 // ]
+#define T_SEMICLN       87 // ;
+#define T_COMMA         88 // ,
+#define T_DOT           89 // .
 
 
 #define ERROR           128
