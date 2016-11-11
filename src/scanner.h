@@ -87,6 +87,6 @@
 #define E_SEM           132
 
 
-Token *getToken(FILE *file);
+int getToken();
 
 #endif // SCANNER

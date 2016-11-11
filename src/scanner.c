@@ -20,16 +20,16 @@
 #define KEYWORDS    17 // pocet klicovych slov
 //#define MAX_ESCAPE  377 // maximalni hodnota escape sekvence //TODO overflow error. musi to byt mensi jak 255
 
-<<<<<<< HEAD
+//<<<<<<< HEAD
 
-=======
+//=======
 SymTableNode *root = NULL;
 FILE* file;
 
 void set_file(FILE *source){
 file = source;
 }
->>>>>>> origin/master
+//>>>>>>> origin/master
 //SEZNAM STAVU:
 enum {
     S_START = 0,
@@ -68,7 +68,7 @@ int isWhiteSpace(char c){
   else return 0;
 }
 
-Token * getToken()
+int getToken()
 {
 
 
@@ -281,13 +281,13 @@ Token * getToken()
                   return T_IDENT; // byl to identifikator
                  }
         //ret->id = T_IDENT;
-<<<<<<< HEAD
+//<<<<<<< HEAD
         SymTableNode *root = NULL;
         SymTableNode *node = newSymTableNode(ret, ident_string);
-=======
+//=======
 
         SymTableNode *node = newSymTableNode(ret, string);
->>>>>>> origin/master
+//>>>>>>> origin/master
         root = insertSymTableNode(root, node);
         //ret->data.s = (String *)node;
 
