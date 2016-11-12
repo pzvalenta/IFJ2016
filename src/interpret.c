@@ -13,6 +13,9 @@
  */
 #include <stdio.h>
 #include "ilist.h"
+#include "str.h"
+
+int interpret(SymTableNode *root, tInstrList *instrList);
 
 int interpret(SymTableNode *root, tInstrList *instrList){
   list_first(instrList);    //aktivita na prvni polozku seznamu
