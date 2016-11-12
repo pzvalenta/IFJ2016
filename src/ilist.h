@@ -11,6 +11,24 @@
  *      Petr Jares
  *
  */
+
+ // typy instrukci
+ #define I_STOP     0     //stop
+ #define I_ADD      //1     //+
+ #define I_SUB      //2     //-
+ #define I_MUL      //3     //*
+ #define I_DIV      //4     //div
+ #define I_FIND     //5     //find
+ #define I_INC      6     //inkrementace
+ #define I_DEC      //7     //dekrementace
+ #define I_NOT      //8     //not
+ #define I_IFGOTO   9     //podmineny skok
+ #define I_GOTO     10    //skok
+ #define I_EQUAL    //11    //rovna se
+ #define I_NEQUAL   //12    //nerovna se
+ #define I_LABEL      13    //navesti
+
+
 typedef struct{
   int Inst_type;     //typ instrukce
   void *addr1;
