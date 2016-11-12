@@ -68,7 +68,7 @@ int isWhiteSpace(char c){
   else return 0;
 }
 
-int getToken()
+char getToken()
 {
 
 
