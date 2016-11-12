@@ -36,12 +36,48 @@ int interpret(SymTableNode *root, tInstrList *instrList){
         break;
 
       case I_INC:
+        //TODO
         break;
 
       case I_GOTO:
         list_goto(instrList, I->addr3);
         break;
+        
       case I_ADD:
+        //TODO
+        break;
+
+      case I_DEC:
+        //TODO
+        break;
+
+      case I_NOT:
+        //TODO
+        break;
+
+      case I_EQUAL:
+        //TODO
+        break;
+
+      case I_NEQUAL:
+        //TODO
+        break;
+
+      case I_SUB:
+        //TODO
+        break;
+
+      case I_MUL:
+        //TODO
+        break;
+
+      case I_DIV:
+        //TODO
+        break;
+
+      case I_FIND:
+        //TODO
+        break;
 
 
     }
