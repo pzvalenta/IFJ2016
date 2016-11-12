@@ -64,13 +64,18 @@ const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
 };
 
 int isWhiteSpace(char c){
+  /*
+  * test zda neni bily znak
+  */
   if(c == ' ' || c == '\t') return 1; //.......
   else return 0;
 }
 
 char getToken()
 {
-
+/*
+* hlavni funkce scanneru
+*/
 
     //Token *ret = newToken();
 
@@ -82,8 +87,10 @@ char getToken()
     //(*ret).data.s = NULL;
 
     while (1){
-
-        current_char = getc(file); // v nekonecnem cyklu nacitame znaky
+      /*
+      * v nekonecnem cyklu nacitame znaky
+      */
+        current_char = getc(file);
 
     switch(state){
     case S_START:
@@ -161,7 +168,7 @@ char getToken()
         }
         else if (current_char == '/'){
             state = S_SLASH;
-            //alokovat pamet (add char)
+            //TODO alokovat pamet (add char)
         }
         else if (current_char == '"'){
             string = newString();
@@ -246,10 +253,6 @@ char getToken()
                 // vypsat chybovou hlasku na stderr
                 return E_LEX;
             }
-
-
-
-
         }
         state = S_START;
         break;
@@ -430,7 +433,7 @@ char getToken()
             state = S_NUM_EX_NUM;
         }
         else {
-            //error
+            return E_LEX;
         }
         break;
 
@@ -453,14 +456,7 @@ char getToken()
 
     } // konec switch
 
-
-
   } // konec while
-
-
-
-// vratit token, uvolnit posledni string
-
 
 // return ret;
 }
