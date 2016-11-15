@@ -14,7 +14,7 @@ char isok(char token){
 char body(){
   char result;
   switch (token){
-    //BODY --> STATEMENT BODY // petr jares
+    //BODY --> STATEMENT BODY // petr j
     case T_IDENT:
     case T_RETURN:
     case T_IF:
