@@ -42,4 +42,6 @@ TableNode *searchT(TableNode *root, char *exp);
 char destroyTN (TableNode *node);
 char destroyT (TableNode *root);
 
+void printInorder(TableNode *node);
+
 #endif
