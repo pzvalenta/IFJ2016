@@ -1,6 +1,6 @@
 #include "ial.h"
 // Symbol Table implementation
-
+//TODO ERRORS
 
 TableNode *newTN(String *str, char token_id){
 	TableNode *ret = malloc(sizeof(TableNode));
@@ -10,7 +10,7 @@ TableNode *newTN(String *str, char token_id){
 	}
 
 	ret->name = str;
-	ret->id = token->id;
+	ret->id = token_id;
 	ret->state = 0;
 	ret->data = NULL;
 	ret->global = NULL;
@@ -41,7 +41,7 @@ TableNode *insertTN(TableNode *root, TableNode *node){
 
 
 void deleteTN(TableNode *root, TableNode *node){
-	if (root == NULL || node == NULL) return NULL; //TODO warning?
+	if (root == NULL || node == NULL) return;
 	int cmp = strcmp(node->name->data, root->name->data);
 	if (cmp > 0)
 		deleteTN(root->right, node);
@@ -72,7 +72,7 @@ void deleteTN(TableNode *root, TableNode *node){
 void replaceTN(TableNode *out, TableNode *in){
 	destroyString(out->data);
 	destroyString(out->name);
-	destroyT(node->localTable);
+	destroyT(out->localTable);
 //DONE pokud je localTable != NULL, destroy LT
 
 	out->name = in->name;
@@ -109,17 +109,22 @@ TableNode *searchT(TableNode *root, char *exp){
 }
 
 
-char destroyTN (TableNode *node){
+void destroyTN (TableNode *node){
+	if (node == NULL) return;
 	destroyString(node->data);
+
 	destroyString(node->name);
+
 	destroyT(node->localTable);
+
 
 
 	free(node);
 	node = NULL;
 }
 
-char destroyT (TableNode *root){
+void destroyT (TableNode *root){
+	if (root == NULL) return;
 	if (root->left != NULL)
 		destroyT(root->left);
 	if (root->right != NULL)
@@ -145,7 +150,7 @@ void printInorder(TableNode *node){
 // 	if (root == node) return NULL; //no parent, it is root
 // 	else if (root->left == node) return root;
 // 	else if (root->right == node) return root;
-// 
+//
 // 	int a = strcmp(node->name->data, root->name->data);
 // 	if (a > 0) return findParent(root->right, node);
 // 	else return findParent(root->left, node);
