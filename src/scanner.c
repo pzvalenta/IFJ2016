@@ -20,16 +20,21 @@
 #define KEYWORDS    17 // pocet klicovych slov
 //#define MAX_ESCAPE  377 // maximalni hodnota escape sekvence //TODO overflow error. musi to byt mensi jak 255
 
-//<<<<<<< HEAD
+
 
 //=======
-SymTableNode *root = NULL;
 FILE* file;
+String* string = NULL;
 
 void set_file(FILE *source){
 file = source;
 }
-//>>>>>>> origin/master
+
+void set_data(String *addr){
+  string = addr;
+}
+
+
 //SEZNAM STAVU:
 enum {
     S_START = 0,
@@ -51,7 +56,7 @@ enum {
     S_NUM_EX_NUM,
 };
 
-String *string = NULL;
+
 
 
 const char* klicova_slova [TABLE_SIZE] = { //tabulka klicovych slov
@@ -71,7 +76,7 @@ int isWhiteSpace(char c){
   else return 0;
 }
 
-char getToken()
+int getToken()
 {
 /*
 * hlavni funkce scanneru
@@ -92,6 +97,7 @@ char getToken()
       */
         current_char = getc(file);
 
+
     switch(state){
     case S_START:
         if (isspace(current_char) != 0)
@@ -102,12 +108,14 @@ char getToken()
         }
         else if ( (isalpha(current_char)) != 0 || current_char == '$' || current_char == '_'){
             //zacina znakem, dolarem nebo podtrzitkem
-           string = newString();
+           string = eraseString(string);
+           //TODO if NULL, handle error
            appendChar(string, current_char);
            state = S_IDENT;
         }
         else if (isdigit(current_char) != 0) { //pokud to je cislo
-           string = newString();
+           string = eraseString(string);
+           //TODO if NULL, handle error
            state = S_NUM;
         }
         else if (current_char == '+'){
@@ -168,13 +176,14 @@ char getToken()
         }
         else if (current_char == '/'){
             state = S_SLASH;
-            //TODO alokovat pamet (add char)
+
         }
         else if (current_char == '"'){
-            string = newString();
+            string = eraseString(string);
+            //TODO if NULL, handle error
             state = S_STRING;
         }
-        return E_LEX;
+        else return E_LEX;
         break;
 
 
@@ -277,22 +286,13 @@ char getToken()
                      if ((strcmp(string->data, klicova_slova[a])) == 0) /****JAK POZNAT TO, CO MAM NACTENO***/
                          { //je to klicove slovo
                            //printf("Comparing with %s\n", klicova_slova[a]);
-                           destroyString(string);
+                           //destroyString(string);
                            return T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
 
                          }
                   return T_IDENT; // byl to identifikator
                  }
-        //ret->id = T_IDENT;
-//<<<<<<< HEAD
-        SymTableNode *root = NULL;
-        SymTableNode *node = newSymTableNode(ret, ident_string);
-//=======
 
-        SymTableNode *node = newSymTableNode(ret, string);
-//>>>>>>> origin/master
-        root = insertSymTableNode(root, node);
-        //ret->data.s = (String *)node;
 
         }
         else {
@@ -445,7 +445,7 @@ char getToken()
         else {
             ungetc(current_char, file);
             return T_NUMBER_D;
-            destroyString(string);
+            //destroyString(string);
         }
 
         break;

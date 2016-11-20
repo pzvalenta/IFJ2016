@@ -2,24 +2,30 @@
 
 int main(void){
 
-  String *test = newString();
-  destroyString(test);
+
   printf("No  ID\n");
-  FILE *file = fopen("C:\\Users\\justr\\Documents\\GitHub\\IFJ2016\\testing\\input\\example1.java", "r");
+
+  FILE *file = fopen("/home/petr/Code/IFJ2016/testing/input/example10.java", "r");
+  set_file(file);
+
+  String *string = newString();
+  set_data(string);
+
   for(int i = 0; 1; i++){
-    Token *token = getToken(file);
-    if (token->id == 1) break;
-    if (token->id == T_IDENT){
-      SymTableNode * node = (SymTableNode *) token->data.s;
-      printf("identifikator: %s\n", node->name->data);
+    int token = getToken(file);
+    if (token == T_END) break;
+    if (token == T_IDENT){
+      printf("identifikator: %s\n", string->data);
     }
-    printf("%d  %d\n",i, token->id);
+    printf("%d  %d\n",i, token);
 
   }
 
 
   printf("Press ENTER key to Continue\n");
   getchar();
+
+  destroyString(string);
 
   return 0;
 }
