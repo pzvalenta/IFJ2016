@@ -334,10 +334,6 @@ int getToken()
              appendChar(string, current_char);
             state = S_STRING;
         }
-         else if (current_char == 't'){
-             appendChar(string, current_char);
-            state = S_STRING;
-        }
         else if (isdigit(current_char) < 4){ // je to cislo, mensi
 
             state = S_ESCAPE_N;
