@@ -8,61 +8,38 @@
 #include "str.h"
 #include "token.h"
 
-typedef struct SymTableNode SymTableNode;
+enum {
+	DEFINED = 1,
+	INITIALIZED
+}
 
-struct SymTableNode{
-	String *name; // identifikator a zaroven klic
-	char id; // na to nase id nam staci jeden byte
+//TODO zmenit state a global na flags
 
-	union{ // union zabira tolik mista v pameti jako jeho nejvetsi prvek, smi se pouzit jenom jeden
-		long i; // int
-		double f; // float
-		String * s; // string
-	} data;
+typedef struct tableNode TableNode;
 
-	SymTableNode *left;
-	SymTableNode *right;
-};
+struct TableNode{
+	String *name; // identifikator / klic
+	char id; //typ (funkce/char/string ...)
+	char state; // DEFINED / INITIALIZED
 
-typedef struct SymStackItem SymStackItem;
+	TableNode *global; // pokud je global != NULL, je v nem odkaz do global table, na prislusnou polozku
 
-struct SymStackItem{
-	SymTableNode *table;
-	SymStackItem *next;
-};
+	TableNode *localTable; // pokud je to funkce nebo class, je tu odkaz na lokalni tabulku
+	String *data; //data
 
+	//pokud je definovana lokalni promenna i pres to, ze uz je definovana globalni, vytvori se novy string
 
+	TableNode *left;
+  TableNode *right;
+}
 
-
-//////////////EXTERNAL FUNCTIONS//////////////
-SymTableNode *newSymTableNode(Token *token, String *str);
-
-SymTableNode *insertSymTableNode(SymTableNode *root, SymTableNode *node);
-
-void deleteSymTableNode(SymTableNode *root, SymTableNode *node);
-
-void replaceSymTableNode(SymTableNode *out, SymTableNode *in);
-
-void printInorder(SymTableNode *node);
-
-SymTableNode *findMaxNode(SymTableNode *root);
-
-SymTableNode *searchSymTable(SymTableNode *root, char *exp);
-
-SymStackItem *newSymStackItem();
-
-SymStackItem *pushSymStackItem(SymStackItem *item, SymStackItem *stack);
-
-SymStackItem *popSymStackItem(SymStackItem *stack);
-
-void destroySymStack(SymStackItem *stack);
-
-void destroySymStackItem(SymStackItem *item);
-
-//////////////INTERNAL FUNCTIONS//////////////
-void destroySymTableNode(SymTableNode *node);
-
-void destroySymTable(SymTableNode *root);
-
+TableNode *newTN(String *str);
+TableNode *insertTN(TableNode *root, TableNode *node);
+char deleteTN(TableNode *root, TableNode *node);
+char replaceTN(TableNode *out, TableNode *in);
+TableNode *findMaxTN(TableNode *root);
+TableNode *searchT(TableNode *root, char *exp);
+char destroyTN (TableNode *node);
+char destroyT (TableNode *root);
 
 #endif
