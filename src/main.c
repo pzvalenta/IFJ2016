@@ -2,6 +2,8 @@ int main(void){
   char result = E_OK;
 
   //TODO zpracovat vstupy + nastavit input streamu pro scanner
+  FILE *source = fopen(argv[1]);
+  set_file(source);
 
   //deklarace tabulek
   TableNode *CTRoot = NULL;

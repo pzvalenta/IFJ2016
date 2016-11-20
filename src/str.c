@@ -12,8 +12,8 @@ String *newString(){
 
 	ret->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
 	if (ret->data == NULL){
-		return NULL; //TODO handle error
 		destroyString(ret);
+		return NULL; //TODO handle error
 	}
 	else
 		ret->data[0]='\0';
@@ -66,26 +66,48 @@ void appendChar(String *str, char c){
 }
 
 void destroyStringData(String *string){
-	free(string->data);
-	string->data = NULL;
+	if (string->data != NULL){
+		free(string->data);
+		string->data = NULL;
+	}
+
 	string->len = -1;
 	string->size = -1;
 }
 
 void destroyString(String *string){
+	if (string == NULL) return;
 	destroyStringData(string);
 	free(string);
 	string = NULL;
 }
 
-String *copyString(String* old){
-	String *new = newString();
+String *eraseString(String *in){
+	destroyStringData(in);
 
-	if (old->size > BASE_STRING_SIZE)
-		realloc(new->data, old->size*sizeof(char)); //TODO handle error
+	in->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
+	if (in->data == NULL){
+		destroyString(ret);
+		return NULL; //TODO handle error
+	}
+	else
+		in->data[0]='\0';
 
-	new->size = old->size;
-	new->len = old->len;
-	strcpy(new->data, old->data);
-	return new;
+	in->size = BASE_STRING_SIZE;
+	in->len = 0;
+	return in;
 }
+
+
+//TODO navratova hodnota z realloc
+// String *copyString(String* old){
+// 	String *new = newString();
+//
+// 	if (old->size > BASE_STRING_SIZE)
+// 		new->data = realloc(new->data, old->size*sizeof(char)); //TODO handle error
+//
+// 	new->size = old->size;
+// 	new->len = old->len;
+// 	strcpy(new->data, old->data);
+// 	return new;
+// }
