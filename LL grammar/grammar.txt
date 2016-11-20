@@ -1,5 +1,7 @@
 PROGRAM --> BODY EOF
 
+//TODO class Main { static void run() {...} }
+
 BODY --> epsilon
 BODY --> STATEMENT BODY
 BODY --> METHOD BODY
@@ -11,7 +13,7 @@ CLASS_BODY --> epsilon
 CLASS_BODY --> STATEMENT_LIST CLASS_BODY
 CLASS_BODY --> METHOD CLASS_BODY
 
-METHOD --> TYPE id ( PARAM ) { STATEMENT_LIST }
+METHOD --> static TYPE id ( PARAM ) { STATEMENT_LIST } // fce jsou vždy static
 
 PARAM --> epsilon
 PARAM --> id PARAMETER
