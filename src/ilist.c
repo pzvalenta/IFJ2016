@@ -39,13 +39,19 @@ void list_free (tInstrList *L){
 
 }
 
-void list_insert_last (tInstrList *L, tInstr I){
+void list_insert_last (tInstrList *L, int i_type, void* adresa1, void* adresa2, void* adresa3){
   /*
   * vkladani nove instrukce na konec listu
   */
+  tInstr new_instruction;
+  new_instruction.Inst_type = i_type;
+  new_instruction.addr1 = adresa1;
+  new_instruction.addr2 = adresa2;
+  new_instruction.addr3 = adresa3;
+
   tList_item *new;
   new = malloc (sizeof(tList_item));
-  new->instruct = I;      //ulozeni novych dat
+  new->instruct = new_instruction;      //ulozeni novych dat
   new->next_item = NULL;  //next_item == new, tudiz ukazatel nikam ukazovat nemuze
   if (L->first == NULL){  //pokud je list prazdny == prvni vlozeni
     L->first = new;       //prvni prvek je new
