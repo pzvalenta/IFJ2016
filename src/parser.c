@@ -1,4 +1,5 @@
 //predpokladam zmenu vystupu scanneru na pouhe ID + data pres globalni promennou
+// TODO zapomnel jsem na - class Main { static void run() {...} }
 
 char token;
 
