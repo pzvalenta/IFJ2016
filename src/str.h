@@ -32,6 +32,9 @@ void appendChar(String *str, char c);
 //destroys string. frees all memory
 void destroyString(String *string);
 
+
+String *eraseString(String *in);
+
 ///////////////////////////////////////////////
 
 

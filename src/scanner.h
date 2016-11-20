@@ -87,6 +87,8 @@
 #define E_SEM           132
 
 
-char getToken();
+int getToken();
+void set_data(String *addr);
+void set_file(FILE *source);
 
 #endif // SCANNER

@@ -76,7 +76,7 @@ int isWhiteSpace(char c){
   else return 0;
 }
 
-char getToken()
+int getToken()
 {
 /*
 * hlavni funkce scanneru
@@ -97,6 +97,7 @@ char getToken()
       */
         current_char = getc(file);
 
+
     switch(state){
     case S_START:
         if (isspace(current_char) != 0)
@@ -107,13 +108,13 @@ char getToken()
         }
         else if ( (isalpha(current_char)) != 0 || current_char == '$' || current_char == '_'){
             //zacina znakem, dolarem nebo podtrzitkem
-           string = eraseString();
+           string = eraseString(string);
            //TODO if NULL, handle error
            appendChar(string, current_char);
            state = S_IDENT;
         }
         else if (isdigit(current_char) != 0) { //pokud to je cislo
-           string = eraseString();
+           string = eraseString(string);
            //TODO if NULL, handle error
            state = S_NUM;
         }
@@ -178,11 +179,11 @@ char getToken()
 
         }
         else if (current_char == '"'){
-            string = eraseString();
+            string = eraseString(string);
             //TODO if NULL, handle error
             state = S_STRING;
         }
-        return E_LEX;
+        else return E_LEX;
         break;
 
 
