@@ -87,7 +87,7 @@ String *eraseString(String *in){
 
 	in->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
 	if (in->data == NULL){
-		destroyString(ret);
+		destroyString(in);
 		return NULL; //TODO handle error
 	}
 	else
