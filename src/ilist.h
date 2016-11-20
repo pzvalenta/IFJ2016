@@ -13,27 +13,31 @@
  */
 
  // typy instrukci
- #define I_STOP     0     //stop
- #define I_ADD      1     //+
- #define I_SUB      2     //-
- #define I_MUL      3     //*
- #define I_DIV      4     //div
- #define I_FIND     5     //find
- #define I_INC      6     //inkrementace
- #define I_DEC      7     //dekrementace
- #define I_NOT      8     //not
- #define I_IFGOTO   9     //podmineny skok
- #define I_GOTO     10    //skok
- #define I_EQUAL    11    //rovna se
- #define I_NEQUAL   12    //nerovna se
- #define I_LABEL    13    //navesti
+ #define I_STOP         0     //stop
+ #define I_ADD_INT      1     //int + int
+ #define I_ADD_DOUBLE   2     //double + double
+ #define I_SUB_INT      3     //int - int
+ #define I_SUB_DOUBLE   4     //double - double
+ #define I_MUL_INT      5     //int * int
+ #define I_MUL_DOUBLE   6     //double * double
+ #define I_DIV_INT      7     //dividing integers
+ #define I_DIV_DOUBLE   8     //dividing doubles
+ #define I_FIND         9     //find
+ #define I_INC          10    //inkrementace
+ #define I_DEC          11    //dekrementace
+ #define I_NOT          12    //not
+ #define I_IFGOTO       13    //podmineny skok
+ #define I_GOTO         14    //skok
+ #define I_EQUAL        15    //rovna se
+ #define I_NEQUAL       16    //nerovna se
+ #define I_LABEL        17    //navesti
 
 
 typedef struct{
   int Inst_type;     //typ instrukce
-  void *addr1;
-  void *addr2;
-  void *addr3;
+  void *addr1;       //zdroj 1
+  void *addr2;       //zdroj 2
+  void *addr3;       //cil
 } tInstr;
 
 typedef struct list_item{
