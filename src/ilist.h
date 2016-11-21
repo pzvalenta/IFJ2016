@@ -31,13 +31,14 @@
  #define I_EQUAL        15    //rovna se
  #define I_NEQUAL       16    //nerovna se
  #define I_LABEL        17    //navesti
+ #define I_CAT          18    //konkatenace
 
 
 typedef struct{
   int Inst_type;     //typ instrukce
-  void *addr1;       //zdroj 1
-  void *addr2;       //zdroj 2
-  void *addr3;       //cil
+  void *addr1;       //operator 1
+  void *addr2;       //operator 2
+  void *addr3;       //vysledek
 } tInstr;
 
 typedef struct list_item{
@@ -56,7 +57,7 @@ typedef struct {
 
 void list_init (tInstrList *L);
 void list_free (tInstrList *L);
-void list_insert_last (tInstrList *L, tInstr I);
+int list_insert_last (tInstrList *L, tInstr I);
 void list_first (tInstrList *L);
 void list_next (tInstrList *L);
 void list_goto (tInstrList *L, void *goto_instr);
