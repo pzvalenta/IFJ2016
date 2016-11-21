@@ -39,6 +39,19 @@ int statement(){
       // TODO predat rizeni precedencni analyze
     break;
 
+    case T_RETURN:
+    break;
+
+    case T_IF:
+    break;
+
+    case T_WHILE:
+    break;
+
+
+    case default: return E_SYN;
+    break;
+
 
   }
 }
@@ -107,6 +120,7 @@ int class(){
       /// error check
       CurrentClass = newTN(data, token);
       if (CurrentClass == NULL) return E_INTERNAL;
+      CurrentMethod = NULL; // nejsme v zadne funkci
 
       // vlozi novou node do tabulky, data = jmeno, token = id
       CTRoot = insertTN(CTRoot, newNode);
