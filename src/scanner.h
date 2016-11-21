@@ -25,7 +25,6 @@
 
 
 #define START       		 255 // pocatecni nastaveni tokenu (id)
-#define E_OK             1
 
 #define T_IDENT          11
 
@@ -81,10 +80,6 @@
 #define T_DOT           89 // .
 
 
-#define ERROR           128
-#define E_LEX           130
-#define E_SYN           131
-#define E_SEM           132
 
 
 int getToken();
