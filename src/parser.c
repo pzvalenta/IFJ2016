@@ -13,10 +13,11 @@ String *data;  // globalni promenna, ve ktere budou ulozena data tokenu
 
 // vraci 0 kdyz je token ERROR
 char isok(char token){
-  if (token > 100)
+  if (token > 1 && token < 11)
     return 0;
   else
-    return 1;
+    if (token == 99) return 0;
+    else return 1;
 }
 
 //CLASS_BODY --> epsilon | STATEMENT_LIST CLASS_BODY | METHOD CLASS_BODY
