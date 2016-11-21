@@ -1,32 +1,93 @@
-//predpokladam zmenu vystupu scanneru na pouhe ID + data pres globalni promennou
-// TODO zapomnel jsem na - class Main { static void run() {...} }
 
 //TODO list:
 //TODO nahradit token = getToken() + error check nejakym onelinerem
-//TODO getToken(&data) by mel vracet char TOKEN_ID a pres odkaz data jako string(i v pripade integeru atd.)
-//TODO predelat scanner a parser, tak aby scanner nepouzival tabulku symbolu
-//TODO class Main { static void run() {...} }
-
+// if (!isok(token = getToken()))
+//TODO class Main { static void run() {...} }    --- check
+//TODO pridat vestavene funkce
 
 char token;    // globalni promena, do ktere se bude vkladat navratova hodnota z getToken
 String *data;  // globalni promenna, ve ktere budou ulozena data tokenu
+TableNode *CTRoot = NULL; //koren globalni tabulky trid
+TableNode *GTRoot = NULL; //koren globalni tabulky funkci a promennych
+
+TableNode *CurrentClass = NULL;
+TableNode *CurrentMethod = NULL;
+
 
 // vraci 0 kdyz je token ERROR
-char isok(char token){
-  if (token > 100)
+int isok(char token){
+  if (token > 1 && token < 11)
     return 0;
   else
-    return 1;
+    if (token == 99) return 0;
+    else return 1;
+}
+
+
+// STATEMENT --> epsilon     TODO
+// STATEMENT --> id = EXPRESSION ;  TODO
+// STATEMENT --> return EXPRESSION ; TODO
+// STATEMENT --> if ( EXPRESSION ) { STATEMENT_LIST } else { STATEMENT_LIST }  TODO
+// STATEMENT --> while ( EXPRESSION ) { STATEMENT_LIST }   TODO
+// STATEMENT --> id = id (PARAM) ;   TODO
+// STATEMENT --> id (PARAM) ;        TODO
+int statement(){
+  int result = E_OK;
+  switch (token) {
+    case T_IDENT: // co EXPRESSION --> id (PARAM)   TODO TODO TODO
+      // TODO nacist id, vyhledat v symtable
+      // TODO predat rizeni precedencni analyze
+    break;
+
+
+  }
+}
+
+//STATEMENT_LIST --> epsilon | STATEMENT STATEMENT_LIST
+int statement_list(){
+  int result = E_OK;
+  switch (token){
+    case STATEMENT:  //TODO
+      result = statement();
+      if (result != E_OK) return result;
+      return statement_list();
+    break;
+
+    case cokoliv cim nezacina statement: //TODO
+      return E_OK;
+    break;
+
+    case default:
+      return E_SYN;
+    break;
+  }
+}
+
+int method(){
+  //cast martinoveho kodu TODO
 }
 
 //CLASS_BODY --> epsilon | STATEMENT_LIST CLASS_BODY | METHOD CLASS_BODY
-char class_body(){
-  char result;
+int class_body(){
+  int result = E_OK;
   switch (token){
-    case STATEMENT:
+    case T_IDENT:  // CLASS_BODY --> STATEMENT_LIST
+    case T_RETURN:
+    case T_IF:
+    case T_WHILE:
+      result = statement_list();
+      if (result != E_OK) return result;
+      return class_body();
     break;
 
-    case METHOD:
+
+    case T_INT:  //CLASS_BODY --> METHOD
+    case T_STRING:
+    case T_VOID:
+    case T_STATIC:
+      result = method();
+      if (result != E_OK) return result;
+      return class_body();
     break;
 
     case T_RCBRACKET: //nactena }, konec class_body
@@ -38,56 +99,56 @@ char class_body(){
 }
 
 //CLASS --> class id { CLASS_BODY }
-char class(){
-  char result;
+int class(){
+  int result = E_OK;
   if (token != T_IDENT) return E_SYN;
   else {
-      /// vytvorit novou node v globalni tabulce symbolu
+      /// vytvorit novou node v globalni tabulce trid
       /// error check
+      CurrentClass = newTN(data, token);
+      if (CurrentClass == NULL) return E_INTERNAL;
+
+      // vlozi novou node do tabulky, data = jmeno, token = id
+      CTRoot = insertTN(CTRoot, newNode);
   }
 
   token = getToken();
   if (token != T_LCBRACKET) return E_SYN;
 
-  token = getToken(); // error check
+  token = getToken();
+  if (!isok(token)) return LEX_ERROR; // error check
+
   result = class_body();
   if (result != E_OK) return result;
 
-  // token nacteny class_body() by mel byt
+  // token nacteny v class_body() by mel byt
   if (token != T_RCBRACKET) return E_SYN;
 
+  token = getToken();
+  if (!isok(token)) return LEX_ERROR;
 
+  return result;
 }
 
-//BODY --> epsilon | STATEMENT BODY | METHOD BODY | CLASS BODY
-char body(){
-  char result;
+//BODY --> epsilon | CLASS BODY
+int body(){
+  int result = E_OK;
   switch (token){
-    //BODY --> STATEMENT BODY // petr j
-    case T_IDENT:
-    case T_RETURN:
-    case T_IF:
-    case T_WHILE:
-
-    break;
-
-    //BODY --> CLASS BODY // petr v
-    case T_CLASS:
+    case T_CLASS: //BODY --> CLASS
       token = getToken();
       if (!isok(token)) return LEX_ERROR;
+
       result = class();
-      if (result != E_OK)
-    break;
+      if (result != E_OK) return result;
 
-    //BODY --> METHOD BODY // martin
-    case T_INT:
-    case T_STRING:
-    case T_VOID:
-    case T_STATIC:
+      result = body()
 
     break;
 
-    //TODO BODY --> epsilon
+    case T_END: //BODY --> epsilon
+      //TODO check for main void run here!
+      return E_OK;
+    break;
 
     case default:
       result = SYNTAX_ERROR;
@@ -97,50 +158,26 @@ char body(){
 }
 
 //PROGRAM --> BODY EOF
-char program(){
-  char result;
+int program(){
+  int result = E_OK;
 
-  switch (token){
-    case T_IDENT:
-    case T_RETURN:
-    case T_IF:
-    case T_WHILE:
+  result = body();
+  if (result != E_OK) return result;
 
-    case T_CLASS:
+  if (token != T_END) return E_SYN;
 
-    case T_INT:
-    case T_STRING:
-    case T_VOID:
-    case T_STATIC:
-
-      result = body();       // BODY
-      if (result != E_OK) return result;
-
-
-      token = getToken();    //EOF
-      if (token != T_END) return E_SYN;
-
-      return E_OK;
-    break;
-
-    case default:
-      result = E_SYN;
-    break;
-  }
-    return result;
+  return result;
 }
 
 
-char parse(){
-  char result;
-  if ((data = newString()) == NULL) return E_ALL;
+int parse(){
+  int result = E_OK;
+  if ((data = newString()) == NULL) return E_INTERNAL;
   //malloc
-
-
 
   token = getToken();
   if (isok(token)) result = program();
 
-  //free
+  //free TODO
   return result;
 }

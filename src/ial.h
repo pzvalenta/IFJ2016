@@ -41,8 +41,9 @@ struct TableNode{
 
 	struct TableNode *localTable; // pokud je to funkce nebo class, je tu odkaz na lokalni tabulku
 	String *data; //data
-
 	//pokud je definovana lokalni promenna i pres to, ze uz je definovana globalni, vytvori se novy string
+
+	tListItem *funcStart; //ukazuje na prvni instrukci funkce
 
 	struct TableNode *left;
   struct TableNode *right;
@@ -51,7 +52,7 @@ typedef struct TableNode TableNode;
 
 
 
-TableNode *newTN(String *str, char token_id);
+TableNode *newTN(String *str, int token_id);
 TableNode *insertTN(TableNode *root, TableNode *node);
 void deleteTN(TableNode *root, TableNode *node);
 void replaceTN(TableNode *out, TableNode *in);
