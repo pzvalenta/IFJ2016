@@ -11,27 +11,32 @@
  *      Petr Jares
  *
  */
+ #include "main.h"
 
  // typy instrukci
  #define I_STOP         0     //stop
- #define I_ADD_INT      1     //int + int
- #define I_ADD_DOUBLE   2     //double + double
- #define I_SUB_INT      3     //int - int
- #define I_SUB_DOUBLE   4     //double - double
- #define I_MUL_INT      5     //int * int
- #define I_MUL_DOUBLE   6     //double * double
- #define I_DIV_INT      7     //dividing integers
- #define I_DIV_DOUBLE   8     //dividing doubles
- #define I_FIND         9     //find
- #define I_INC          10    //inkrementace
- #define I_DEC          11    //dekrementace
- #define I_NOT          12    //not
- #define I_IFGOTO       13    //podmineny skok
- #define I_GOTO         14    //skok
- #define I_EQUAL        15    //rovna se
- #define I_NEQUAL       16    //nerovna se
+
+ #define I_ADD          1     //scitani
+ #define I_SUB          2     //odcitani
+ #define I_MUL          3     //nasobeni
+ #define I_DIV          4     //deleni
+
+ #define I_GREAT        5     //vetsi nez >
+ #define I_LESS         6     //mensi nez <
+ #define I_GREQ         7     //vetsirovno >=
+ #define I_LESEQ        8     //mensirovno <=
+ #define I_EQUAL        9     //rovna se ==
+ #define I_NEQUAL       10    //nerovna se !=
+
+ // #define I_FIND         9     //find
+ // #define I_INC          10    //inkrementace
+ // #define I_DEC          11    //dekrementace
+ // #define I_NOT          12    //not
+ // #define I_IFGOTO       13    //podmineny skok
+ // #define I_GOTO         14    //skok
+
  #define I_LABEL        17    //navesti
- #define I_CAT          18    //konkatenace
+
 
 
 typedef struct{
