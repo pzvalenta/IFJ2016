@@ -7,6 +7,7 @@
 
 typedef struct _String{
 	int len;
+	int type;
 	int size;
 	char * data;
 } String;
