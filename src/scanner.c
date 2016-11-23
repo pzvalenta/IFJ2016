@@ -290,9 +290,9 @@ int getToken()
                            return T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
 
                          }
-                  return T_IDENT; // byl to identifikator
-                 }
 
+                 }
+                 return T_IDENT; // byl to identifikator
 
         }
         else {
