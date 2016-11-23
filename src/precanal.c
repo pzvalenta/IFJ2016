@@ -12,27 +12,9 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-///include s ostatnima
+#include "precanal.h"
 
 char token;
-
-typedef struct item{
-    char c;             //ID terminalu
-    ///string value  //pokud bude terminal identifikator, int, float, string prida se hodnota
-    bool terminal;      //pokud je terminal-> TRUE
-    bool handle;        //pokud je to handle -> TRUE
-    struct item *next;  //ukazatel na dalsi
-    struct item *prev;  //ukazatel na predchozi
-}tItem;
-
-typedef struct {
-    tItem *first;
-    tItem *last;
-    tItem *lastTerminal;
-}tList;
 
 ///////////////////////////////////////////////////////////
 ///prace se zasobnikem(dvousmerny linearni seznam)
@@ -74,7 +56,7 @@ void insert_terminal_last(tList *l, char c) //ok
     l->lastTerminal=tmp;
     }
 }
-
+/** handle slouzi jako vnoreni, co se bude jako prvni pocitat ve vyrazu*/
 void insert_handle(tList *l) //ok
 {
     if(l->last==l->lastTerminal)
@@ -103,7 +85,7 @@ void insert_handle(tList *l) //ok
     }
 }
 
-
+/** testovani zda je handle na zasobniku, musi byt vzdy pokud probehne redukce*/
 bool is_handle(tList *l) //ok
 {
     tItem *tmp=l->last;
@@ -119,7 +101,7 @@ bool is_handle(tList *l) //ok
     return false;
 }
 
-
+/**pokud ma byt ukoncovaci symbol prava zavorka, zkontroluje se jestli ma byt zakoncovaci, nebo jestli ma byt nejakou vnorenou casti vyrazu*/
 int bracket_balance(tList *l)
 {
     int i=0;
@@ -140,7 +122,7 @@ int bracket_balance(tList *l)
 
 ///////////////////////////////////////////////////
 ///redukce
-
+/**ukazatel na nejvnorenejsi handle, od neho dal se bude provadet redukce*/
 tItem * get_last_handle(tList *l)
 {
     tItem *tmp=l->last;
@@ -155,7 +137,7 @@ tItem * get_last_handle(tList *l)
     }
     return tmp;
 }
-
+/** hledani posledniho terminalu, aby bylo mozne zjistit jake pravidlo z prec. tabulky se ma pouzit*/
 void find_last_terminal(tList *l)
 {
     tItem *tmp=l->last;
@@ -167,7 +149,7 @@ void find_last_terminal(tList *l)
     //vzdy by melo najit aspon terminal $
 
 }
-
+/** vyjmuti operandu nebo operatoru pro posladni instrukce na spocitani vyrazu*/
 tItem * cut_item(tList *l)
 {
     tItem *tmp=get_last_handle(l);
@@ -179,7 +161,7 @@ tItem * cut_item(tList *l)
         // nemelo by nastat, po vkladani handle by mel byt dalsi prvek na zasobniku
     }
 
-    tItem *tmpReturn=tmp;
+    tItem *tmpReturn=tmp; //tmp se uvolni ze asobniku, tmpReturn se vrati dany operand/operator
     if(tmp==l->last)
     {
         l->last=l->last->prev;
@@ -202,7 +184,7 @@ tItem * cut_item(tList *l)
     }
 
 }
-
+/** samotne redukovani podvyrazu na jeden neterminal*/
 void reduce (tList *l)
 {
     ///prozatimni implementace bez pocitani hodnoty neterminalu, jenom testovani funkcnosti redukce
@@ -222,7 +204,7 @@ void reduce (tList *l)
 
 
 }
-
+/**kontrola semantiky (pokud je jeden z neterminalu string, muze se provest pouze + ->konkatenace)*/
 int sem_correct (tList *l)
 {
     tItem *tmp=get_last_handle(l);
@@ -241,7 +223,7 @@ int sem_correct (tList *l)
     }
     return 0;
 }
-
+/** syntakticka kontrola, zda je dany podvyraz vysledkem nejakeho pravidla*/
 int is_rule (tList*l)
 {
     tItem *tmp=get_last_handle(l);
@@ -264,13 +246,13 @@ int is_rule (tList*l)
         }
 
     }
-
+    /** pravidla maji za vysledek pouze 1 nebo 3 prvky*/
     if(tmp->next->next==NULL)
     {
         //existuje pravidlo s jednim operandem, nebo dvouma a jednim operatorem
         return 1;
     }
-
+    /** pripad uz zredukovaneho vyrazu v zavorkach*/
     if(tmp->c==T_LBRACKET && tmp->next->terminal==false && tmp->next->next->c==T_RBRACKET)
     {
         //neterminal v zavorce
@@ -304,10 +286,11 @@ int is_rule (tList*l)
 //////////////////////////////////////////////////////////
 ///prace s precedenci tabulkou
 
-
+/** indexy precedenci tabulky*/
 char index[14]={T_PLUS,T_MINUS,T_MUL,T_SLASH,T_LBRACKET,T_RBRACKET,
                 T_GREAT,T_LESS,T_GEQUAL,T_LEQUAL,T_EQUAL,T_EXCLAIM,T_IDENT,'$'}; //ok
 
+/** pravidla pro analyzu v tabulce*/
 char prec_table[14][14]={
     {'>','>','<','<','<','>','>','>','>','>','>','>','<','>'},
     {'>','>','<','<','<','>','>','>','>','>','>','>','<','>'},
@@ -325,7 +308,7 @@ char prec_table[14][14]={
     {'<','<','<','<','<',' ','<','<','<','<','<','<','<',' '},
 
 };
-
+/** zjisteni indexu daneho terminalu*/
 int get_index(char c) //ok
 {
     int i;
@@ -342,7 +325,7 @@ int get_index(char c) //ok
     //pokud nenalezne- ve vyrazu se vyskytl nepovoleny token- syntakticka chyba
 }
 
-
+/** zjisteni co je posledni terminal na zasobniku a co je na vstupu*/
 char rule(tList *l)
 {
     int i=get_index(l->lastTerminal->c);
@@ -358,15 +341,14 @@ int prec_anal(char until)
     tList *l;
     l=malloc(sizeof(tList));
     init_list(l);
-    insert_terminal_last(l,'$');
+    insert_terminal_last(l,'$'); //na spodek zasobniku se dava terminal $
 
-    print_list(l);
-    token=getToken();
+    token=getToken(); //nacte se prvni vstup
 
     char end=until;
-    while(token!=end || l->lastTerminal->c!='$')
+    while(token!=end || l->lastTerminal->c!='$') //dokud neni na vstupu zakoncujici znak a na zasobniku je pouze jede terminal $
     {
-        //
+        //kontrola posledniho znaku
         if(token==end)
             {
                 if(token==T_RBRACKET)
@@ -396,7 +378,7 @@ int prec_anal(char until)
             }
 
 
-
+        //jednotlive algoritmy pravidel u precedencni analyzy
         switch(rule(l))
         {
         case '=':
@@ -410,7 +392,7 @@ int prec_anal(char until)
             token=getToken();
             break;
 
-        case '>':
+        case '>':  //pokud je handle na zasobniku a existuje pravidlo ze ktereho je vysledek za handlem
             if(is_handle(l))
             {
                 if(is_rule(l)==0)
@@ -421,24 +403,24 @@ int prec_anal(char until)
                     }
                     else
                     {
-                        return E_SEM;
+                        return E_SEM;  //semanticka chyba, nepovolede operace s retezcem
                     }
 
                 }
-                else
+                else //spatne zapsany vyraz
                 {
                     return E_SYN;
                 }
 
             }
-            else
+            else //neni handle na zasobniku, zase spatne zapsany vyraz
             {
                 return E_SYN;
             }
 
             break;
 
-        default:
+        default: //pokud je pravidlo ' ' taky spatne zapsany vyraz
            return E_SYN;
         }
     }
