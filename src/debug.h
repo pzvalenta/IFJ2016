@@ -8,6 +8,8 @@
 #include "scanner.h"
 #include "main.h"
 
-void dprint(int token, String *data);
+struct tListItem;
+
+void dprint(struct tListItem *token);
 
 #endif

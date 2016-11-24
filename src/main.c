@@ -12,15 +12,59 @@
  *
  */
 
- #include "main.h"
+#include "main.h"
 
-int main(void){
-  char result = E_OK;
+int main(int argc, char **argv){
+  int result = E_OK;
 
-  if (argv)
-  //TODO zpracovat vstupy + nastavit input streamu pro scanner
-  FILE *source = fopen(argv[1]);
-  set_file(source);
+  if (argc == 2){
+    //TODO zpracovat vstupy + nastavit input streamu pro scanner
+    printf("opening: %s\n", argv[1]);
+    FILE *source = fopen(argv[1], "r");
+    //errorcheck TODO
+    set_file(source);
+    printf("opened: %p\n", source);
+  }
+  else ///REMOVE!!! TODO
+  {
+    FILE *source = fopen("/home/petr/Code/IFJ2016/testing/input/example1.java", "r");
+    set_file(source);
+  }
+
+
+  // zabalit do inicializace
+  struct tListItem *tokenListHead = malloc(sizeof(struct tListItem));
+  if(tokenListHead == NULL) return E_INTERNAL;
+  else {
+    tokenListHead->next = NULL;
+    tokenListHead->id = START;
+  }
+
+  set_token_list(tokenListHead);
+
+  result = loadTokens();
+  if(result != E_OK){
+    //TODO dealokace
+    printf("ERROR result = %d\n", result);
+    return result;
+  }
+
+  // //DEBUG TOKEN LIST PRINT
+  // printf("pointer na head %p\n", tokenListHead);
+  //
+  // while(tokenListHead != NULL){
+  //   dprint(tokenListHead);
+  //   tokenListHead = tokenListHead->next;
+  // }
+
+
+
+//testing //
+
+
+
+
+
 
   //deklarace tabulek
   TableNode *CTRoot = NULL;
@@ -29,14 +73,14 @@ int main(void){
   //TODO inicializace ilistu
 
   //volani parseru
-  result = parse(CTRoot, GTRoot)
+  result = parse(CTRoot, GTRoot, tokenListHead);
   //TODO errorcheck
 
   //TODO druhy pruchod?
 
 
   //volani interpretu   TODO odkaz na main v ilistu, jak?
-  result = interpret(ilist);
+  //result = interpret(ilist);
 
   //TODO errorcheck
 

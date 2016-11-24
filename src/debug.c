@@ -1,9 +1,13 @@
 #include "debug.h"
 
 
-void dprint(int token, String *data){
+void dprint(struct tListItem *token){
+
+  String *data = token->data;
+  int id = token->id;
+
   fprintf(stderr, "current token is: ");
-  switch (token) {
+  switch (id) {
     case START:
     fprintf(stderr, "WARNING! pocatecni hodnota tokenu");
     break;
@@ -191,7 +195,7 @@ void dprint(int token, String *data){
     break;
 
     default:
-      fprintf(stderr, "??? not recognized by debugger, token No.: %d", token);
+      fprintf(stderr, "??? not recognized by debugger, token No.: %d", id);
 
   }
 

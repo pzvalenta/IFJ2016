@@ -2,20 +2,21 @@
 // Symbol Table implementation
 //TODO ERRORS
 
-TableNode *newTN(String *str, int token_id){
+TableNode *newTN(struct tListItem *token){
+
 	TableNode *ret = malloc(sizeof(TableNode));
 	if (ret == NULL){
 		fprintf(stderr, "Not enough memory, can't alloc.\n");
 		return NULL;
 	}
 
-	ret->name = str;
-	ret->id = token_id;
+	ret->name = token->data;
+	ret->id = token->id;
 	ret->state = 0;
 	ret->data = NULL;
 	ret->global = NULL;
 	ret->localTable = NULL;
-	ret->funcStart = NULL;
+	//ret->funcStart = NULL;
 
 	ret->left = NULL;
 	ret->right = NULL;

@@ -33,9 +33,10 @@ pˇríkazové ˇrádky atd.).
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "ial.h"
+
 #include "scanner.h"
 #include "parser.h"
-#include "ial.h"
 //#include "ilist.h"
 
 #endif

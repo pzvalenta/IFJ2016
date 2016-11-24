@@ -15,11 +15,15 @@ String *newString(){
 		destroyString(ret);
 		return NULL; //TODO handle error
 	}
+
+
 	else
 		ret->data[0]='\0';
 
+
 	ret->size = BASE_STRING_SIZE;
 	ret->len = 0;
+
 	return ret;
 }
 
@@ -88,6 +92,7 @@ String *eraseString(String *in){
 	in->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
 	if (in->data == NULL){
 		destroyString(in);
+		fprintf(stderr ,"erase string malloc error\n");
 		return NULL; //TODO handle error
 	}
 	else

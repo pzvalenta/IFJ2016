@@ -25,15 +25,21 @@
 //=======
 FILE* file;
 String* string = NULL;
+struct tListItem *head = NULL;
+struct tListItem *tail = NULL;
+int tokenValue = E_LEX;
+
 
 void set_file(FILE *source){
-file = source;
+  file = source;
 }
 
-void set_data(String *addr){
-  string = addr;
-}
 
+
+
+void set_token_list(struct tListItem *list){
+  head = list;
+}
 
 //SEZNAM STAVU:
 enum {
@@ -76,6 +82,70 @@ int isWhiteSpace(char c){
   else return 0;
 }
 
+
+
+int insertLastToken(){
+  if (head->id == START){
+    head->id = tokenValue;
+    head->data = string;
+    head->next = NULL;
+    tail = head;
+  }
+  else{
+
+    // TODO optimalizace, nevkladat string pro tokeny krome identifikatoru a literalu
+    struct tListItem *tmp = malloc(sizeof(struct tListItem));
+    if (tmp == NULL) return E_INTERNAL;
+
+    tmp->next = NULL;
+    tmp->data = string;
+    tmp->id = tokenValue;
+    tail->next = tmp;
+    tail = tmp;
+  }
+
+  return E_OK;
+}
+
+int loadTokens(){
+  int result = E_OK;
+  do{
+    string = newString();
+    getToken();
+
+
+    if (result != E_OK){
+      destroyString(string);
+      return tokenValue;
+    }
+
+    result = insertLastToken();
+    if (result != E_OK){
+      destroyString(string);
+      return result;
+    }
+
+  } while(tokenValue != T_END);
+
+  return result;
+}
+
+int freeTokenList(){
+  int result = E_OK;
+  struct tListItem *tmp = head;
+  struct tListItem *next = NULL;
+
+  while(tmp != NULL){
+      free (tmp->data); //TODO errorcheck
+      next = tmp->next;
+      tmp = next;
+      free(tmp);
+  }
+
+  return result;
+}
+
+
 int getToken()
 {
 /*
@@ -96,7 +166,7 @@ int getToken()
       * v nekonecnem cyklu nacitame znaky
       */
         current_char = getc(file);
-
+        //printf("current_char: %c\n", current_char);
 
     switch(state){
     case S_START:
@@ -108,55 +178,68 @@ int getToken()
         }
         else if ( (isalpha(current_char)) != 0 || current_char == '$' || current_char == '_'){
             //zacina znakem, dolarem nebo podtrzitkem
-           string = eraseString(string);
+           //string = eraseString(string);
            //TODO if NULL, handle error
            appendChar(string, current_char);
            state = S_IDENT;
         }
         else if (isdigit(current_char) != 0) { //pokud to je cislo
-           string = eraseString(string);
+           //string = eraseString(string);
            //TODO if NULL, handle error
            state = S_NUM;
         }
         else if (current_char == '+'){
-          return T_PLUS;
+          tokenValue = T_PLUS;
+          return E_OK;
         }
         else if (current_char == '-'){
-          return T_MINUS;
+          tokenValue = T_MINUS;
+          return E_OK;
         }
         else if (current_char == '*'){
-          return T_MUL;
+          tokenValue = T_MUL;
+          return E_OK;
         }
         else if (current_char == '('){
-          return T_LBRACKET;
+          tokenValue = T_LBRACKET;
+          return E_OK;
         }
         else if (current_char == ')'){
-          return T_RBRACKET;
+          tokenValue = T_RBRACKET;
+          return E_OK;
         }
         else if (current_char == '{'){
             //printf("debug, {\n");
-            return T_LCBRACKET;
+            tokenValue = T_LCBRACKET;
+            return E_OK;
         }
         else if (current_char == '}'){
-            return T_RCBRACKET;
+            tokenValue = T_RCBRACKET;
+            return E_OK;
         }
         else if (current_char == '['){
-            return T_LSBRACKET;
+            tokenValue = T_LSBRACKET;
+            return E_OK;
         }
         else if (current_char == ']'){
-            return T_RSBRACKET;
+            tokenValue = T_RSBRACKET;
+            return E_OK;
         }
         else if (current_char == ';'){
-            return T_SEMICLN;
+            tokenValue = T_SEMICLN;
+            return E_OK;
         }
         else if (current_char == ','){
-            return T_COMMA;
+            tokenValue = T_COMMA;
+            return E_OK;
         }
         else if (current_char == '.'){
-            return T_DOT;
+            tokenValue = T_DOT;
+            return E_OK;
         }
         else if (current_char == EOF){
-            return T_END;
+            tokenValue = T_END;
+            return E_OK;
         }
 
 /*..............................................*/
@@ -179,7 +262,7 @@ int getToken()
 
         }
         else if (current_char == '"'){
-            string = eraseString(string);
+            //string = eraseString(string);
             //TODO if NULL, handle error
             state = S_STRING;
         }
@@ -194,37 +277,45 @@ int getToken()
 
     case S_GREATER:
         if (current_char == '='){
-            return T_GEQUAL; // >=
+            tokenValue = T_GEQUAL; // >=
+            return E_OK;
         }
         else if (current_char == '\n'){
-            return T_GREAT; // >
+            tokenValue = T_GREAT; // >
+            return E_OK;
         }
         break;
 
     case S_LESS:
         if (current_char == '='){
-            return T_LEQUAL; // <=
+            tokenValue = T_LEQUAL; // <=
+            return E_OK;
         }
         else if (current_char == '\n'){
-            return T_LESS; // <
+            tokenValue = T_LESS; // <
+            return E_OK;
         }
         break;
 
     case S_EXCLAIM:
         if (current_char == '='){
-            return T_EXCLAIM; // !=
+            tokenValue = T_EXCLAIM; // !=
+            return E_OK;
         }
         else if (current_char == '\n'){
-            return E_LEX;     //pokud za vykricnikem nic neni
+            tokenValue = E_LEX;     //pokud za vykricnikem nic neni
+            return E_OK;
         }
         break;
 
     case S_EQUAL:
         if (current_char == '='){
-            return T_EQUAL; // ==
+            tokenValue = T_EQUAL; // ==
+            return E_OK;
         }
         else if (isWhiteSpace(current_char)){
-            return T_ADD;        // =
+            tokenValue = T_ADD;        // =
+            return E_OK;
         }
         break;
 
@@ -242,7 +333,8 @@ int getToken()
             state = S_BL_COMM;
         }
         else if (current_char == '\n'){ // pouze lomitko
-            return T_SLASH;     // /
+            tokenValue = T_SLASH;     // /
+            return E_OK;
         }
         break;
 
@@ -273,6 +365,7 @@ int getToken()
           // test, zda je to alfanumericky znak, dolar nebo podtrzitko - pak je to identifikator
            appendChar(string, current_char);
            state = S_IDENT;
+           //printf("scanner, current state of indetificator = %s\n", string->data);
         }
         else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
                 (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
@@ -280,18 +373,20 @@ int getToken()
                 current_char == '{'|| current_char == '}'|| current_char == '['|| current_char == ']' ){ //
            // neni identifikator - testy na nepovolene znaky
             ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
-
+            //printf("DEBUG %s\n", string->data);
                  for (int a = 0; a < KEYWORDS; a++){
-                      //printf("DEBUG %s\n", string->data);
+                      //printf("Comparing with %s\n", klicova_slova[a]);
+
                      if ((strcmp(string->data, klicova_slova[a])) == 0) /****JAK POZNAT TO, CO MAM NACTENO***/
                          { //je to klicove slovo
-                           //printf("Comparing with %s\n", klicova_slova[a]);
                            //destroyString(string);
-                           return T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
-
+                           tokenValue = T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
+                           return E_OK;
                          }
-                  return T_IDENT; // byl to identifikator
                  }
+                 tokenValue = T_IDENT; // byl to identifikator
+                 return E_OK;
+
 
 
         }
@@ -302,7 +397,8 @@ int getToken()
 /*........................STRING......................*/
     case S_STRING: // "
             if (current_char == '"'){
-                return T_STRING_L; // "string"
+                tokenValue = T_STRING_L; // "string"
+                return E_OK;
             }
             else if (current_char == '\\'){ /*   "..\    */
                 state = S_ESCAPE;
@@ -385,7 +481,8 @@ int getToken()
 
         else {
             ungetc(current_char, file);
-            return T_NUMBER_I;
+            tokenValue = T_NUMBER_I;
+            return E_OK;
 
         }
         break;
@@ -417,7 +514,8 @@ int getToken()
         }
         else {
           ungetc(current_char, file);
-            return T_NUMBER_D;
+            tokenValue = T_NUMBER_D;
+            return E_OK;
         }
         break;
 
@@ -440,7 +538,8 @@ int getToken()
         }
         else {
             ungetc(current_char, file);
-            return T_NUMBER_D;
+            tokenValue = T_NUMBER_D;
+            return E_OK;
             //destroyString(string);
         }
 

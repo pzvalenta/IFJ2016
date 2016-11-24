@@ -22,6 +22,7 @@
 #include "str.h"
 #include "token.h"
 #include "ial.h"
+#include "main.h"
 
 
 #define START       		 255 // pocatecni nastaveni tokenu (id)
@@ -81,9 +82,17 @@
 
 
 
+struct tListItem {
+  int id;
+  String *data;
+  struct tListItem *next;
+};
+
 
 int getToken();
-void set_data(String *addr);
+int returnToken();
 void set_file(FILE *source);
+void set_token_list(struct tListItem *list);
+int loadTokens();
 
 #endif // SCANNER
