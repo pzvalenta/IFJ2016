@@ -47,6 +47,7 @@ enum {
     S_EQUAL,
     S_STRING,
     S_BL_COMM,  // /*..*/
+    S_LN_COMM,
     S_ESCAPE,
     S_ESCAPE_N,
     S_ESCAPE_N2,
@@ -231,26 +232,29 @@ int getToken()
 /*................KOMENTARE.................*/
 case S_SLASH: // /
     if (current_char == '/'){ // // - radkovy komentar
-        do{
-            if (current_char != '\n' || current_char != EOF){
-                //printf("KOMENT\n");
-                break;
-            }
-          current_char = getc(file);
-          //printf("KOMENT2\n");
-        }while (current_char != '\n' || current_char != EOF);
-
-        state = S_START;
-        //printf("KOMENT3\n");
-        break;
+      state = S_LN_COMM;
     }
     else if (current_char == '*'){  // /* - zacatek blokoveho komentare
         state = S_BL_COMM;
     }
     else if (current_char == '\n'){ // pouze lomitko
-        //printf("slash\n");
+        printf("slash\n");
         return T_SLASH;     // /
     }
+    break;
+
+case S_LN_COMM:
+    do{
+    //  printf("KOMENT\n");
+      if ( current_char == '\n' || current_char == EOF ){
+      //  printf("KOMENT1\n");
+        break;
+      }
+      //printf("KOMENT2\n");
+                current_char = getc(file);
+    }while(current_char != EOF && current_char != '\n');
+    //printf("KOMENT3\n");
+    state = S_START;
     break;
 
 
