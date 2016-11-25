@@ -54,7 +54,7 @@ void insert_terminal_last(tList *l, int c) //ok
     tmp=malloc(sizeof(tItem));
     if(c==T_IDENT || c==T_C_IDENT)
     {
-        tmp->c=//pridat z tabulky symbolu
+        tmp->c=T_NUMBER_I;//pridat z tabulky symbolu
     }
     else
     {
@@ -76,7 +76,7 @@ void insert_handle(tList *l) //ok
     {
         tItem *tmp;
         tmp=malloc(sizeof(tItem));
-        tmp->c=NULL;
+        tmp->c=-1; //TODO
         tmp->terminal=false;
         tmp->handle=true;
         tmp->next=NULL;
@@ -88,7 +88,7 @@ void insert_handle(tList *l) //ok
     {
         tItem *tmp;
         tmp=malloc(sizeof(tItem));
-        tmp->c=NULL;
+        tmp->c=-1; //TODO
         tmp->terminal=false;
         tmp->handle=true;
         tmp->next=l->lastTerminal->next;
@@ -235,7 +235,8 @@ void reduce (tList *l)
     if(s) tmp->c=T_STRING_L;
     else if(d) tmp->c=T_NUMBER_D;
         else if(in) tmp->c=T_NUMBER_I;
-            else tmp->c=NULL;
+            else tmp->c=-1; //TODO
+
 
   ///zamena handle na pozdeji vypocitany neterminal
 
@@ -327,7 +328,7 @@ int is_rule (tList*l)
 ///prace s precedenci tabulkou
 
 /** indexy precedenci tabulky*/
-int index[14]={T_PLUS,T_MINUS,T_MUL,T_SLASH,T_LBRACKET,T_RBRACKET,
+int t_index[14]={T_PLUS,T_MINUS,T_MUL,T_SLASH,T_LBRACKET,T_RBRACKET,
                 T_GREAT,T_LESS,T_GEQUAL,T_LEQUAL,T_EQUAL,T_EXCLAIM,T_IDENT,'$'}; //ok
 
 /** pravidla pro analyzu v tabulce*/
@@ -358,10 +359,11 @@ int get_index(int c) //ok
 
     for(i=0;i<14;i++)
     {
-        if(index[i]==c)
+        if(t_index[i]==c)
             return i;
     }
 
+    return -1;
     //pokud nenalezne- ve vyrazu se vyskytl nepovoleny token- syntakticka chyba
 }
 
@@ -387,7 +389,7 @@ int prec_anal(int until)
     init_list(l);
     insert_terminal_last(l,'$'); //na spodek zasobniku se dava terminal $
 
-    token=token->next; //nacte se prvni vstup
+    //token=token->next; //nacte se prvni vstup
     if(token->id==until) //expession nemuze byt prazdny
     {
         return E_SYN;
@@ -417,7 +419,7 @@ int prec_anal(int until)
             else
             {
                 //kontrola zda token muze byt ve vyrazu
-                if(token->id==T_C_IDENT ||token->id==T_IDENT || (token->id>=T_NUMBER_I && token->id<=T_NUMBER_D ) ||
+                if(token->id==T_C_IDENT ||token->id==T_IDENT || (token->id>=T_NUMBER_I && token->id<=T_STRING_L ) ||
                    (token->id>=T_EQUAL && token->id<=T_SLASH ) ||(token->id>=T_LBRACKET && token->id<=T_RBRACKET) ||token->id==36 ) //36 ascii $
                     {}
                 else

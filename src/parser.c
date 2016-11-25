@@ -5,15 +5,17 @@
 //TODO class Main { static void run() {...} }    --- check
 //TODO pridat vestavene funkce
 #include "parser.h"
+#include "precanal.h"
 
-struct tListItem *token;    // globalni promena, ukazatel na momentalni token v tokenlistu
-String *data;  // globalni promenna, ve ktere budou ulozena data tokenu
+struct tListItem *token = NULL;    // globalni promena, ukazatel na momentalni token v tokenlistu
 TableNode *CTRoot = NULL; //koren globalni tabulky trid
 TableNode *GTRoot = NULL; //koren globalni tabulky funkci a promennych
 
 TableNode *CurrentClass = NULL;
 TableNode *CurrentMethod = NULL;
 
+
+int ifjfind();
 int ifjprint();
 int assign_rule();
 int declaration_rule();
@@ -30,6 +32,21 @@ int class();
 int program();
 int body();
 int param();
+
+
+
+int ifjfind(){
+  printf("entering ifjfind()\n");
+  int result = E_OK;
+
+  //TODO placeholder
+  while (token->id != T_RBRACKET && token->id != T_END){
+    token = token->next;
+    dprint(token);
+  }
+
+  return result;
+}
 
 
 int ifjprint(){
@@ -56,11 +73,24 @@ int assign_rule(){
   token = token->next;  // id = EXPRESSION ;
   if (token->id != T_ADD) return E_SYN;
 
-  //TODO volani precedencni
-  // TODO // placeholder pro precedencni analyzu
-  while(token->id != T_SEMICLN && token->id != T_END){
+
+  if (strcmp("ifj16.print", token->data->data) == 0){
+    result = ifjprint();
     token = token->next;
+    return result;
   }
+  if (strcmp("ifj16.find", token->data->data) == 0){
+    result = ifjfind();
+    token = token->next;
+    return result;
+  }
+
+  //TODO volani precedencni
+  token = token->next;
+
+  result = prec_anal(T_SEMICLN);
+  if (result != E_OK) return result;
+
   dprint(token);
 
   token = token->next;
@@ -209,6 +239,12 @@ int void_func_call_rule(){
     token = token->next;
     return result;
   }
+  if (strcmp("ifj16.find", token->data->data) == 0){
+    result = ifjfind();
+    token = token->next;
+    return result;
+  }
+
 
 
   token = token->next;
