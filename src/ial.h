@@ -54,7 +54,6 @@ typedef struct TableNode TableNode;
 struct tListItem;
 
 
-
 TableNode *newTN(struct tListItem *token);
 TableNode *insertTN(TableNode *root, TableNode *node);
 void deleteTN(TableNode *root, TableNode *node);

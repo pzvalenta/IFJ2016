@@ -201,3 +201,57 @@ void dprint(struct tListItem *token){
 
   fprintf(stderr, "\n");
 }
+
+
+void eprint(int value){
+  switch (value) {
+    case E_OK:
+     fprintf(stderr, "ERROR %d: No Error", value);
+    break;
+
+    case E_LEX:
+      fprintf(stderr, "ERROR %d: Lexical Analysis Error", value);
+    break;
+
+    case E_SYN:
+      fprintf(stderr, "ERROR %d: Syntax Analysis Error", value);
+    break;
+
+    case E_DEF:
+      fprintf(stderr, "ERROR %d: No Definition/ReDefinition Error", value);
+    break;
+
+    case E_TYP:
+      fprintf(stderr, "ERROR %d: Type Error", value);
+    break;
+
+    case E_SEM:
+      fprintf(stderr, "ERROR %d: Other Semantical Error", value);
+    break;
+
+    case E_INPT:
+      fprintf(stderr, "ERROR %d: Input Error", value);
+    break;
+
+    case E_INIT:
+      fprintf(stderr, "ERROR %d: Not Initialized Error", value);
+    break;
+
+    case E_ZERO:
+      fprintf(stderr, "ERROR %d: Zero Division Error", value);
+    break;
+
+    case E_OTHR:
+      fprintf(stderr, "ERROR %d: Other Runtime Error", value);
+    break;
+
+    case E_INTERNAL:
+      fprintf(stderr, "ERROR %d: Internal Error", value);
+    break;
+
+    default: fprintf(stderr, "ERROR %d: Unrecognized Error Value", value);
+
+  }
+  fprintf(stderr, "\n");
+
+}

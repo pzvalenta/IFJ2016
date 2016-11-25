@@ -70,15 +70,15 @@
 #define T_EXCLAIM        64 // !=
 #define T_SLASH          65 // /
 
-#define T_LBRACKET      81 // (
-#define T_RBRACKET      82 // )
-#define T_LCBRACKET     83 // {
-#define T_RCBRACKET     84 // }
-#define T_LSBRACKET     85 // [
-#define T_RSBRACKET     86 // ]
-#define T_SEMICLN       87 // ;
-#define T_COMMA         88 // ,
-#define T_DOT           89 // .
+#define T_LBRACKET       81 // (
+#define T_RBRACKET       82 // )
+#define T_LCBRACKET      83 // {
+#define T_RCBRACKET      84 // }
+#define T_LSBRACKET      85 // [
+#define T_RSBRACKET      86 // ]
+#define T_SEMICLN        87 // ;
+#define T_COMMA          88 // ,
+#define T_DOT            89 // .
 
 
 

@@ -23,6 +23,7 @@ int class_body();
 int class();
 int program();
 int body();
+int param();
 
 // nemelo by to byt s novou formou tokenu potreba
 // // vraci 0 kdyz je token ERROR
@@ -36,13 +37,61 @@ int body();
 
 
 
+// PARAM --> epsilon
+// PARAM --> id PARAM
+// PARAM --> , id PARAM
+int param(){
+  printf("entering param()\n");
+  int result = E_OK;
 
+  if (token->id == T_RBRACKET) return result;  //epsilon
+
+
+  if (token->id != T_IDENT) return E_SYN;    // id
+  //TODO zpracovani
+
+  token = token->next;
+  if(token->id == T_COMMA){                  // ,
+    token = token->next;
+    return param();
+  }
+
+  if (token->id == T_LBRACKET) return E_OK;
+  else return E_SYN;
+}
+
+// MPARAM --> epsilon
+// MPARAM --> TYPE id MPARAM
+// MPARAM --> , TYPE id MPARAM
+int mparam(){
+  printf("entering mparam()\n");
+  int result = E_OK;
+
+  if (token->id == T_RBRACKET) return result;  //epsilon
+
+                                               // TYPE
+  if (token->id == T_INT || token->id == T_DOUBLE || token->id == T_STRING){
+    token = token->next;
+    if (token->id != T_IDENT) return E_SYN;    // id
+    //TODO zpracovani
+
+    token = token->next;
+    if(token->id == T_COMMA){                  // ,
+      token = token->next;
+      return mparam();
+    }
+    if (token->id == T_LBRACKET) return E_OK;
+    else return E_SYN;
+  }
+  else return E_SYN;
+}
 
 // STATEMENT --> while ( EXPRESSION ) { STATEMENT_LIST }
 int while_rule(){
   printf("entering while_rule()\n");
   int result = E_OK;
   //momentalni token je urcite while         // while
+  if (token->id != T_WHILE) return E_SYN;
 
   token = token->next;
   if(token->id != T_LBRACKET) return E_SYN;  // (
@@ -50,7 +99,10 @@ int while_rule(){
   token = token->next;
   // TODO precedencni analyza                // EXPRESSION
   // TODO // placeholder pro precedencni analyzu
-  while(token->id != T_RBRACKET && token->id != T_END) token = token->next;
+  while(token->id != T_RBRACKET && token->id != T_END){
+    token = token->next;
+    dprint(token);
+  }
 
   //nacteny token by mel byt )
   if(token->id != T_RBRACKET) return E_SYN;  // )
@@ -74,6 +126,7 @@ int if_rule(){
   printf("entering if_rule()\n");
   int result = E_OK;
   //momentalni token je urcite if            // if
+  if (token->id != T_IF) return E_SYN;
 
   token = token->next;
   if(token->id != T_LBRACKET) return E_SYN;  // (
@@ -81,8 +134,10 @@ int if_rule(){
   token = token->next;
   // TODO precedencni analyza                // EXPRESSION
   // TODO // placeholder pro precedencni analyzu
-  while(token->id != T_RBRACKET && token->id != T_END) token = token->next;
-
+  while(token->id != T_RBRACKET && token->id != T_END){
+    token = token->next;
+    dprint(token);
+  }
 
   //nacteny token by mel byt )
   if(token->id != T_RBRACKET) return E_SYN;  // )
@@ -168,7 +223,10 @@ int statement(){
       // // TODO predat rizeni precedencni analyze
 
       //placeholder
-      while(token->id != T_SEMICLN && token->id != T_END) token = token->next;
+      while(token->id != T_SEMICLN && token->id != T_END){
+        token = token->next;
+        dprint(token);
+      }
       return result;
     break;
 
@@ -177,7 +235,10 @@ int statement(){
     case T_RETURN:
       //result = return_rule();
       //placeholder
-      while(token->id != T_SEMICLN && token->id != T_END) token = token->next;
+      while(token->id != T_SEMICLN && token->id != T_END){
+        token = token->next;
+        dprint(token);
+      }
       return result;
     break;
 
@@ -196,7 +257,11 @@ int statement(){
     case T_STATIC:
       //result = static_rule();
       //placeholder
-      while(token->id != T_SEMICLN && token->id != T_END) token = token->next;
+
+      while(token->id != T_SEMICLN && token->id != T_END){
+        token = token->next;
+        dprint(token);
+      }
       return result;
     break;
 
@@ -207,12 +272,16 @@ int statement(){
     case T_STRING:
       //result = assing_rule();
       //placeholder
-      while(token->id != T_SEMICLN && token->id != T_END) token = token->next;
+      while(token->id != T_SEMICLN && token->id != T_END){
+        token = token->next;
+        dprint(token);
+      }
       return result;
     break;
 
     default:
-      return E_SYN;
+
+      return result;
 
   }
   return E_SYN;
@@ -223,7 +292,6 @@ int statement_list(){
   int result = E_OK;
   printf("entering statement_list()\n");
 
-  return result;
   switch (token->id){
     case T_INT:
     case T_DOUBLE:
@@ -238,7 +306,8 @@ int statement_list(){
       result = statement();
       if (result != E_OK) return result;
 
-      if (token->id != T_SEMICLN || token->id != T_RCBRACKET){ //TODO je to nutne?
+
+      if (token->id != T_SEMICLN && token->id != T_RCBRACKET){ //TODO je to nutne?
         return E_SYN;
       }
       else {
@@ -247,13 +316,8 @@ int statement_list(){
       }
     break;
 
-    case T_SEMICLN:
-    case T_RCBRACKET:
-      token = token->next;
-      return statement_list();
-    break;
-
     default:
+      printf("leaving statement_list()\n");
       return E_OK;
   }
 }
@@ -261,9 +325,43 @@ int statement_list(){
 //METHOD --> static TYPE id ( PARAM ) { STATEMENT_LIST } // fce jsou vždy static
 int method(){
   int result = E_OK;
-  //cast martinoveho kodu TODO
-  // TODO placeholder
-  while(token->id != T_RCBRACKET && token->id != T_END) token = token->next;
+  printf("entering method()\n");
+
+
+  //momentalni token je urcite static         // static
+  if (token->id != T_STATIC) return E_SYN;
+
+  token = token->next;
+  if (token->id != T_INT && token->id != T_DOUBLE && token->id != T_STRING && token->id != T_VOID)
+  return E_SYN;                               // TYPE
+
+  token = token->next;
+  if (token->id != T_IDENT) return E_SYN;     // id
+
+  // TODO newTN GTable
+
+  token = token->next;
+  if (token->id != T_LBRACKET) return E_SYN;  // (
+
+  token = token->next;
+  printf("going from method() to mparam()\n");
+  result = mparam();                           // PARAM
+  if (result != E_OK) return result;
+
+  //nacteny token z prec. analyzy by mel byt  // )
+  if (token->id != T_RBRACKET) return E_SYN;
+
+  token = token->next;
+  if (token->id != T_LCBRACKET) return E_SYN; // {
+
+  token = token->next;
+  printf("going from method() to statement_list()\n");
+  result = statement_list();                  // STATEMENT_LIST
+
+  // token nacteny statement listem by mel byt }
+  if (token->id != T_RCBRACKET) return E_SYN; // }
+
+
   return result;
 }
 
@@ -277,22 +375,31 @@ int class_body(){
     case T_RETURN:
     case T_IF:
     case T_WHILE:
+    case T_INT:
+    case T_STRING:
+    case T_DOUBLE:
       printf("going from class_body() to statement_list()\n");
       result = statement_list();
       if (result != E_OK) return result;
       return class_body();
     break;
 
-
-    case T_INT:  //CLASS_BODY --> METHOD
-    case T_STRING:
-    case T_VOID:
-    case T_STATIC:
-      printf("going from class_body() to method()\n");
-      result = method();
-      if (result != E_OK) return result;
-      return class_body();
+    case T_STATIC:  // METHOD / STATEMENT ?
+      if (token->next->next->next->id == T_LBRACKET){ //TODO errorcheck
+        printf("going from class_body() to method()\n");
+        result = method();
+        if (result != E_OK) return result;
+        return class_body();
+      }
+      else if (token->next->next->next->id == T_SEMICLN){
+        printf("going from class_body() to statement_list()\n");
+        result = statement_list();
+        if (result != E_OK) return result;
+        return class_body();
+      }
+      else return E_SYN;
     break;
+
 
     case T_RCBRACKET: //nactena }, konec class_body
       printf("leaving class_body()\n");

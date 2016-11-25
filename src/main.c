@@ -40,14 +40,18 @@ int main(int argc, char **argv){
     tokenListHead->id = START;
   }
 
-  set_token_list(tokenListHead);
 
+  fprintf(stderr, "############## Start Scanneru ##############\n");
+
+  set_token_list(tokenListHead);
   result = loadTokens();
   if(result != E_OK){
     //TODO dealokace
-    printf("ERROR result = %d\n", result);
     return result;
   }
+  fprintf(stderr, "############# Vysledek Scanneru ############\n");
+  eprint(result);
+
 
   // //DEBUG TOKEN LIST PRINT
   // printf("pointer na head %p\n", tokenListHead);
@@ -72,8 +76,12 @@ int main(int argc, char **argv){
 
   //TODO inicializace ilistu
 
+  fprintf(stderr, "############### Start Parseru ##############\n");
+
   //volani parseru
   result = parse(CTRoot, GTRoot, tokenListHead);
+  fprintf(stderr, "############# Vysledek Parseru #############\n");
+  eprint(result);
   //TODO errorcheck
 
   //TODO druhy pruchod?

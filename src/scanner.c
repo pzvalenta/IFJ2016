@@ -138,8 +138,8 @@ int freeTokenList(){
   while(tmp != NULL){
       free (tmp->data); //TODO errorcheck
       next = tmp->next;
-      tmp = next;
       free(tmp);
+      tmp = next;
   }
 
   return result;

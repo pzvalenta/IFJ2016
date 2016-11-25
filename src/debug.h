@@ -10,6 +10,7 @@
 
 struct tListItem;
 
+void eprint(int value);
 void dprint(struct tListItem *token);
 
 #endif
