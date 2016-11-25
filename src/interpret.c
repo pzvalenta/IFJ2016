@@ -15,15 +15,23 @@
 #include "ilist.h"
 #include "str.h"
 #include "ial.h"
+#include "interpret.h"
 
-int interpret(tInstrList *instrList);
 
 int interpret(tInstrList *instrList){
   list_first(instrList);    //aktivita na prvni polozku seznamu
   tInstr *I;      // instrukce I
+  int type = 0; //typ data
+  void* value1 = NULL; //hodnota dat
+  void* value2 = NULL;
+  void* value3 = NULL;
 
+//pamatovat si kde jsem byla predtim (ukazatel)
 
-//TODO Inicializace zasobniku??
+stack = Init_stack(); //Inicializace zasobniku
+if(stack == NULL){
+  //ERROR
+}
 
   while(instrList->act->instruct.Inst_type != I_STOP && instrList->act != NULL){
   //cyklus dokud typ instrukce neni ukoncovaci instrukce programu nebo
@@ -42,39 +50,57 @@ int interpret(tInstrList *instrList){
 
       case I_IFGOTO:
         //podmineny skok
-        //TODO if()
-        list_goto(instrList, I->addr3);
+        if(address1->data != 0){
+          list_goto(instrList, address2->data); //??? bude ukazatel address2->data
+        }
         break;
 
       case I_GOTO:
-        list_goto(instrList, I->addr3);
+        list_goto(instrList, I->addr3); //???
         break;
 /*................BINARNI OPERACE.................*/
       case I_ADD:
       //TODO test na incializaci
         if(address1->id == T_NUMBER_I && address2->id == T_NUMBER_I){ //oba operatory jsou int
           address3->id = T_NUMBER_I;
-          //uvolneni stringu (destroyStringData)
-          address3->data = (address1->data) + (address2->data); //scitani ulozeno do address3
+
+          //destroyStringData();
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          address3->data = value1 + value2; //scitani ulozeno do address3
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_D;
-          if(address1->id != T_NUMBER_D){
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          if(address1->data->type != T_NUMBER_D){ //address1->type ?
             //pretypovani
+            double val1 = (double *)value1;
+            address3->data = val1 + value2;
           }
-          if(address2->id != T_NUMBER_D){
+          if(address2->data->type != T_NUMBER_D){
             //pretypovani
+            double val = (double *)value2;
+            address3->data = value1 + val2;
           }
-          //uvolneni stringu (destroyStringData)
-          address3->data = (address1->data) + (address2->data); //scitani ulozeno do address3
+          else{
+            //uvolneni stringu (destroyStringData)
+            address3->data = value1 + value2; //scitani ulozeno do address3
+          }
+
         }
-        else if(address1->id == STRING || address2->id == STRING){ //alespon jeden operator je string
-          address3->id = STRING;
-          if(address1->id != STRING){
+        else if(address1->id == T_STRING_L || address2->id == T_STRING_L){ //alespon jeden operator je string
+          address3->id = T_STRING_L);
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          if(address1->id != T_STRING_L)){
             //pretypovani
+            char* val1 = (char*)value1;
+            address3->data = strcat();
           }
-          if(address2->id != STRING){
+          if(address2->id != T_STRING_L)){
             //pretypovani
+            char* val2 = (char*)value2;
           }
           //uvolneni stringu (destroyStringData)
           address3->data = strcat(mem, address2->data); //konkatenace ulozena do address3
@@ -89,42 +115,60 @@ int interpret(tInstrList *instrList){
       //TODO test na incializaci
         if(address1->id == T_NUMBER_I && address2->id == T_NUMBER_I){ //oba operatory jsou int
           address3->id = T_NUMBER_I;
-          //uvolneni stringu (destroyStringData)
-          address3->data = (address1->data) - (address2->data); //odcitani ulozeno do address3
+
+          //destroyStringData();
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          address3->data = value1 - value2; //odcitani ulozeno do address3
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_D;
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
           if(address1->id != T_NUMBER_D){
             //pretypovani
+            double val1 = (double *)value1;
+            address3->data = val1 - value2;
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
+            double val = (double *)value2;
+            address3->data = value1 - val2;
           }
           //uvolneni stringu (destroyStringData)
-          address3->data = (address1->data) - (address2->data); //odcitani ulozeno do address3
+          address3->data = value1 - value2; //odcitani ulozeno do address3
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
         }
         //chyba Inicializace??
         break;
+
       case I_MUL:
       //TODO test na incializaci
         if(address1->id == T_NUMBER_I && address2->id == T_NUMBER_I){ //oba operatory jsou int
           address3->id = T_NUMBER_I;
-          //uvolneni stringu (destroyStringData)
-          address3->data = (address1->data) * (address2->data); //nasobeni ulozeno do address3
+          //destroyStringData();
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          address3->data = value1 * value2; //nasobeni ulozeno do address3
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_D;
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
           if(address1->id != T_NUMBER_D){
             //pretypovani
+            double val1 = (double *)value1;
+            address3->data = val1 * value2;
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
+            double val = (double *)value2;
+            address3->data = value1 * val2;
           }
           //uvolneni stringu (destroyStringData)
-          address3->data = (address1->data) * (address2->data); //nasobeni ulozeno do address3
+          address3->data = value1 * value2; //nasobeni ulozeno do address3
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
@@ -136,19 +180,27 @@ int interpret(tInstrList *instrList){
       //TODO test na incializaci
         if(address1->id == T_NUMBER_I && address2->id == T_NUMBER_I){ //oba operatory jsou int
           address3->id = T_NUMBER_I;
-          //uvolneni stringu (destroyStringData)
-          address3->data = (address1->data) / (address2->data); //deleni ulozeno do address3
+          //destroyStringData();
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          address3->data = value1 / value2; //deleni ulozeno do address3
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_D;
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
           if(address1->id != T_NUMBER_D){
             //pretypovani
+            double val1 = (double *)value1;
+            address3->data = val1 / value2;
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
+            double val = (double *)value2;
+            address3->data = value1 / val2;
           }
           //uvolneni stringu (destroyStringData)
-          address3->data = (address1->data) / (address2->data); //deleni ulozeno do address3
+          address3->data = value1 / value2; //deleni ulozeno do address3
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
@@ -163,7 +215,9 @@ int interpret(tInstrList *instrList){
         if(address1->id == T_NUMBER_I && address2->id == T_NUMBER_I){ //oba operatory jsou int
           address3->id = T_NUMBER_I;
           //uvolneni stringu (destroyStringData)
-          if((address1->data) == (address2->data)){
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          if((value1) == (value2)){
             address3->data = 1;  // !0 TRUE
           }
           else{
@@ -172,19 +226,29 @@ int interpret(tInstrList *instrList){
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_I;
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
           if(address1->id != T_NUMBER_D){
             //pretypovani
+            double val1 = (double *)value1;
+            if((val1) == (value2)){
+              address3->data = 1;  // !0 TRUE
+            }
+            else{
+              address3->data = 0;  // 0 FALSE
+            }
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
+            double val2 = (double *)value2;
+            if((value1) == (val2)){
+              address3->data = 1;  // !0 TRUE
+            }
+            else{
+              address3->data = 0;  // 0 FALSE
+            }
           }
 
-          if((address1->data) == (address2->data)){
-            address3->data = 1;  // !0 TRUE
-          }
-          else{
-            address3->data = 0;  // 0 FALSE
-          }
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
@@ -194,44 +258,58 @@ int interpret(tInstrList *instrList){
 
       case I_NEQUAL:
       //TODO test na incializaci
-        if(address1->id == T_NUMBER_I && address2->id == T_NUMBER_I){ //oba operatory jsou int
-          address3->id = T_NUMBER_I;
-          //uvolneni stringu (destroyStringData)
-          if((address1->data) != (address2->data)){
-            address3->data = 1;  // !0 TRUE
-          }
-          else{
-            address3->data = 0;  // 0 FALSE
-          }
-        }
-        else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
-          address3->id = T_NUMBER_I;
-          if(address1->id != T_NUMBER_D){
-            //pretypovani
-          }
-          if(address2->id != T_NUMBER_D){
-            //pretypovani
-          }
-
-          if((address1->data) != (address2->data)){
-            address3->data = 1;  // !0 TRUE
-          }
-          else{
-            address3->data = 0;  // 0 FALSE
-          }
+      if(address1->id == T_NUMBER_I && address2->id == T_NUMBER_I){ //oba operatory jsou int
+        address3->id = T_NUMBER_I;
+        //uvolneni stringu (destroyStringData)
+        value1 = GetDataofString(address1->data);
+        value2 = GetDataofString(address2->data);
+        if((value1) != (value2)){
+          address3->data = 1;  // !0 TRUE
         }
         else{
-          return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
+          address3->data = 0;  // 0 FALSE
         }
-        //chyba Inicializace??
-        break;
+      }
+      else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
+        address3->id = T_NUMBER_I;
+        value1 = GetDataofString(address1->data);
+        value2 = GetDataofString(address2->data);
+        if(address1->id != T_NUMBER_D){
+          //pretypovani
+          double val1 = (double *)value1;
+          if((val1) != (value2)){
+            address3->data = 1;  // !0 TRUE
+          }
+          else{
+            address3->data = 0;  // 0 FALSE
+          }
+        }
+        if(address2->id != T_NUMBER_D){
+          //pretypovani
+          double val2 = (double *)value2;
+          if((value1) != (val2)){
+            address3->data = 1;  // !0 TRUE
+          }
+          else{
+            address3->data = 0;  // 0 FALSE
+          }
+        }
+
+      }
+      else{
+        return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
+      }
+      //chyba Inicializace??
+      break;
 
       case I_GREQ:
       //TODO test na incializaci
         if(address1->id == T_NUMBER_I && address2->id == T_NUMBER_I){ //oba operatory jsou int
           address3->id = T_NUMBER_I;
           //uvolneni stringu (destroyStringData)
-          if((address1->data) >= (address2->data)){
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          if((value1) >= (value2)){
             address3->data = 1;  // !0 TRUE
           }
           else{
@@ -240,19 +318,29 @@ int interpret(tInstrList *instrList){
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_I;
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
           if(address1->id != T_NUMBER_D){
             //pretypovani
+            double val1 = (double *)value1;
+            if((val1) >= (value2)){
+              address3->data = 1;  // !0 TRUE
+            }
+            else{
+              address3->data = 0;  // 0 FALSE
+            }
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
+            double val2 = (double *)value2;
+            if((value1) >= (val2)){
+              address3->data = 1;  // !0 TRUE
+            }
+            else{
+              address3->data = 0;  // 0 FALSE
+            }
           }
 
-          if((address1->data) >= (address2->data)){
-            address3->data = 1;  // !0 TRUE
-          }
-          else{
-            address3->data = 0;  // 0 FALSE
-          }
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
@@ -265,7 +353,9 @@ int interpret(tInstrList *instrList){
         if(address1->id == T_NUMBER_I && address2->id == T_NUMBER_I){ //oba operatory jsou int
           address3->id = T_NUMBER_I;
           //uvolneni stringu (destroyStringData)
-          if((address1->data) <= (address2->data)){
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          if((value1) <= (value2)){
             address3->data = 1;  // !0 TRUE
           }
           else{
@@ -274,19 +364,29 @@ int interpret(tInstrList *instrList){
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_I;
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
           if(address1->id != T_NUMBER_D){
             //pretypovani
+            double val1 = (double *)value1;
+            if((val1) <= (value2)){
+              address3->data = 1;  // !0 TRUE
+            }
+            else{
+              address3->data = 0;  // 0 FALSE
+            }
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
+            double val2 = (double *)value2;
+            if((value1) <= (val2)){
+              address3->data = 1;  // !0 TRUE
+            }
+            else{
+              address3->data = 0;  // 0 FALSE
+            }
           }
 
-          if((address1->data) <= (address2->data)){
-            address3->data = 1;  // !0 TRUE
-          }
-          else{
-            address3->data = 0;  // 0 FALSE
-          }
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
@@ -294,7 +394,26 @@ int interpret(tInstrList *instrList){
         //chyba Inicializace??
         break;
 
+      case I_PUSH:
+        if (address1->id == T_NUMBER_I){
+          void *value = GetDataofString();
+          type = T_NUMBER_I;
+        }
+        else if(address1->id == T_NUMBER_D){
+          value = GetDataofString();
+          type = T_NUMBER_D;
+        }
+        else if(address1->id == T_STRING_L){
+          value = GetDataofString();
+          type = T_STRING_L;
+        }
+        else{
+          //TODO ERROR
+        }
+        Push_stack(stack, value, type);
+        break;
 
+      case
 
     } //konec switch
 
@@ -302,6 +421,53 @@ int interpret(tInstrList *instrList){
     list_next(*instrList); //nacteni dalsi instrukce
   } // konec while
 
-// TODO uvolnit zasobnik
+  Free_stack(*stack); // uvolneni stacku
   return E_OK; //uspesne projiti
 } //konec funkce
+
+/*...............FUNKCE ZASOBNIKU..............*/
+
+//Inicializace zasobniku
+Stack Init_stack(){
+  Stack *stack = (Stack *) malloc(sizeof(Stack));
+  if(stack == NULL){
+    return NULL;
+  }
+  stack->data = (*St_data) malloc(BASE_STACK_SIZE*sizeof(St_data));
+  if (stack->data == NULL){
+    Free_stack(*stack);
+    return NULL; //TODO handle error
+  }
+  stack->size = BASE_STACK_SIZE;
+  stack->next = NULL;
+  return stack;
+}
+
+//push zasobniku, parametry:
+//nazev zasobniku
+//hodnota vkladanych dat
+//typ vkladanych dat
+void Push_stack(Stack stack, void *value, int type){
+  if(stack->size <= stack->topof){
+    ResizeStack(stack);
+  }
+  stack->data.val = value;
+  stack->data.type = type;
+  stack->top++;
+}
+
+//uvolneni zasobniku
+void Free_stack(Stack * stack){
+  free(stack->data);
+  free(stack);
+}
+
+//zvetsi velikost zasobniku
+void ResizeStack(Stack *stack){
+  stack->data = realloc(stack->data, 5* sizeof(St_data));
+  if(stack->data == NULL){
+    free(stack);
+    //TODO ERROR
+  }
+  stack->size = 5*(stack->size);
+}

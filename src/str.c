@@ -97,17 +97,36 @@ String *eraseString(String *in){
 	in->len = 0;
 	return in;
 }
+//vytazeni hodnot ze stringu (konverze typu)
+void *GetDataofString (String *str){
+	if(str->type == T_NUMBER_D){
+		double *dbl_num = malloc(sizeof(double));
+		sscanf(str->data, "%lf", &dbl_num);
+		return (void*) dbl_num;
+	}
+	if(str->type == T_NUMBER_I){
+		int *int_num = malloc(sizeof(int));;
+		sscanf(str->data, "%d", &int_num);
+		return (void*) int_num;
+	}
+	if(str->type == T_STRING_L){
+		String *str = newString(*str);
+		str = copyString(*str);
+		return str;
+	}
+}
 
 
 //TODO navratova hodnota z realloc
-// String *copyString(String* old){
-// 	String *new = newString();
-//
-// 	if (old->size > BASE_STRING_SIZE)
-// 		new->data = realloc(new->data, old->size*sizeof(char)); //TODO handle error
-//
-// 	new->size = old->size;
-// 	new->len = old->len;
-// 	strcpy(new->data, old->data);
-// 	return new;
-// }
+String *copyString(String* old){
+	String *new = newString();
+
+//		if (old->size > BASE_STRING_SIZE)
+// 			new->data = realloc(new->data, old->size*sizeof(char)); //TODO handle error
+
+ 	new->size = old->size;
+ 	new->len = old->len;
+	strcpy(new->data, old->data);
+	return new;
+	}
+}
