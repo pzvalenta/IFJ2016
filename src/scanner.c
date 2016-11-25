@@ -60,6 +60,7 @@ enum {
     S_NUM_DOT_NUM,
     S_NUM_EX,
     S_NUM_EX_NUM,
+    S_C_IDENT,
 };
 
 
@@ -321,22 +322,28 @@ int getToken()
 
 /*................KOMENTARE.................*/
     case S_SLASH: // /
-        if (current_char == '/'){ // // - radkovy komentar
-            do{
-                if (current_char != '\n' || current_char != EOF){
-                    break;
-                }
-              current_char = getc(file);
-            }while (current_char != '\n' || current_char != EOF);
-        }
-        else if (current_char == '*'){  // /* - zacatek blokoveho komentare
-            state = S_BL_COMM;
-        }
-        else if (current_char == '\n'){ // pouze lomitko
-            tokenValue = T_SLASH;     // /
-            return E_OK;
-        }
+      if (current_char == '/'){ // // - radkovy komentar
+        do{
+            if (current_char != '\n' || current_char != EOF){
+                //printf("KOMENT\n");
+                break;
+            }
+          current_char = getc(file);
+          //printf("KOMENT2\n");
+        }while (current_char != '\n' || current_char != EOF);
+
+        state = S_START;
+        //printf("KOMENT3\n");
         break;
+      }
+      else if (current_char == '*'){  // /* - zacatek blokoveho komentare
+        state = S_BL_COMM;
+      }
+      else if (current_char == '\n'){ // pouze lomitko
+        //printf("slash\n");
+        return T_SLASH;     // /
+      }
+      break;
 
 
     case S_BL_COMM: // /*
@@ -359,13 +366,36 @@ int getToken()
         break;
 
 /*...............IDENTIFIKATOR x KLICOVE SLOVO...............*/
+    case S_C_IDENT:
+      if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_' ){
+      // test, zda je to alfanumericky znak, dolar nebo podtrzitko - pak je to identifikator
+       appendChar(string, current_char);
+       state = S_C_IDENT;
+      }
+      else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
+               (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
+               current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
+               current_char == '{'|| current_char == '}'|| current_char == '['|| current_char == ']' ){ //
+          // neni identifikator - testy na nepovolene znaky
+          ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
+          tokenValue = T_C_IDENT; // byl to identifikator
+          return E_OK;
+      }
+      else {
+          return E_LEX; // chyba
+      }
+    break;
 
     case S_IDENT: // identifikator nebo klicove slovo -> zacina znakem, podtrzitkem nebo dolarem
-        if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_'){
+        if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_' ){
           // test, zda je to alfanumericky znak, dolar nebo podtrzitko - pak je to identifikator
            appendChar(string, current_char);
            state = S_IDENT;
            //printf("scanner, current state of indetificator = %s\n", string->data);
+        }
+        else if (current_char == '.' ){
+          appendChar(string, current_char);
+          state = S_C_IDENT;
         }
         else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
                 (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||

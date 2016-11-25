@@ -18,6 +18,13 @@ void dprint(struct tListItem *token){
 
     break;
 
+
+    case T_C_IDENT:
+    fprintf(stderr, "uplny identifikator: ");
+    fprintf(stderr, "%s", data->data);
+
+    break;
+
     case T_KEY:
     fprintf(stderr, "WARNING! pocatecni hodnota pro keyword");
     break;

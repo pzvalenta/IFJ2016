@@ -14,7 +14,13 @@ TableNode *GTRoot = NULL; //koren globalni tabulky funkci a promennych
 TableNode *CurrentClass = NULL;
 TableNode *CurrentMethod = NULL;
 
-
+int ifjprint();
+int assign_rule();
+int declaration_rule();
+int static_rule();
+int return_rule();
+int void_func_call_rule();
+int func_call_rule();
 int while_rule();
 int statement_list();
 int statement();
@@ -25,16 +31,203 @@ int program();
 int body();
 int param();
 
-// nemelo by to byt s novou formou tokenu potreba
-// // vraci 0 kdyz je token ERROR
-// int isok(char token){
-//   if (token > 1 && token < 11)
-//     return 0;
-//   else
-//     if (token == 99) return 0;
-//     else return 1;
-// }
 
+int ifjprint(){
+  printf("entering ifjprint()\n");
+  int result = E_OK;
+
+  //TODO placeholder
+  while (token->id != T_RBRACKET && token->id != T_END){
+    token = token->next;
+    dprint(token);
+  }
+
+  return result;
+}
+
+int assign_rule(){
+  printf("entering assign_rule()\n");
+  int result = E_OK;
+  dprint(token);
+
+  // momentalne je v tokenu id
+  //TODO vytvoreni polozky v symtable
+
+  token = token->next;  // id = EXPRESSION ;
+  if (token->id != T_ADD) return E_SYN;
+
+  //TODO volani precedencni
+  // TODO // placeholder pro precedencni analyzu
+  while(token->id != T_SEMICLN && token->id != T_END){
+    token = token->next;
+  }
+  dprint(token);
+
+  token = token->next;
+  dprint(token);
+  return result;
+}
+
+
+
+
+//STATEMENT --> static TYPE id ;
+//STATEMENT --> static TYPE id = EXPRESSION ;
+
+int static_rule(){
+  printf("entering static_rule()\n");
+  int result = E_OK;
+
+  // momentalne je v tokenu static
+  token = token->next;
+  if (token->id != T_STRING && token->id != T_INT && token->id != T_DOUBLE)
+  return E_SYN;
+
+  //ted je v tokenu type
+  //int type = token->id; TODO
+
+  token = token->next;
+  if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;
+  //TODO vytvoreni polozky v symtable GLOBALNI
+
+  token = token->next;
+  if (token->id == T_SEMICLN){
+    token = token->next;
+    return result;
+  }
+
+  //TYPE id = EXPRESSION ;
+
+  if (token->id != T_ADD) return E_SYN;
+
+  //TODO volani precedencni
+  // TODO // placeholder pro precedencni analyzu
+  while(token->id != T_SEMICLN && token->id != T_END){
+    token = token->next;
+    dprint(token);
+  }
+
+  token = token->next;
+  return result;
+}
+
+
+//STATEMENT --> TYPE id ;
+//STATEMENT --> TYPE id = EXPRESSION ;
+int declaration_rule(){
+  printf("entering declaration_rule()\n");
+  int result = E_OK;
+  dprint(token);
+
+  // momentalne je v tokenu type
+  //int type = token->id; TODO
+
+  token = token->next;
+  if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;
+  //TODO vytvoreni polozky v symtable
+
+  token = token->next;
+  if (token->id == T_SEMICLN){
+    token = token->next;
+    return result;
+  }
+
+  //TYPE id = EXPRESSION ;
+
+  if (token->id != T_ADD) return E_SYN;
+
+  //TODO volani precedencni
+  // TODO // placeholder pro precedencni analyzu
+  while(token->id != T_SEMICLN && token->id != T_END){
+    token = token->next;
+    dprint(token);
+  }
+
+  token = token->next;
+  return result;
+}
+
+int return_rule(){
+  printf("entering return_rule()\n");
+  int result = E_OK;
+  //momentalni token by mel byt return
+
+  token = token->next;
+  //TODO volani precedencni
+  // TODO // placeholder pro precedencni analyzu
+  while(token->id != T_SEMICLN && token->id != T_END){
+    token = token->next;
+    dprint(token);
+  }
+
+  token = token->next;
+  return result;
+}
+
+
+int func_call_rule(){
+  printf("entering func_call_rule()\n");
+  int result = E_OK;
+
+  //momentalni token je ID
+
+  //TODO zknotrolovat symtable
+
+  token = token->next;
+  if (token->id != T_ADD)return E_SYN;
+
+  token = token->next;
+  if (token->id != T_IDENT && token->id != T_C_IDENT )return E_SYN;
+  //TODO zknotrolovat symtable
+  //TODO vygenerovat volani fce
+
+  token = token->next;
+  result = param();  //generace parametru
+  if(result != E_OK) return result;
+  //token by mel byt )
+
+  token = token->next;
+  if (token->id != T_SEMICLN)return E_SYN;
+
+  token = token->next;
+  return result;
+}
+
+
+int void_func_call_rule(){
+  printf("entering void_func_call_rule()\n");
+  int result = E_OK;
+
+  //momentalni token je ID
+
+
+  if (token->id != T_IDENT && token->id != T_C_IDENT)return E_SYN;
+  //TODO zknotrolovat symtable
+  //TODO vygenerovat volani fce
+  if (strcmp("ifj16.print", token->data->data) == 0){
+    result = ifjprint();
+    token = token->next;
+    return result;
+  }
+
+
+  token = token->next;
+  if (token->id != T_LBRACKET)return E_SYN;
+
+
+  token = token->next;
+  result = param();  //generace parametru
+
+  if(result != E_OK) return result;
+  //token by mel byt )
+
+  token = token->next;
+  if (token->id != T_SEMICLN)return E_SYN;
+
+  dprint(token);
+  token = token->next;
+  return result;
+}
 
 
 // PARAM --> epsilon
@@ -47,7 +240,7 @@ int param(){
   if (token->id == T_RBRACKET) return result;  //epsilon
 
 
-  if (token->id != T_IDENT) return E_SYN;    // id
+  if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;    // id
   //TODO zpracovani
 
   token = token->next;
@@ -56,7 +249,8 @@ int param(){
     return param();
   }
 
-  if (token->id == T_LBRACKET) return E_OK;
+
+  if (token->id == T_RBRACKET) return E_OK;
   else return E_SYN;
 }
 
@@ -72,7 +266,7 @@ int mparam(){
                                                // TYPE
   if (token->id == T_INT || token->id == T_DOUBLE || token->id == T_STRING){
     token = token->next;
-    if (token->id != T_IDENT) return E_SYN;    // id
+    if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;    // id
     //TODO zpracovani
 
     token = token->next;
@@ -116,6 +310,7 @@ int while_rule(){
 
   //nacteny token by mel byt }
   if(token->id != T_RCBRACKET) return E_SYN; // }
+  token = token->next;
 
   return result;
 }
@@ -164,17 +359,19 @@ int if_rule(){
 
   //nacteny token by mel byt }
   if(token->id != T_RCBRACKET) return E_SYN; // }
+
+  token = token->next;
   return result;
 }
 
 
-// STATEMENT --> epsilon     TODO
-// STATEMENT --> id = EXPRESSION ;  TODO
-// STATEMENT --> return EXPRESSION ; TODO
-// STATEMENT --> if ( EXPRESSION ) { STATEMENT_LIST } else { STATEMENT_LIST }  TODO
-// STATEMENT --> while ( EXPRESSION ) { STATEMENT_LIST }   TODO
-// STATEMENT --> id = id (PARAM) ;   TODO
-// STATEMENT --> id (PARAM) ;        TODO
+// STATEMENT --> epsilon
+// STATEMENT --> id = EXPRESSION ;
+// STATEMENT --> return EXPRESSION ;
+// STATEMENT --> if ( EXPRESSION ) { STATEMENT_LIST } else { STATEMENT_LIST }
+// STATEMENT --> while ( EXPRESSION ) { STATEMENT_LIST }
+// STATEMENT --> id = id (PARAM) ;
+// STATEMENT --> id (PARAM) ;
 
 // STATEMENT --> static TYPE id ;
 // STATEMENT --> TYPE id ;
@@ -183,57 +380,35 @@ int statement(){
   printf("entering statement()\n");
   int result = E_OK;
   switch (token->id) {
-    // STATEMENT --> id = id (PARAM) ;   TODO
-    // STATEMENT --> id (PARAM) ;        TODO
-    // STATEMENT --> id = EXPRESSION ;  TODO
-    case T_IDENT: // co EXPRESSION --> id (PARAM)   TODO TODO TODO
+    // STATEMENT --> id = id (PARAM) ;
+    // STATEMENT --> id (PARAM) ;
+    // STATEMENT --> id = EXPRESSION ;
+    case T_IDENT: // co EXPRESSION --> id (PARAM)
+    case T_C_IDENT:
       // // TODO nacist id, vyhledat v symtable
       // // vlozit do symtable jestli tam neni
-      //
-      // token = getToken();
-      // if (!isok(token)) return E_LEX;
-      // dprint(token); //DEBUG
-      //
-      //
-      // switch (token) {
-      //   // STATEMENT --> id = EXPRESSION
-      //   // STATEMENT --> id = id(PARAM)
-      //   case T_ADD:
-      //     token = getToken();
-      //     if (!isok(token)) return E_LEX;
-      //     dprint(token); //DEBUG
-      //
-      //
-      //     switch (token) {
-      //       // STATEMENT --> id = id(PARAM)
-      //       case T_IDENT:
-      //       break;
-      //
-      //       //case : // EXPRESSION
-      //
-      //       default:
-      //         return E_SYN;
-      //     }
-      //   break;
-      //
-      //   default:
-      //     return E_SYN;
-      // }
-      //
-      // // TODO predat rizeni precedencni analyze
+      if (token->next->id == T_ADD){
+        if (token->next->next->id == T_IDENT && token->next->next->next->id == T_LBRACKET)
+        return func_call_rule(); // id = id (PARAM) ;
+        else // id = EXPRESSION ; TODO
+        return assign_rule();
 
-      //placeholder
-      while(token->id != T_SEMICLN && token->id != T_END){
-        token = token->next;
-        dprint(token);
+
       }
+      else if (token->next->id == T_LBRACKET){
+        //       id (PARAM) ;
+        result = void_func_call_rule();
+        token = token->next;
+        return result;
+      }
+
       return result;
     break;
 
 
     // STATEMENT --> return EXPRESSION ; TODO
     case T_RETURN:
-      //result = return_rule();
+      result = return_rule();
       //placeholder
       while(token->id != T_SEMICLN && token->id != T_END){
         token = token->next;
@@ -254,15 +429,8 @@ int statement(){
 
     // STATEMENT --> static TYPE id ;
     // STATEMENT --> static TYPE id = EXPRESSION;
-    case T_STATIC:
-      //result = static_rule();
-      //placeholder
-
-      while(token->id != T_SEMICLN && token->id != T_END){
-        token = token->next;
-        dprint(token);
-      }
-      return result;
+    case T_STATIC: // nejedna se o method, bylo to vylouceno v statement_list()
+      return static_rule();
     break;
 
     // STATEMENT --> TYPE id ;
@@ -270,17 +438,10 @@ int statement(){
     case T_INT:
     case T_DOUBLE:
     case T_STRING:
-      //result = assing_rule();
-      //placeholder
-      while(token->id != T_SEMICLN && token->id != T_END){
-        token = token->next;
-        dprint(token);
-      }
-      return result;
+      return declaration_rule();
     break;
 
     default:
-
       return result;
 
   }
@@ -296,25 +457,42 @@ int statement_list(){
     case T_INT:
     case T_DOUBLE:
     case T_STRING:
-    case T_STATIC:
     case T_WHILE:
     case T_IF:
     case T_RETURN:
     case T_IDENT:
+    case T_C_IDENT:
 
     // TODO check proti metodam
+      printf("going from statement_list() to statement()\n");
       result = statement();
+      dprint(token);
       if (result != E_OK) return result;
 
+      return statement_list();
+      // if (token->id != T_SEMICLN && token->id != T_RCBRACKET){ //TODO je to nutne?
+      //   return E_SYN;
+      // }
+      // else {
+      //   token = token-> next;
+      //   return statement_list();
+      // }
+    break;
 
-      if (token->id != T_SEMICLN && token->id != T_RCBRACKET){ //TODO je to nutne?
-        return E_SYN;
+    case T_STATIC:  // METHOD / STATEMENT ?
+      if (token->next->next->next->id == T_LBRACKET){ //TODO errorcheck
+        printf("leaving statement_list() - found method\n");
+        return E_OK;
       }
       else {
-        token = token-> next;
+        printf("going from statement_list() to statement()\n");
+        result = statement();
+        if (result != E_OK) return result;
         return statement_list();
       }
     break;
+
+
 
     default:
       printf("leaving statement_list()\n");
@@ -336,7 +514,7 @@ int method(){
   return E_SYN;                               // TYPE
 
   token = token->next;
-  if (token->id != T_IDENT) return E_SYN;     // id
+  if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;     // id
 
   // TODO newTN GTable
 
@@ -369,9 +547,11 @@ int method(){
 int class_body(){
   int result = E_OK;
   printf("entering class_body()\n");
+  dprint(token);
 
   switch (token->id){
     case T_IDENT:  // CLASS_BODY --> STATEMENT_LIST
+    case T_C_IDENT:
     case T_RETURN:
     case T_IF:
     case T_WHILE:
@@ -381,6 +561,7 @@ int class_body(){
       printf("going from class_body() to statement_list()\n");
       result = statement_list();
       if (result != E_OK) return result;
+
       return class_body();
     break;
 
@@ -391,13 +572,14 @@ int class_body(){
         if (result != E_OK) return result;
         return class_body();
       }
-      else if (token->next->next->next->id == T_SEMICLN){
-        printf("going from class_body() to statement_list()\n");
+      else {
+        printf("1going from class_body() to statement_list()\n");
         result = statement_list();
         if (result != E_OK) return result;
+
+        dprint(token);
         return class_body();
       }
-      else return E_SYN;
     break;
 
 
@@ -417,7 +599,7 @@ int class(){
   int result = E_OK;
   printf("entering class()\n");
 
-  if (token->id != T_IDENT) return E_SYN;
+  if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;
   else {
       /// vytvorit novou node v globalni tabulce trid
       /// error check
@@ -441,9 +623,9 @@ int class(){
   if (result != E_OK) return result;
 
   // token nacteny v class_body() by mel byt
+
   if (token->id != T_RCBRACKET) return E_SYN;
 
-  token = token->next;
   dprint(token); //DEBUG
   printf("leaving class()\n");
 
@@ -455,6 +637,8 @@ int body(){
   int result = E_OK;
   printf("entering body()\n");
 
+  dprint(token);
+
   switch (token->id){
     case T_CLASS: //BODY --> CLASS
       token = token->next;
@@ -464,6 +648,7 @@ int body(){
       result = class();
       if (result != E_OK) return result;
 
+      token = token->next;
       result = body();
     break;
 

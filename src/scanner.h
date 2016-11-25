@@ -28,6 +28,7 @@
 #define START       		 255 // pocatecni nastaveni tokenu (id)
 
 #define T_IDENT          11
+#define T_C_IDENT        12
 
 //klicova slova
 #define T_KEY            20
