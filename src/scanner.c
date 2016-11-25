@@ -229,22 +229,29 @@ int getToken()
         break;
 
 /*................KOMENTARE.................*/
-    case S_SLASH: // /
-        if (current_char == '/'){ // // - radkovy komentar
-            do{
-                if (current_char != '\n' || current_char != EOF){
-                    break;
-                }
-              current_char = getc(file);
-            }while (current_char != '\n' || current_char != EOF);
-        }
-        else if (current_char == '*'){  // /* - zacatek blokoveho komentare
-            state = S_BL_COMM;
-        }
-        else if (current_char == '\n'){ // pouze lomitko
-            return T_SLASH;     // /
-        }
+case S_SLASH: // /
+    if (current_char == '/'){ // // - radkovy komentar
+        do{
+            if (current_char != '\n' || current_char != EOF){
+                //printf("KOMENT\n");
+                break;
+            }
+          current_char = getc(file);
+          //printf("KOMENT2\n");
+        }while (current_char != '\n' || current_char != EOF);
+
+        state = S_START;
+        //printf("KOMENT3\n");
         break;
+    }
+    else if (current_char == '*'){  // /* - zacatek blokoveho komentare
+        state = S_BL_COMM;
+    }
+    else if (current_char == '\n'){ // pouze lomitko
+        //printf("slash\n");
+        return T_SLASH;     // /
+    }
+    break;
 
 
     case S_BL_COMM: // /*
