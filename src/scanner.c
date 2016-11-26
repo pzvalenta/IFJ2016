@@ -55,6 +55,7 @@ enum {
     S_NUM_DOT_NUM,
     S_NUM_EX,
     S_NUM_EX_NUM,
+    S_C_IDENT,
 };
 
 
@@ -230,35 +231,35 @@ int getToken()
         break;
 
 /*................KOMENTARE.................*/
-case S_SLASH: // /
-    if (current_char == '/'){ // // - radkovy komentar
-      state = S_LN_COMM;
-    }
-    else if (current_char == '*'){  // /* - zacatek blokoveho komentare
-        state = S_BL_COMM;
-    }
-    else if (current_char == '\n'){ // pouze lomitko
-        printf("slash\n");
-        return T_SLASH;     // /
-    }
-    break;
-
-case S_LN_COMM:
-    do{
-    //  printf("KOMENT\n");
-      if ( current_char == '\n' || current_char == EOF ){
-      //  printf("KOMENT1\n");
+    case S_SLASH: // /
+        if (current_char == '/'){
+          state = S_LN_COMM; // prejdi na stav radkoveho komentare
+        }
+        else if (current_char == '*'){  // /* - zacatek blokoveho komentare
+            state = S_BL_COMM;
+        }
+        else if (current_char == '\n'){ // pouze lomitko
+            printf("slash\n");
+            return T_SLASH;     // /
+        }
         break;
-      }
-      //printf("KOMENT2\n");
-                current_char = getc(file);
-    }while(current_char != EOF && current_char != '\n');
-    //printf("KOMENT3\n");
-    state = S_START;
-    break;
+
+    case S_LN_COMM: // // - radkovy komentar
+        do{
+        //  printf("KOMENT\n");
+          if ( current_char == '\n' || current_char == EOF ){
+          //  printf("KOMENT1\n");
+            break;
+          }
+          //printf("KOMENT2\n");
+                    current_char = getc(file);
+        }while(current_char != EOF && current_char != '\n');
+        //printf("KOMENT3\n");
+        state = S_START;
+        break;
 
 
-    case S_BL_COMM: // /*
+    case S_BL_COMM: // /* zacatek blokoveho komentare
         // kdyz je komentar, scanner ho ignoruje -> rozpoznat a jit na start
         while (1) {     //nekonecny cyklus nacitani dalsich znaku
         current_char = getc(file); //nacitani znaku
@@ -278,13 +279,37 @@ case S_LN_COMM:
         break;
 
 /*...............IDENTIFIKATOR x KLICOVE SLOVO...............*/
+    case S_C_IDENT:
+      if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_' ){
+      // test, zda je to alfanumericky znak, dolar nebo podtrzitko - pak je to identifikator
+       appendChar(string, current_char);
+       state = S_C_IDENT;
+      }
+      else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
+               (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
+              current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
+               current_char == '{'|| current_char == '}'|| current_char == '['|| current_char == ']' ){ //
+          // neni identifikator - testy na nepovolene znaky
+          ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
+          tokenValue = T_C_IDENT; // byl to identifikator
+          return E_OK;
+      }
+      else {
+          return E_LEX; // chyba
+      }
+    break;
 
     case S_IDENT: // identifikator nebo klicove slovo -> zacina znakem, podtrzitkem nebo dolarem
-        if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_'){
+        if ((isalnum(current_char)) != 0 || current_char == '$' || current_char == '_' ){
           // test, zda je to alfanumericky znak, dolar nebo podtrzitko - pak je to identifikator
            appendChar(string, current_char);
            state = S_IDENT;
         }
+        else if (current_char == '.' ){
+          appendChar(string, current_char);
+          state = S_C_IDENT;
+        }
+
         else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
                 (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
                 current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
