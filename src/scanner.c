@@ -85,7 +85,7 @@ int getToken()
 */
 
     //Token *ret = newToken();
-
+    int num;
     int current_char; //aktualne nacitany znak
     int state = S_START; //pocatek automatu
 
@@ -353,54 +353,62 @@ int getToken()
             break;
 
 /*........................ESCAPE......................*/
-    case S_ESCAPE:
-        if (current_char == 'n'){
-            appendChar(string, current_char);
-            state = S_STRING;
+case S_ESCAPE:
+    if (current_char == 'n'){
+        appendChar(string, '\n');
+        state = S_STRING;
+    }
+    else if (current_char == 't'){
+         appendChar(string, '\t');
+        state = S_STRING;
+    }
+     else if (current_char == '\\'){
+         appendChar(string, '\\');
+        state = S_STRING;
+    }
+     else if (current_char == '\"'){
+         appendChar(string, '\"');
+        state = S_STRING;
+    }
+    else if ((num = isdigit(current_char)) != 0){ // je to cislo, mensi
+    //  printf("%s\n", current_char);
+        if(current_char < '4'){
+          //printf("prosel1\n");
+          //appendChar(string, num);
+          printf("%d\n", num);
+          state = S_ESCAPE_N;
         }
-        else if (current_char == 't'){
-             appendChar(string, current_char);
-            state = S_STRING;
-        }
-         else if (current_char == '\\'){
-             appendChar(string, current_char);
-            state = S_STRING;
-        }
-         else if (current_char == '\"'){
-             appendChar(string, current_char);
-            state = S_STRING;
-        }
-        else if (isdigit(current_char) < 4){ // je to cislo, mensi
-
-            state = S_ESCAPE_N;
-
-        }
-        else{
-            return E_LEX;
-        }
-        break;
-
-
-    case S_ESCAPE_N:
-        if (isdigit(current_char) < 8){ // \0-30-7
-
-            state = S_ESCAPE_N2;
-        }
-        else {
-            return E_LEX;
-        }
-        break;
 
 
-    case S_ESCAPE_N2:
-        if (isdigit(current_char) < 8){ // \0-30-70-7
-            //
-            state = S_STRING;
-        }
-        else {
-            return E_LEX;
-        }
-        break;
+    }
+    else{
+      //printf("neprosel2\n");
+        return E_LEX;
+    }
+    break;
+
+
+case S_ESCAPE_N:
+    if ((current_char < '8') && (current_char >= '0')){ // \0-30-7
+      //printf("prosel2\n");
+        state = S_ESCAPE_N2;
+    }
+    else {
+        return E_LEX;
+    }
+    break;
+
+
+case S_ESCAPE_N2:
+    if ((current_char < '8') && (current_char >= '0')){ // \0-30-70-7
+        //
+        //printf("prosel3\n");
+        state = S_STRING;
+    }
+    else {
+        return E_LEX;
+    }
+    break;
 /*.........................CISLO......................*/
     case S_NUM: // cislo
         if (isdigit(current_char) != 0 ) {

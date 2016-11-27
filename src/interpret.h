@@ -34,6 +34,8 @@ typedef struct{
 
  void Push_stack(Stack stack, void *value, int type);
 
+ void Pop_stack(Stack stack, void ** value, int type);
+
  void Free_stack(Stack *stack);
 
  void ResizeStack(Stack *stack);

@@ -49,6 +49,7 @@
 
 
 
+
  // #define I_FIND         9     //find
  // #define I_INC          10    //inkrementace
  // #define I_DEC          11    //dekrementace

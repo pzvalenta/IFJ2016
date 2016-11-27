@@ -396,7 +396,7 @@ if(stack == NULL){
 
       case I_PUSH:
         if (address1->id == T_NUMBER_I){
-          void *value = GetDataofString();
+          value = GetDataofString();
           type = T_NUMBER_I;
         }
         else if(address1->id == T_NUMBER_D){
@@ -417,8 +417,10 @@ if(stack == NULL){
 
     } //konec switch
 
-    //TODO - podminka pro skok
-    list_next(*instrList); //nacteni dalsi instrukce
+    if (instrList->act->instruct.Inst_type == I_GOTO || instrList->act->instruct.Inst_type == I_IFGOTO){
+
+    }
+    else list_next(*instrList); //nacteni dalsi instrukce pokud to neni skok
   } // konec while
 
   Free_stack(*stack); // uvolneni stacku
@@ -451,9 +453,15 @@ void Push_stack(Stack stack, void *value, int type){
   if(stack->size <= stack->topof){
     ResizeStack(stack);
   }
-  stack->data.val = value;
-  stack->data.type = type;
-  stack->top++;
+  stack->data[stack->topof].val = value;
+  stack->data[stack->topof].type = type;
+  stack->topof++; // navyseni vrcholu zasobniku
+}
+
+void Pop_stack(Stack stack, void ** value, int type){
+  stack->topof--; // snizeni pocitadla vrcholu zasobniku
+  *value = stack->data[stack->topof].val;
+  *type  = stack->data[stack->topof].type;
 }
 
 //uvolneni zasobniku
