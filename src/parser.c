@@ -44,6 +44,8 @@ int ifjfind(){
     token = token->next;
     dprint(token);
   }
+  token = token->next;
+
 
   return result;
 }
@@ -58,6 +60,9 @@ int ifjprint(){
     token = token->next;
     dprint(token);
   }
+  token = token->next;
+  dprint(token);
+
 
   return result;
 }
@@ -72,7 +77,9 @@ int assign_rule(){
 
   token = token->next;  // id = EXPRESSION ;
   if (token->id != T_ADD) return E_SYN;
+  printf("DEBUG, pred strcmp, token->data->data = %s\n",token->data->data);
 
+  token = token->next;
 
   if (strcmp("ifj16.print", token->data->data) == 0){
     result = ifjprint();
@@ -80,13 +87,15 @@ int assign_rule(){
     return result;
   }
   if (strcmp("ifj16.find", token->data->data) == 0){
+    printf("DEBUG, found ifj16find\n");
     result = ifjfind();
     token = token->next;
+    printf("done with ifjfind\n");
+    dprint(token);
     return result;
   }
 
-  //TODO volani precedencni
-  token = token->next;
+
 
   result = prec_anal(T_SEMICLN);
   if (result != E_OK) return result;
@@ -94,6 +103,7 @@ int assign_rule(){
   dprint(token);
 
   token = token->next;
+  printf("done with assign rule\n");
   dprint(token);
   return result;
 }
@@ -237,11 +247,14 @@ int void_func_call_rule(){
   if (strcmp("ifj16.print", token->data->data) == 0){
     result = ifjprint();
     token = token->next;
+    printf("DEBUG\n");
+    dprint(token);
     return result;
   }
   if (strcmp("ifj16.find", token->data->data) == 0){
     result = ifjfind();
     token = token->next;
+    dprint(token);
     return result;
   }
 
@@ -434,7 +447,7 @@ int statement(){
       else if (token->next->id == T_LBRACKET){
         //       id (PARAM) ;
         result = void_func_call_rule();
-        token = token->next;
+        //token = token->next;
         return result;
       }
 
@@ -574,7 +587,7 @@ int method(){
 
   // token nacteny statement listem by mel byt }
   if (token->id != T_RCBRACKET) return E_SYN; // }
-
+  token = token->next;
 
   return result;
 }
