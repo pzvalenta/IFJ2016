@@ -25,21 +25,15 @@
 //=======
 FILE* file;
 String* string = NULL;
-struct tListItem *head = NULL;
-struct tListItem *tail = NULL;
-int tokenValue = E_LEX;
-
 
 void set_file(FILE *source){
-  file = source;
+file = source;
 }
 
-
-
-
-void set_token_list(struct tListItem *list){
-  head = list;
+void set_data(String *addr){
+  string = addr;
 }
+
 
 //SEZNAM STAVU:
 enum {
@@ -53,6 +47,7 @@ enum {
     S_EQUAL,
     S_STRING,
     S_BL_COMM,  // /*..*/
+    S_LN_COMM,
     S_ESCAPE,
     S_ESCAPE_N,
     S_ESCAPE_N2,
@@ -83,70 +78,6 @@ int isWhiteSpace(char c){
   else return 0;
 }
 
-
-
-int insertLastToken(){
-  if (head->id == START){
-    head->id = tokenValue;
-    head->data = string;
-    head->next = NULL;
-    tail = head;
-  }
-  else{
-
-    // TODO optimalizace, nevkladat string pro tokeny krome identifikatoru a literalu
-    struct tListItem *tmp = malloc(sizeof(struct tListItem));
-    if (tmp == NULL) return E_INTERNAL;
-
-    tmp->next = NULL;
-    tmp->data = string;
-    tmp->id = tokenValue;
-    tail->next = tmp;
-    tail = tmp;
-  }
-
-  return E_OK;
-}
-
-int loadTokens(){
-  int result = E_OK;
-  do{
-    string = newString();
-    getToken();
-
-
-    if (result != E_OK){
-      destroyString(string);
-      return tokenValue;
-    }
-
-    result = insertLastToken();
-    if (result != E_OK){
-      destroyString(string);
-      return result;
-    }
-
-  } while(tokenValue != T_END);
-
-  return result;
-}
-
-int freeTokenList(){
-  int result = E_OK;
-  struct tListItem *tmp = head;
-  struct tListItem *next = NULL;
-
-  while(tmp != NULL){
-      free (tmp->data); //TODO errorcheck
-      next = tmp->next;
-      free(tmp);
-      tmp = next;
-  }
-
-  return result;
-}
-
-
 int getToken()
 {
 /*
@@ -167,7 +98,7 @@ int getToken()
       * v nekonecnem cyklu nacitame znaky
       */
         current_char = getc(file);
-        //printf("current_char: %c\n", current_char);
+
 
     switch(state){
     case S_START:
@@ -179,68 +110,55 @@ int getToken()
         }
         else if ( (isalpha(current_char)) != 0 || current_char == '$' || current_char == '_'){
             //zacina znakem, dolarem nebo podtrzitkem
-           //string = eraseString(string);
+           string = eraseString(string);
            //TODO if NULL, handle error
            appendChar(string, current_char);
            state = S_IDENT;
         }
         else if (isdigit(current_char) != 0) { //pokud to je cislo
-           //string = eraseString(string);
+           string = eraseString(string);
            //TODO if NULL, handle error
            state = S_NUM;
         }
         else if (current_char == '+'){
-          tokenValue = T_PLUS;
-          return E_OK;
+          return T_PLUS;
         }
         else if (current_char == '-'){
-          tokenValue = T_MINUS;
-          return E_OK;
+          return T_MINUS;
         }
         else if (current_char == '*'){
-          tokenValue = T_MUL;
-          return E_OK;
+          return T_MUL;
         }
         else if (current_char == '('){
-          tokenValue = T_LBRACKET;
-          return E_OK;
+          return T_LBRACKET;
         }
         else if (current_char == ')'){
-          tokenValue = T_RBRACKET;
-          return E_OK;
+          return T_RBRACKET;
         }
         else if (current_char == '{'){
             //printf("debug, {\n");
-            tokenValue = T_LCBRACKET;
-            return E_OK;
+            return T_LCBRACKET;
         }
         else if (current_char == '}'){
-            tokenValue = T_RCBRACKET;
-            return E_OK;
+            return T_RCBRACKET;
         }
         else if (current_char == '['){
-            tokenValue = T_LSBRACKET;
-            return E_OK;
+            return T_LSBRACKET;
         }
         else if (current_char == ']'){
-            tokenValue = T_RSBRACKET;
-            return E_OK;
+            return T_RSBRACKET;
         }
         else if (current_char == ';'){
-            tokenValue = T_SEMICLN;
-            return E_OK;
+            return T_SEMICLN;
         }
         else if (current_char == ','){
-            tokenValue = T_COMMA;
-            return E_OK;
+            return T_COMMA;
         }
         else if (current_char == '.'){
-            tokenValue = T_DOT;
-            return E_OK;
+            return T_DOT;
         }
         else if (current_char == EOF){
-            tokenValue = T_END;
-            return E_OK;
+            return T_END;
         }
 
 /*..............................................*/
@@ -263,7 +181,7 @@ int getToken()
 
         }
         else if (current_char == '"'){
-            //string = eraseString(string);
+            string = eraseString(string);
             //TODO if NULL, handle error
             state = S_STRING;
         }
@@ -278,75 +196,70 @@ int getToken()
 
     case S_GREATER:
         if (current_char == '='){
-            tokenValue = T_GEQUAL; // >=
-            return E_OK;
+            return T_GEQUAL; // >=
         }
         else if (current_char == '\n'){
-            tokenValue = T_GREAT; // >
-            return E_OK;
+            return T_GREAT; // >
         }
         break;
 
     case S_LESS:
         if (current_char == '='){
-            tokenValue = T_LEQUAL; // <=
-            return E_OK;
+            return T_LEQUAL; // <=
         }
         else if (current_char == '\n'){
-            tokenValue = T_LESS; // <
-            return E_OK;
+            return T_LESS; // <
         }
         break;
 
     case S_EXCLAIM:
         if (current_char == '='){
-            tokenValue = T_EXCLAIM; // !=
-            return E_OK;
+            return T_EXCLAIM; // !=
         }
         else if (current_char == '\n'){
-            tokenValue = E_LEX;     //pokud za vykricnikem nic neni
-            return E_OK;
+            return E_LEX;     //pokud za vykricnikem nic neni
         }
         break;
 
     case S_EQUAL:
         if (current_char == '='){
-            tokenValue = T_EQUAL; // ==
-            return E_OK;
+            return T_EQUAL; // ==
         }
         else if (isWhiteSpace(current_char)){
-            tokenValue = T_ADD;        // =
-            return E_OK;
+            return T_ADD;        // =
         }
         break;
 
 /*................KOMENTARE.................*/
     case S_SLASH: // /
-      if (current_char == '/'){ // // - radkovy komentar
-        do{
-            if (current_char != '\n' || current_char != EOF){
-                //printf("KOMENT\n");
-                break;
-            }
-          current_char = getc(file);
-          //printf("KOMENT2\n");
-        }while (current_char != '\n' || current_char != EOF);
-
-        state = S_START;
-        //printf("KOMENT3\n");
+        if (current_char == '/'){
+          state = S_LN_COMM; // prejdi na stav radkoveho komentare
+        }
+        else if (current_char == '*'){  // /* - zacatek blokoveho komentare
+            state = S_BL_COMM;
+        }
+        else if (current_char == '\n'){ // pouze lomitko
+            printf("slash\n");
+            return T_SLASH;     // /
+        }
         break;
-      }
-      else if (current_char == '*'){  // /* - zacatek blokoveho komentare
-        state = S_BL_COMM;
-      }
-      else if (current_char == '\n'){ // pouze lomitko
-        //printf("slash\n");
-        return T_SLASH;     // /
-      }
-      break;
+
+    case S_LN_COMM: // // - radkovy komentar
+        do{
+        //  printf("KOMENT\n");
+          if ( current_char == '\n' || current_char == EOF ){
+          //  printf("KOMENT1\n");
+            break;
+          }
+          //printf("KOMENT2\n");
+                    current_char = getc(file);
+        }while(current_char != EOF && current_char != '\n');
+        //printf("KOMENT3\n");
+        state = S_START;
+        break;
 
 
-    case S_BL_COMM: // /*
+    case S_BL_COMM: // /* zacatek blokoveho komentare
         // kdyz je komentar, scanner ho ignoruje -> rozpoznat a jit na start
         while (1) {     //nekonecny cyklus nacitani dalsich znaku
         current_char = getc(file); //nacitani znaku
@@ -374,7 +287,7 @@ int getToken()
       }
       else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
                (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
-               current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
+              current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
                current_char == '{'|| current_char == '}'|| current_char == '['|| current_char == ']' ){ //
           // neni identifikator - testy na nepovolene znaky
           ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
@@ -391,33 +304,31 @@ int getToken()
           // test, zda je to alfanumericky znak, dolar nebo podtrzitko - pak je to identifikator
            appendChar(string, current_char);
            state = S_IDENT;
-           //printf("scanner, current state of indetificator = %s\n", string->data);
         }
         else if (current_char == '.' ){
           appendChar(string, current_char);
           state = S_C_IDENT;
         }
+
         else if( current_char == ';' || current_char == '.' || current_char == '/' || current_char == '+' || current_char == '-' ||
                 (isspace(current_char) != 0) || current_char == '*' || current_char == '<'|| current_char == '>' ||
                 current_char == ',' || current_char == '('|| current_char == ')' || current_char == '^' || current_char == '='|| current_char == '~' ||
                 current_char == '{'|| current_char == '}'|| current_char == '['|| current_char == ']' ){ //
            // neni identifikator - testy na nepovolene znaky
             ungetc(current_char, file); // vrati posledni znak zpet do souboru, takze dalsi funkce jej precte znovu
-            //printf("DEBUG %s\n", string->data);
-                 for (int a = 0; a < KEYWORDS; a++){
-                      //printf("Comparing with %s\n", klicova_slova[a]);
 
+                 for (int a = 0; a < KEYWORDS; a++){
+                      //printf("DEBUG %s\n", string->data);
                      if ((strcmp(string->data, klicova_slova[a])) == 0) /****JAK POZNAT TO, CO MAM NACTENO***/
                          { //je to klicove slovo
+                           //printf("Comparing with %s\n", klicova_slova[a]);
                            //destroyString(string);
-                           tokenValue = T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
-                           return E_OK;
+                           return T_KEY + a + 1; //vrati presny odkaz na dane klicove slovo
+
                          }
+
                  }
-                 tokenValue = T_IDENT; // byl to identifikator
-                 return E_OK;
-
-
+                 return T_IDENT; // byl to identifikator
 
         }
         else {
@@ -427,8 +338,7 @@ int getToken()
 /*........................STRING......................*/
     case S_STRING: // "
             if (current_char == '"'){
-                tokenValue = T_STRING_L; // "string"
-                return E_OK;
+                return T_STRING_L; // "string"
             }
             else if (current_char == '\\'){ /*   "..\    */
                 state = S_ESCAPE;
@@ -511,8 +421,7 @@ int getToken()
 
         else {
             ungetc(current_char, file);
-            tokenValue = T_NUMBER_I;
-            return E_OK;
+            return T_NUMBER_I;
 
         }
         break;
@@ -544,8 +453,7 @@ int getToken()
         }
         else {
           ungetc(current_char, file);
-            tokenValue = T_NUMBER_D;
-            return E_OK;
+            return T_NUMBER_D;
         }
         break;
 
@@ -568,8 +476,7 @@ int getToken()
         }
         else {
             ungetc(current_char, file);
-            tokenValue = T_NUMBER_D;
-            return E_OK;
+            return T_NUMBER_D;
             //destroyString(string);
         }
 
