@@ -18,6 +18,7 @@
 
 #define TABLE_SIZE  32 // pocet prvku v tabulce klicovych slov
 #define KEYWORDS    17 // pocet klicovych slov
+#define ASCII       48 // pro prevod z desitkove na osmickovou soustavu (escape sek.)
 //#define MAX_ESCAPE  377 // maximalni hodnota escape sekvence //TODO overflow error. musi to byt mensi jak 255
 
 
@@ -354,6 +355,7 @@ int getToken()
 
 /*........................ESCAPE......................*/
 case S_ESCAPE:
+//printf("%d current_char0\n", current_char);
     if (current_char == 'n'){
         appendChar(string, '\n');
         state = S_STRING;
@@ -372,43 +374,35 @@ case S_ESCAPE:
     }
     else if ((num = isdigit(current_char)) != 0){ // je to cislo, mensi
     //  printf("%s\n", current_char);
-        if(current_char < '4'){
+    //printf("%d current_char\n", current_char);
+        if((current_char < '4') && (current_char >= '0')){
           //printf("prosel1\n");
-          //appendChar(string, num);
-          printf("%d\n", num);
-          state = S_ESCAPE_N;
+          //printf("%d\n", current_char);
+          int esc = (current_char - ASCII) * 8 * 8; // 8^2 (nejlevejsi cislo)
+          //printf("%d\n", esc);
+          current_char = getc(file); //dalsi cislo v escape sekvenci
+
+          if ((current_char < '8') && (current_char >= '0')){ // \0-30-7
+            //printf("prosel2\n");
+            esc = esc + (current_char - ASCII) * 8; // 8^1 (prostredni cislo)
+            //printf("%d\n", esc);
+            current_char = getc(file); //dalsi cislo v escape sekvenci
+
+            if ((current_char < '8') && (current_char >= '0')){ // \0-30-70-7
+              //printf("prosel3\n");
+              esc = esc + (current_char - ASCII); // 8^0 (nejpravejsi cislo)
+              //printf("%d\n", esc);
+              appendChar(string, (char) esc); //pridani cele escape sekvence do stringu
+              state = S_STRING;
+            }
+          }
         }
-
-
     }
-    else{
-      //printf("neprosel2\n");
-        return E_LEX;
-    }
-    break;
 
-
-case S_ESCAPE_N:
-    if ((current_char < '8') && (current_char >= '0')){ // \0-30-7
-      //printf("prosel2\n");
-        state = S_ESCAPE_N2;
-    }
     else {
         return E_LEX;
     }
-    break;
-
-
-case S_ESCAPE_N2:
-    if ((current_char < '8') && (current_char >= '0')){ // \0-30-70-7
-        //
-        //printf("prosel3\n");
-        state = S_STRING;
-    }
-    else {
-        return E_LEX;
-    }
-    break;
+break;
 /*.........................CISLO......................*/
     case S_NUM: // cislo
         if (isdigit(current_char) != 0 ) {
