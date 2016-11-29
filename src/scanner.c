@@ -50,8 +50,6 @@ enum {
     S_BL_COMM,  // /*..*/
     S_LN_COMM,
     S_ESCAPE,
-    S_ESCAPE_N,
-    S_ESCAPE_N2,
     S_NUM_DOT,
     S_NUM_DOT_NUM,
     S_NUM_EX,
@@ -372,7 +370,7 @@ case S_ESCAPE:
          appendChar(string, '\"');
         state = S_STRING;
     }
-    else if ((num = isdigit(current_char)) != 0){ // je to cislo, mensi
+    else if ((num = isdigit(current_char)) != 0){ // je to cislo
     //  printf("%s\n", current_char);
     //printf("%d current_char\n", current_char);
         if((current_char < '4') && (current_char >= '0')){
