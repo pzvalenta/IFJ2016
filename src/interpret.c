@@ -17,6 +17,7 @@
 #include "ial.h"
 #include "interpret.h"
 
+//TODO dodelat push a pop funkce v ramci jednotlivych instrukci ?
 
 int interpret(tInstrList *instrList){
   list_first(instrList);    //aktivita na prvni polozku seznamu
@@ -26,7 +27,7 @@ int interpret(tInstrList *instrList){
   void* value2 = NULL;
   void* value3 = NULL;
 
-//pamatovat si kde jsem byla predtim (ukazatel)
+//TODO pamatovat si kde jsem byla predtim (ukazatel)
 
 stack = Init_stack(); //Inicializace zasobniku
 if(stack == NULL){
@@ -83,11 +84,9 @@ if(stack == NULL){
             double val = (double *)value2;
             address3->data = value1 + val2;
           }
-          else{
-            //uvolneni stringu (destroyStringData)
-            address3->data = value1 + value2; //scitani ulozeno do address3
+          if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
+            address3->data = value1 + value2; //nasobeni ulozeno do address3
           }
-
         }
         else if(address1->id == T_STRING_L || address2->id == T_STRING_L){ //alespon jeden operator je string
           address3->id = T_STRING_L);
@@ -96,14 +95,17 @@ if(stack == NULL){
           if(address1->id != T_STRING_L)){
             //pretypovani
             char* val1 = (char*)value1;
-            address3->data = strcat();
+            address3->data = strcat(); //!!!
           }
           if(address2->id != T_STRING_L)){
             //pretypovani
             char* val2 = (char*)value2;
           }
+          if(address1->id == T_STRING_L && address2->id == T_STRING_L){
+            address3->data = strcat; //nasobeni ulozeno do address3 //TODO
+          }
           //uvolneni stringu (destroyStringData)
-          address3->data = strcat(mem, address2->data); //konkatenace ulozena do address3
+          //address3->data = strcat(mem, address2->data); //konkatenace ulozena do address3
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
@@ -135,8 +137,10 @@ if(stack == NULL){
             double val = (double *)value2;
             address3->data = value1 - val2;
           }
+          if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
+            address3->data = value1 - value2; //nasobeni ulozeno do address3
+          }
           //uvolneni stringu (destroyStringData)
-          address3->data = value1 - value2; //odcitani ulozeno do address3
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
@@ -167,8 +171,11 @@ if(stack == NULL){
             double val = (double *)value2;
             address3->data = value1 * val2;
           }
+          if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
+            address3->data = value1 * value2; //nasobeni ulozeno do address3
+          }
           //uvolneni stringu (destroyStringData)
-          address3->data = value1 * value2; //nasobeni ulozeno do address3
+
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
@@ -199,8 +206,10 @@ if(stack == NULL){
             double val = (double *)value2;
             address3->data = value1 / val2;
           }
+          if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
+            address3->data = value1 / value2; //nasobeni ulozeno do address3
+          }
           //uvolneni stringu (destroyStringData)
-          address3->data = value1 / value2; //deleni ulozeno do address3
         }
         else{
           return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
@@ -242,6 +251,14 @@ if(stack == NULL){
             //pretypovani
             double val2 = (double *)value2;
             if((value1) == (val2)){
+              address3->data = 1;  // !0 TRUE
+            }
+            else{
+              address3->data = 0;  // 0 FALSE
+            }
+          }
+          if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
+            if((value1) == (value2)){
               address3->data = 1;  // !0 TRUE
             }
             else{
@@ -294,6 +311,14 @@ if(stack == NULL){
             address3->data = 0;  // 0 FALSE
           }
         }
+        if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
+          if((value1) != (value2)){
+            address3->data = 1;  // !0 TRUE
+          }
+          else{
+            address3->data = 0;  // 0 FALSE
+          }
+        }
 
       }
       else{
@@ -334,6 +359,14 @@ if(stack == NULL){
             //pretypovani
             double val2 = (double *)value2;
             if((value1) >= (val2)){
+              address3->data = 1;  // !0 TRUE
+            }
+            else{
+              address3->data = 0;  // 0 FALSE
+            }
+          }
+          if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
+            if((value1) >= (value2)){
               address3->data = 1;  // !0 TRUE
             }
             else{
@@ -386,6 +419,14 @@ if(stack == NULL){
               address3->data = 0;  // 0 FALSE
             }
           }
+          if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
+            if((value1) <= (value2)){
+              address3->data = 1;  // !0 TRUE
+            }
+            else{
+              address3->data = 0;  // 0 FALSE
+            }
+          }
 
         }
         else{
@@ -396,24 +437,72 @@ if(stack == NULL){
 
       case I_PUSH:
         if (address1->id == T_NUMBER_I){
-          value = GetDataofString();
+          value1 = GetDataofString(address1->data);
           type = T_NUMBER_I;
         }
         else if(address1->id == T_NUMBER_D){
-          value = GetDataofString();
+          value1 = GetDataofString(address1->data);
           type = T_NUMBER_D;
         }
         else if(address1->id == T_STRING_L){
-          value = GetDataofString();
+          value1 = GetDataofString(address1->data);
           type = T_STRING_L;
         }
         else{
-          //TODO ERROR
+          return E_TYP;
         }
         Push_stack(stack, value, type);
         break;
 
-      case
+      case I_POP:
+      if (address1->id == T_NUMBER_I){
+        value1 = GetDataofString(address1->data);
+        type = T_NUMBER_I;
+      }
+      else if(address1->id == T_NUMBER_D){
+        value1 = GetDataofString(address1->data);
+        type = T_NUMBER_D;
+      }
+      else if(address1->id == T_STRING_L){
+        value1 = GetDataofString(address1->data);
+        type = T_STRING_L;
+      }
+      else{
+        return E_TYP;
+      }
+      Pop_stack(stack, value, type); //??? ukazatele
+      break;
+
+      case I_MOV:
+      case I_INPUT: //jen treti adresa
+
+      case I_CALL:
+      case I_RETURN:
+
+      case I_CMP_STR:
+        if (address1->id == T_STRING_L && address2->id == T_STRING_L){
+          value1 = GetDataofString(address1->data);
+          value2 = GetDataofString(address2->data);
+          int ret_c = NULL; //sem se ulozi navratova hodnota strcmp
+          ret_c = strcmp(value1, value2);
+          if (ret_c == 0){
+            address3->data = 0;  // 0 TRUE stringy se rovnaji
+          }
+          else if (ret_c > 0){
+            address3->data = 1; // prvni string je vetsi nez druhy string
+          }
+          else{
+            address3->data = -1; // jine, resp. druhy je vetsi nez prvni
+          }
+        }
+        else{
+          return E_TYP;
+        }
+        break;
+
+
+
+
 
     } //konec switch
 
@@ -458,7 +547,7 @@ void Push_stack(Stack stack, void *value, int type){
   stack->topof++; // navyseni vrcholu zasobniku
 }
 
-void Pop_stack(Stack stack, void ** value, int type){
+void Pop_stack(Stack stack, void ** value, int * type){
   stack->topof--; // snizeni pocitadla vrcholu zasobniku
   *value = stack->data[stack->topof].val;
   *type  = stack->data[stack->topof].type;

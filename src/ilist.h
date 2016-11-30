@@ -44,8 +44,10 @@
  /* list_insert_last(*List instrukci, I_IFGOTO, 1/0 = skok/neskok, adresa kam skocit, )*/
  #define I_PUSH         13    //push
 /* list_insert_last(*List instrukci, I_PUSH, co se pushuje, , )*/
-
-
+ #define I_POP          14    //pop
+/* list_insert_last(*List instrukci, I_POP, co se popuje, , )*/
+ #define I_CMP_STR      15    //porovnavani sringu
+/* list_insert_last(*List instrukci, I_CMP_STR, prvni string, druhy string, vysledek)*/
 
 
 
