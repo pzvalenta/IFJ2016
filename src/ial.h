@@ -17,7 +17,7 @@ struct varNode{
 	int offset;
 	int declared;
 	int initialized;
-	
+
 	struct varNode *global;
 
 	struct varNode *left;
@@ -68,6 +68,7 @@ struct classNode{
 	String *name;
 
 	varNode *lVarTable;
+	int varc;
 
 	struct classNode *left;
 	struct classNode *right;
