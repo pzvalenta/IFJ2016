@@ -51,7 +51,7 @@ String *copyString(String* old);
 
 void *GetDataofString (String *str);
 
-String *concatenate(String *s1, String *s2);
+String *concatenate(String *str1, String *str2);
 
 ///////////////////////////////////////////////
 

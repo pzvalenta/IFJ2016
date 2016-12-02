@@ -90,33 +90,10 @@ if(stack == NULL){
           }
         }
         else if(address1->id == T_STRING_L || address2->id == T_STRING_L){ //alespon jeden operator je string
-          address3->id = T_STRING_L);
-          value1 = GetDataofString(address1->data);
-          value2 = GetDataofString(address2->data);
-          if(address1->id != T_STRING_L)){
-            //pretypovani
-            char* val1 = (char*)value1;
-            address3->data->data = concatenate((char*) value1, (char*) value2); //!!!
-            // TODO??? zvetseni len a size ve stringu???
-          }
-          if(address2->id != T_STRING_L)){
-            //pretypovani
-            char* val2 = (char*)value2;
-            address3->data->data = concatenate((char*) value1, (char*) value2); //!!!
-            // TODO??? zvetseni len a size ve stringu???
-          }
-          if(address1->id == T_STRING_L && address2->id == T_STRING_L){
-            address3->data->data = concatenate((char*) value1, (char*) value2); //konkatenace ulozena do address3 //TODO
-            // TODO??? zvetseni len a size ve stringu???
-          }
-          //uvolneni stringu (destroyStringData)
-          //address3->data = strcat(mem, address2->data); //konkatenace ulozena do address3
-        }
-        else{
-          return E_TYP; //pokud neprojde pres podminky -> chyba kompatibility
-        }
+          address3->id = T_STRING_L;
+          address3->data->data = concatenate(address1->data->data, address2->data->data);
         //chyba Inicializace??
-        break;
+      break;
 
       case I_SUB:
       //TODO test na incializaci
@@ -503,7 +480,7 @@ if(stack == NULL){
 
       case I_CALL:
       case I_RETURN:
-
+//TODO print, read,
       case I_CMP_STR:
         if (address1->id == T_STRING_L && address2->id == T_STRING_L){
           address3->id = T_STRING_L;

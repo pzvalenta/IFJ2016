@@ -128,14 +128,37 @@ String *copyString(String* old){
  	new->len = old->len;
 	strcpy(new->data, old->data);
 	return new;
-	}
 }
 
-char *concatenate(char *s1, char *s2){
+
+String *concatenate(String *str1, String *str2){
+	char *s1 = NULL;
+	char *s2 = NULL;
+	if(str1->type != T_STRING_L){
+		void* s = GetDataofString(str1);
+		s1 = (char*) s;
+		s2 = str2->data;
+	}
+	if(str2->type != T_STRING_L){
+		void* s = GetDataofString(str2);
+		s2 = (char*) s;
+		s1 = str2->data;
+	}
+	if((str1->type != T_STRING_L) && (str1->type != T_STRING_L)){
+		s1 = str1->data;
+		s2 = str2->data;
+	}
+	else{
+		return E_TYP;
+	}
+
 	s1 = (char*) realloc(s1, strlen(s1) + strlen(s2) + 1);
 	if(s1 == NULL){ //chyba pri realokaci pameti
 		return NULL;
 	}
 	strcat(s1, s2);
-	return s1;
+	str1->data = s1;
+	str1->size = /*TODO*/;
+	str1->len = /*TODO*/;
+	return str1;
 }
