@@ -45,6 +45,10 @@ int getType(){
   else return tmp->type;
 }
 
+void setVarType(int type){
+  CurrentVar->type = type;
+}
+
 struct varNode* findVar(){
   if (isCompleteIdent(token->data)) return searchVT(GVRoot, token->data->data);
 
@@ -53,7 +57,7 @@ struct varNode* findVar(){
   if (CurrentClass != NULL){
     struct varNode *tmp = searchVT(CurrentClass->lVarTable, token->data->data);
     if (tmp == NULL) {
-      completize(token->data);
+      token->data = completize(token->data);
       return searchVT(GVRoot, token->data->data);
     }
   }
@@ -83,6 +87,12 @@ int newFunction(){
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
     destroyFN(tmp);
     return E_SEM;  // TODO uz byla deklarovana, je v tabulce
+  }
+
+  if (searchVT(GVRoot, tmp->name->data) != NULL) {
+    destroyFN(tmp);
+    fprintf(stderr, "ERROR, deklarace funkce se jmenem totoznym jako globalni promenna \n");
+    return E_SEM;
   }
 
   FTRoot = insertFN(FTRoot, tmp);
@@ -133,19 +143,28 @@ int newStaticVar(){
     return E_SEM;  // uz byla deklarovana, je v globalni tabulce promennych
   }
 
+  if (searchFT(FTRoot, tmp->name->data) != NULL) {
+    destroyVN(tmp);
+    fprintf(stderr, "ERROR, deklarace globalni promenne se jmenem totoznym jako funkce\n");
+    return E_SEM;  
+  }
   //vytvoreni polozky v lokalni tabulce
   CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
 
   //vytvoreni polozky v glob. tabulce
   struct varNode *tmp2 = newVN(token);
   if (tmp2 == NULL) return E_INTERNAL;
-  if(completize(tmp2->name) != E_OK){
+
+  tmp2->name = completize(tmp2->name);
+  if (tmp2->name == NULL){
     destroyVN(tmp2);
     return E_INTERNAL;
   }
 
+
   tmp->global = tmp2;
 
+  CurrentVar = tmp2;
   GVRoot = insertVN(GVRoot, tmp2);
 
 
@@ -183,6 +202,7 @@ int newVar(){
     }
   }
 
+  CurrentVar = tmp;
   return E_OK;
 }
 

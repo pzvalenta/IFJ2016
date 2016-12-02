@@ -14,10 +14,9 @@ struct funNode *FTRoot = NULL; // koren glob tabulky funkci
 
 struct classNode *CurrentClass = NULL;
 struct funNode *CurrentMethod = NULL;
+struct varNode *CurrentVar = NULL;
 
 int createCompleteIdent();
-int ifjfind();
-int ifjprint();
 int assign_rule();
 int declaration_rule();
 int static_rule();
@@ -37,56 +36,8 @@ int buildIn();
 
 
 
-// void createCompleteIdent(){
-//   String *tmp = newString();
-//   for(int i = 0; i < CurrentClass->name->data->len){
-//     appendChar(tmp, CurrentClass->data->data[i]);
-//   }
-//
-//   appendChar(tmp, '.');
-//
-//   for(int i = 0; i < token->data->len){
-//     appendChar(tmp, token->data->data[i]);
-//   }
-//
-//   destroyString(token->data);
-//   token->data = tmp;
-// }
-
-int ifjfind(){
-        fprintf(stderr,"entering ifjfind()\n");
-        dprint(token);
-        int result = E_OK;
-
-        //TODO placeholder
-        while (token->id != T_RBRACKET && token->id != T_END) {
-                token = token->next;
-                dprint(token);
-        }
-        token = token->next;
-
-
-        return result;
-}
-
-
-int ifjprint(){
-        fprintf(stderr,"entering ifjprint()\n");
-        dprint(token);
-        int result = E_OK;
-
-        //TODO placeholder
-        while (token->id != T_RBRACKET && token->id != T_END) {
-                token = token->next;
-                dprint(token);
-        }
-        token = token->next;
-        dprint(token);
-
-
-        return result;
-}
-
+// STATEMENT --> id = EXPRESSION
+// STATEMENT --> id = id() ;
 int assign_rule(){
         fprintf(stderr,"entering assign_rule()\n");
         int result = E_OK;
@@ -99,21 +50,11 @@ int assign_rule(){
         if (token->id != T_ADD) return E_SYN;
         token = token->next;
 
-        if (strcmp("ifj16.print", token->data->data) == 0) {
-                result = ifjprint();
-                token = token->next;
-                return result;
-        }
-        if (strcmp("ifj16.find", token->data->data) == 0) {
-                result = ifjfind();
-                token = token->next;
-                dprint(token);
-                return result;
+        if (isFunction(token)){ // id = id(params);
+
         }
 
-
-
-        result = prec_anal(T_SEMICLN);
+        result = prec_anal(T_SEMICLN); // id = expression ;
         if (result != E_OK) return result;
 
         token = token->next;
@@ -137,11 +78,14 @@ int static_rule(){
                 return E_SYN;
 
         //ted je v tokenu type
-        //int type = token->id; TODO
+        int type = token->id;
 
         token = token->next;
         if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;
         //TODO vytvoreni polozky v symtable GLOBALNI
+        result = newStaticVar();
+        if (result != E_OK) return result;
+        setVarType(type);
 
 
         token = token->next;
@@ -164,10 +108,14 @@ int static_rule(){
 
 //STATEMENT --> TYPE id ;
 //STATEMENT --> TYPE id = EXPRESSION ;
+
+// static TYPE id
 int declaration_rule(){
         fprintf(stderr,"entering declaration_rule()\n");
         int result = E_OK;
         dprint(token);
+
+        int type = token->id;
 
         // momentalne je v tokenu type
         //int type = token->id; TODO
@@ -175,6 +123,9 @@ int declaration_rule(){
         token = token->next;
         if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;
         //TODO vytvoreni polozky v symtable
+        result = newVar();
+        if (result != E_OK) return result;
+        setVarType(type);
 
         token = token->next;
         if (token->id == T_SEMICLN) {
@@ -249,16 +200,6 @@ int void_func_call_rule(){
         if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;
         //TODO zknotrolovat symtable
         //TODO vygenerovat volani fce
-        if (strcmp("ifj16.print", token->data->data) == 0) {
-                result = ifjprint();
-                token = token->next;
-                return result;
-        }
-        if (strcmp("ifj16.find", token->data->data) == 0) {
-                result = ifjfind();
-                token = token->next;
-                return result;
-        }
 
 
 
@@ -428,6 +369,9 @@ int statement(){
         dprint(token);
         int result = E_OK;
         switch (token->id) {
+
+
+
         // STATEMENT --> id = id (PARAM) ;
         // STATEMENT --> id (PARAM) ;
         // STATEMENT --> id = EXPRESSION ;
@@ -811,6 +755,8 @@ int buildIn(){
   result = newFunction();
   if (result != E_OK) return result;
 
+  fprintf(stderr,"#######FINISHED ADDING BUILTIN FUNCTIONS#########\n");
+
   return E_OK;
 }
 
@@ -820,6 +766,7 @@ int parse(struct tListItem *head){
         if (result != E_OK) return result;
         CurrentClass = NULL;
         CurrentMethod = NULL;
+        CurrentVar = NULL;
         fprintf(stderr,"entering parse()\n");
         token = head;
         dprint(token); //DEBUG

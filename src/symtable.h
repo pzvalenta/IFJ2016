@@ -18,6 +18,7 @@ extern struct funNode *FTRoot; // koren glob tabulky funkci
 
 extern struct classNode *CurrentClass;
 extern struct funNode *CurrentMethod;
+extern struct varNode *CurrentVar;
 
 
 struct TableNode;
@@ -25,7 +26,7 @@ struct TableNode;
 struct tListItem;
 
 
-
+void setVarType(int type);
 int newFunction();  // vytvori novou polozku v globalni tabulce funkci, name = token->data
 int newClass();     //                                          trid
 int newStaticVar(); //                                          promennych + v lokalni tabulce
