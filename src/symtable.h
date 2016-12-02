@@ -32,4 +32,7 @@ int newClass();     //                                          trid
 int newStaticVar(); //                                          promennych + v lokalni tabulce
 int newVar();       //                         lokalni tabulce, podle CurrentMethod/CurrentClass
 
+
+int isFunction();
+
 #endif

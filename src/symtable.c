@@ -26,6 +26,12 @@ int isCompleteIdent(String *str);
 //
 // }
 
+int isFunction(){
+  if (findFunction(FTRoot, token->data->data) == NULL)
+  return 0;
+  else return 1;
+}
+
 int isCompleteIdent(String *str){
   for(int i = 0; str->data[i] != '\0'; i++){
     if (str->data[i] == '.') return 1;
@@ -146,7 +152,7 @@ int newStaticVar(){
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
     destroyVN(tmp);
     fprintf(stderr, "ERROR, deklarace globalni promenne se jmenem totoznym jako funkce\n");
-    return E_SEM;  
+    return E_SEM;
   }
   //vytvoreni polozky v lokalni tabulce
   CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
