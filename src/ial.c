@@ -269,13 +269,14 @@ struct funNode *findMaxFN(struct funNode *root){
 	else return root;
 }
 
-struct funNode *searchFT(struct funNode *root, char *exp){
+struct funNode *searchFT(struct funNode *root, char *expression){
 	if (root == NULL) return NULL;
+	if (expression == NULL) return NULL;
 
-	int a = strcmp(exp, root->name->data);
+	int a = strcmp(expression, root->name->data);
 	if (a == 0) return root;
-	else if (a > 0) return searchFT(root->right, exp);
-	else return searchFT(root->left, exp);
+	else if (a > 0) return searchFT(root->right, expression);
+	else return searchFT(root->left, expression);
 
 	return NULL; // not found
 }

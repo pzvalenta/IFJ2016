@@ -33,6 +33,7 @@ int class();
 int program();
 int body();
 int param();
+int buildIn();
 
 
 
@@ -563,12 +564,17 @@ int method(){
         return E_SYN;                 // TYPE
 
         token = token->next;
+        dprint(token);
+        printf("\n\n\nFTRoot = %p\n\n\n", FTRoot);
+        //printf("Value = %s\n", FTRoot->name->data);
         if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;  // id
 
         result = newFunction();
         if (result != E_OK) return result;
 
         token = token->next;
+        dprint(token);
+
         if (token->id != T_LBRACKET) return E_SYN;  // (
 
         token = token->next;
@@ -716,9 +722,104 @@ int program(){
         return result;
 }
 
+int buildIn(){
+  int result = E_OK;
+
+  token = malloc(sizeof(struct tListItem));
+  token->data = newString();
+  token->id = T_IDENT;
+
+  for (int i = 0; i < 5; i++){
+    appendChar(token->data, "ifj16"[i]);
+  }
+  result = newClass();
+  if (result != E_OK) return result;
+
+  //vestavena funkce ifj16.print
+  token->data = newString();
+  for (int i = 0; i < 5; i++){
+    appendChar(token->data, "print"[i]);
+  }
+  result = newFunction();
+  if (result != E_OK) return result;
+
+  //vestavena funkce ifj16.sort
+  token->data = newString();
+  for (int i = 0; i < 4; i++){
+    appendChar(token->data, "sort"[i]);
+  }
+  result = newFunction();
+  if (result != E_OK) return result;
+
+  //vestavena funkce ifj16.compare
+  token->data = newString();
+  for (int i = 0; i < 7; i++){
+    appendChar(token->data, "compare"[i]);
+  }
+  result = newFunction();
+  if (result != E_OK) return result;
+
+
+  //vestavena funkce ifj16.substr
+  token->data = newString();
+  for (int i = 0; i < 6; i++){
+    appendChar(token->data, "substr"[i]);
+  }
+  result = newFunction();
+  if (result != E_OK) return result;
+
+
+  //vestavena funkce ifj16.length
+  token->data = newString();
+  for (int i = 0; i < 6; i++){
+    appendChar(token->data, "length"[i]);
+  }
+  result = newFunction();
+  if (result != E_OK) return result;
+
+  //vestavena funkce ifj16.find
+  token->data = newString();
+  for (int i = 0; i < 4; i++){
+    appendChar(token->data, "find"[i]);
+  }
+  result = newFunction();
+  if (result != E_OK) return result;
+
+  //vestavena funkce ifj16.readInt
+  token->data = newString();
+  for (int i = 0; i < 7; i++){
+    appendChar(token->data, "readInt"[i]);
+  }
+  result = newFunction();
+  if (result != E_OK) return result;
+
+
+  //vestavena funkce ifj16.readString
+  token->data = newString();
+  for (int i = 0; i < 10; i++){
+    appendChar(token->data, "readString"[i]);
+  }
+  result = newFunction();
+  if (result != E_OK) return result;
+
+
+  //vestavena funkce ifj16.readDouble
+  token->data = newString();
+  for (int i = 0; i < 10; i++){
+    appendChar(token->data, "readDouble"[i]);
+  }
+  result = newFunction();
+  if (result != E_OK) return result;
+
+  return E_OK;
+}
 
 int parse(struct tListItem *head){
         int result = E_OK;
+        result = buildIn();
+        if (result != E_OK) return result;
+        CurrentClass = NULL;
+        CurrentMethod = NULL;
         fprintf(stderr,"entering parse()\n");
         token = head;
         dprint(token); //DEBUG

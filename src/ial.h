@@ -59,7 +59,7 @@ struct funNode *insertFN(struct funNode *root, struct funNode *node);
 void deleteFN(struct funNode *root, struct funNode *node);
 void replaceFN(struct funNode *out, struct funNode *in);
 struct funNode *findMaxFN(struct funNode *root);
-struct funNode *searchFT(struct funNode *root, char *exp);
+struct funNode *searchFT(struct funNode *root, char *expression);
 void destroyFN (struct funNode *node);
 void destroyFT (struct funNode *root);
 

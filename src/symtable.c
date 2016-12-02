@@ -12,7 +12,7 @@
 // extern struct classNode *CTRoot; //koren globalni tabulky trid
 
 
-int completize(String *s); // predela string->name z neuplneho identifikatoru na uplny, pomoci CurrentClass
+String *completize(String *s); // predela string->name z neuplneho identifikatoru na uplny, pomoci CurrentClass
 
 int getOffset(); //najde offset z tabulky symbolu podle tokenu
 struct varNode* findVar();
@@ -69,12 +69,17 @@ int newFunction(){
   if (tmp == NULL) return E_INTERNAL;
 
   if (!isCompleteIdent(tmp->name)){
-    if(completize(tmp->name) != E_OK){
+    printf("not complete, %p\n",tmp->name);
+    tmp->name = completize(tmp->name);
+    if(tmp->name == NULL){
       destroyFN(tmp);
       return E_INTERNAL;
     }
+    printf("complete, %p\n", tmp->name);
+
   }
 
+  printf("ABOUT TO SEARCH FTRoot with %s\n",tmp->name->data);
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
     destroyFN(tmp);
     return E_SEM;  // TODO uz byla deklarovana, je v tabulce
@@ -182,21 +187,23 @@ int newVar(){
 }
 
 
-int completize(String *s){   // predela string s na uplny identifikator
+String *completize(String *s){   // predela string s na uplny identifikator
   String *tmp = newString();
+  printf("completizing string %s, with class %s\n", s->data, CurrentClass->name->data);
   for(int i = 0; i < CurrentClass->name->len; i++){
     appendChar(tmp, CurrentClass->name->data[i]);
   }
 
   appendChar(tmp, '.');
+  printf("Current completizing state = %s\n", tmp->data);
 
   for(int i = 0; i < s->len; i++){
     appendChar(tmp, s->data[i]);
   }
+  printf("Current completizing state = %s\n", tmp->data);
 
   destroyString(s);
-  s = tmp;
-  return E_OK;
+  return tmp;
 }
 
 
