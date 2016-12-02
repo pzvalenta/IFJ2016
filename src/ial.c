@@ -36,8 +36,8 @@ struct varNode *newVN(struct tListItem *token){
 	}
 
 	ret->name = token->data;
-	ret->type = E_SYM;
-	ret->offset = 0;
+	ret->type = -1;
+	ret->offset = -1;
 	ret->declared = 0;
 	ret->initialized = 0;
 
@@ -84,7 +84,7 @@ void deleteVN(struct varNode *root, struct varNode *node){
 			replaceVN(node, node->left);
 		}
 		else if (node->right != NULL && node->left != NULL){
-			TableNode *tmp = findMaxVN(node->left);
+			struct varNode *tmp = findMaxVN(node->left);
 			tmp->right = node->right;
 			replaceVN(node, tmp);
 			deleteVN(root, tmp);
@@ -186,7 +186,7 @@ struct funNode *newFN(struct tListItem *token){
 	if (ret->types == NULL) return NULL;
 
 	ret->lVarTable = NULL;
-	int varc = 0;
+	ret-> varc = 0;
 
 	// TODO ukazatel na prvni instrukci
 	// TODO deklarace, definice?	ret->offset = 0;
@@ -234,7 +234,7 @@ void deleteFN(struct funNode *root, struct funNode *node){
 			replaceFN(node, node->left);
 		}
 		else if (node->right != NULL && node->left != NULL){
-			TableNode *tmp = findMaxFN(node->left);
+			struct funNode *tmp = findMaxFN(node->left);
 			tmp->right = node->right;
 			replaceFN(node, tmp);
 			deleteFN(root, tmp);
@@ -283,7 +283,7 @@ struct funNode *searchFT(struct funNode *root, char *exp){
 void destroyFN (struct funNode *node){
 	if (node == NULL) return;
 	destroyString(node->name);
-	destroyFT(node->lVarTable);
+	destroyVT(node->lVarTable);
 	free(node);
 	node = NULL;
 }
@@ -333,7 +333,7 @@ struct classNode *newCN(struct tListItem *token){
 
 
 	ret->lVarTable = NULL;
-	int varc = 0;
+	ret->varc = 0;
 
 	// TODO ukazatel na prvni instrukci
 	// TODO deklarace, definice?	ret->offset = 0;
@@ -380,7 +380,7 @@ void deleteCN(struct classNode *root, struct classNode *node){
 			replaceCN(node, node->left);
 		}
 		else if (node->right != NULL && node->left != NULL){
-			TableNode *tmp = findMaxCN(node->left);
+			struct classNode *tmp = findMaxCN(node->left);
 			tmp->right = node->right;
 			replaceCN(node, tmp);
 			deleteCN(root, tmp);
@@ -427,7 +427,7 @@ struct classNode *searchCT(struct classNode *root, char *exp){
 void destroyCN (struct classNode *node){
 	if (node == NULL) return;
 	destroyString(node->name);
-	destroyFT(node->lVarTable);
+	destroyVT(node->lVarTable);
 
 	free(node);
 	node = NULL;

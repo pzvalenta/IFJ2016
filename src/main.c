@@ -70,16 +70,14 @@ int main(int argc, char **argv){
 
 
 
-        //deklarace tabulek
-        TableNode *CTRoot = NULL;
-        TableNode *GTRoot = NULL;
+
 
         //TODO inicializace ilistu
 
         fprintf(stderr, "############### Start Parseru ##############\n");
 
         //volani parseru
-        result = parse(CTRoot, GTRoot, tokenListHead);
+        result = parse(tokenListHead);
         fprintf(stderr, "############# Vysledek Parseru #############\n");
         eprint(result);
         //TODO errorcheck

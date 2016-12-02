@@ -10,47 +10,25 @@
 
 
 extern struct tListItem *token;    // globalni promena, ukazatel na momentalni token v tokenlistu
-extern struct TableNode *CTRoot; //koren globalni tabulky trid
-extern struct TableNode *GTRoot; //koren globalni tabulky funkci a promennych
 
-extern struct TableNode *CurrentClass;
-extern struct TableNode *CurrentMethod;
+extern struct classNode *CTRoot; //koren globalni tabulky trid
+extern struct varNode *GVRoot; //koren globalni tabulky promennych
+extern struct funNode *FTRoot; // koren glob tabulky funkci
 
 
-// //typedef struct tableNode TableNode;
-//
-// struct TableNode{
-// 	String *name; // identifikator / klic
-// 	char id; //typ (funkce/char/string ...)
-// 	char state; // DEFINED / INITIALIZED
-//
-// 	TableNode *global; // pokud je global != NULL, je v nem odkaz do global table, na prislusnou polozku
-//
-// 	TableNode *localTable; // pokud je to funkce nebo class, je tu odkaz na lokalni tabulku
-// 	String *data; //data
-//
-// 	//pokud je definovana lokalni promenna i pres to, ze uz je definovana globalni, vytvori se novy string
-//
-// 	TableNode *left;
-//   TableNode *right;
-// };
+extern struct classNode *CurrentClass;
+extern struct funNode *CurrentMethod;
+
 
 struct TableNode;
 
 struct tListItem;
 
 
-int addToTable(tListItem token);
 
-TableNode *newTN(struct tListItem *token);
-TableNode *insertTN(TableNode *root, TableNode *node);
-void deleteTN(TableNode *root, TableNode *node);
-void replaceTN(TableNode *out, TableNode *in);
-TableNode *findMaxTN(TableNode *root);
-TableNode *searchT(TableNode *root, char *exp);
-void destroyTN (TableNode *node);
-void destroyT (TableNode *root);
-
-void printInorder(TableNode *node);
+int newFunction();  // vytvori novou polozku v globalni tabulce funkci, name = token->data
+int newClass();     //                                          trid
+int newStaticVar(); //                                          promennych + v lokalni tabulce
+int newVar();       //                         lokalni tabulce, podle CurrentMethod/CurrentClass
 
 #endif

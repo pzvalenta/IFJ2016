@@ -22,7 +22,9 @@ struct varNode{
 
 	struct varNode *left;
 	struct varNode *right;
-}
+};
+
+struct tListItem;
 
 //funkce pro praci s lok / glob tabulkami promennych
 struct varNode *newVN(struct tListItem *token);
@@ -41,15 +43,15 @@ void destroyVT (struct varNode *root);
 struct funNode{
 	String *name;
 
-	String types; // void func(int a, double b)   =  "vid"
+	String *types; // void func(int a, double b)   =  "vid"
 	int varc; //pocet lok. promennych
-	varNode *lVarTable;
+	struct varNode *lVarTable;
 	// TODO ukazatel na prvni instrukci
 	// TODO deklarace, definice?
 
 	struct funNode *left;
 	struct funNode *right;
-}
+};
 
 //funkce pro praci s glob. tabulkou funkci
 struct funNode *newFN(struct tListItem *token);
@@ -67,12 +69,12 @@ void destroyFT (struct funNode *root);
 struct classNode{
 	String *name;
 
-	varNode *lVarTable;
+	struct varNode *lVarTable;
 	int varc;
 
 	struct classNode *left;
 	struct classNode *right;
-}
+};
 
 //funkce pro praci s glob. tabulkou trid
 struct classNode *newCN(struct tListItem *token);

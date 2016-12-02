@@ -8,11 +8,12 @@
 #include "precanal.h"
 
 struct tListItem *token = NULL;    // globalni promena, ukazatel na momentalni token v tokenlistu
-TableNode *CTRoot = NULL; //koren globalni tabulky trid
-TableNode *GTRoot = NULL; //koren globalni tabulky funkci a promennych
+struct classNode *CTRoot = NULL; //koren globalni tabulky trid
+struct varNode *GVRoot = NULL; //koren globalni tabulky promennych
+struct funNode *FTRoot = NULL; // koren glob tabulky funkci
 
-TableNode *CurrentClass = NULL;
-TableNode *CurrentMethod = NULL;
+struct classNode *CurrentClass = NULL;
+struct funNode *CurrentMethod = NULL;
 
 int createCompleteIdent();
 int ifjfind();
@@ -35,21 +36,21 @@ int param();
 
 
 
-void createCompleteIdent(){
-  String *tmp = newString();
-  for(int i = 0; i < CurrentClass->name->data->len){
-    appendChar(tmp, CurrentClass->data->data[i]);
-  }
-
-  appendChar(tmp, '.');
-
-  for(int i = 0; i < token->data->len){
-    appendChar(tmp, token->data->data[i]);
-  }
-
-  destroyString(token->data);
-  token->data = tmp;
-}
+// void createCompleteIdent(){
+//   String *tmp = newString();
+//   for(int i = 0; i < CurrentClass->name->data->len){
+//     appendChar(tmp, CurrentClass->data->data[i]);
+//   }
+//
+//   appendChar(tmp, '.');
+//
+//   for(int i = 0; i < token->data->len){
+//     appendChar(tmp, token->data->data[i]);
+//   }
+//
+//   destroyString(token->data);
+//   token->data = tmp;
+// }
 
 int ifjfind(){
         fprintf(stderr,"entering ifjfind()\n");
@@ -564,20 +565,8 @@ int method(){
         token = token->next;
         if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;  // id
 
-        createCompleteIdent(token);
-        if (searchT(GTRoot, token->data->data) == NULL){
-                /// vytvorit novou node v globalni tabulce trid
-                /// error check
-                CurrentMethod = newTN(token);
-                if (CurrentMethod == NULL) return E_INTERNAL;
-
-                // vlozi novou node do tabulky, jmeno, id
-                GTRoot = insertTN(GTRoot, CurrentMethod);
-
-                //TODO vytvorit lokalni tabulku
-        }
-        else return E_SEM;
-
+        result = newFunction();
+        if (result != E_OK) return result;
 
         token = token->next;
         if (token->id != T_LBRACKET) return E_SYN;  // (
@@ -660,19 +649,8 @@ int class(){
         fprintf(stderr,"entering class()\n");
         dprint(token);
 
-        if (token->id != T_IDENT && token->id != T_C_IDENT) return E_SYN;
-        else if (searchT(CTRoot, token->data->data) == NULL){
-                /// vytvorit novou node v globalni tabulce trid
-                /// error check
-                CurrentClass = newTN(token);
-                if (CurrentClass == NULL) return E_INTERNAL;
-                CurrentMethod = NULL; // nejsme v zadne funkci
-
-                // vlozi novou node do tabulky, data = jmeno, token = id
-                CTRoot = insertTN(CTRoot, CurrentClass);
-                //TODO vytvorit lokalni tabulku
-        }
-        else return E_SEM;
+        result = newClass();
+        if (result != E_OK) return result;
 
         token = token->next;
         if (token->id != T_LCBRACKET) return E_SYN;
@@ -739,7 +717,7 @@ int program(){
 }
 
 
-int parse(TableNode *CTRoot, TableNode *GTRoot, struct tListItem *head){
+int parse(struct tListItem *head){
         int result = E_OK;
         fprintf(stderr,"entering parse()\n");
         token = head;

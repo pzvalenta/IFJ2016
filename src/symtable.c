@@ -8,24 +8,71 @@
 // extern struct TableNode *CurrentMethod;
 //
 // extern struct varNode *GVRoot; //koren globalni tabulky promennych
-// extern struct funNode *GFRoot; //koren globalni tabulky funkci
-// extern struct classNode *GCRoot; //koren globalni tabulky trid
+// extern struct funNode *FTRoot; //koren globalni tabulky funkci
+// extern struct classNode *CTRoot; //koren globalni tabulky trid
 
-int newFunction();  // vytvori novou polozku v globalni tabulce funkci, name = token->data
-int newClass();     //                                          trid
-int newStaticVar(); //                                          promennych + v lokalni tabulce
-int newVar();       //                         lokalni tabulce, podle CurrentMethod/CurrentClass
 
 int completize(String *s); // predela string->name z neuplneho identifikatoru na uplny, pomoci CurrentClass
 
+int getOffset(); //najde offset z tabulky symbolu podle tokenu
+struct varNode* findVar();
+int isCompleteIdent(String *str);
+
+// struct funNode *findFunction(){
+//
+// }
+//
+// struct classNode *findClass(){
+//
+// }
+
+int isCompleteIdent(String *str){
+  for(int i = 0; str->data[i] != '\0'; i++){
+    if (str->data[i] == '.') return 1;
+  }
+  return 0;
+}
+
+int getOffset(){
+  struct varNode *tmp = findVar();
+  if (tmp == NULL) return -1;
+  else return tmp->offset;
+}
+
+int getType(){
+  struct varNode *tmp = findVar();
+  if (tmp == NULL) return -1;
+  else return tmp->type;
+}
+
+struct varNode* findVar(){
+  if (isCompleteIdent(token->data)) return searchVT(GVRoot, token->data->data);
+
+  if (CurrentMethod != NULL) return searchVT(CurrentMethod->lVarTable, token->data->data);
+
+  if (CurrentClass != NULL){
+    struct varNode *tmp = searchVT(CurrentClass->lVarTable, token->data->data);
+    if (tmp == NULL) {
+      completize(token->data);
+      return searchVT(GVRoot, token->data->data);
+    }
+  }
+
+  return NULL;
+}
+
 
 int newFunction(){
+  if (CurrentClass == NULL) return E_SYN;
+
   struct funNode *tmp = newFN(token);
   if (tmp == NULL) return E_INTERNAL;
 
-  if(completize(tmp->name) != E_OK){
-    destroyFN(tmp);
-    return E_INTERNAL;
+  if (!isCompleteIdent(tmp->name)){
+    if(completize(tmp->name) != E_OK){
+      destroyFN(tmp);
+      return E_INTERNAL;
+    }
   }
 
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
@@ -33,7 +80,9 @@ int newFunction(){
     return E_SEM;  // TODO uz byla deklarovana, je v tabulce
   }
 
-  GVRoot = insertFN(tmp);
+  FTRoot = insertFN(FTRoot, tmp);
+  CurrentMethod = tmp;
+
   return E_OK;
 }
 
@@ -46,7 +95,8 @@ int newClass(){
     return E_SEM;  // TODO uz byla deklarovana, je v tabulce
   }
 
-  GCRoot = insertCN(tmp);
+  CTRoot = insertCN(CTRoot, tmp);
+  CurrentClass = tmp;
   return E_OK;
 }
 
@@ -79,17 +129,20 @@ int newStaticVar(){
   }
 
   //vytvoreni polozky v lokalni tabulce
-  CurrentClass->lVarTable = insertVN(tmp);
+  CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
 
   //vytvoreni polozky v glob. tabulce
-  struct varNode *tmp = newVN(token);
-  if (tmp == NULL) return E_INTERNAL;
-  if(completize(tmp->name) != E_OK){
-    destroyVN(tmp);
+  struct varNode *tmp2 = newVN(token);
+  if (tmp2 == NULL) return E_INTERNAL;
+  if(completize(tmp2->name) != E_OK){
+    destroyVN(tmp2);
     return E_INTERNAL;
   }
 
-  GVRoot = insertVN(tmp);
+  tmp->global = tmp2;
+
+  GVRoot = insertVN(GVRoot, tmp2);
+
 
   return E_OK;
 }
@@ -111,7 +164,7 @@ int newVar(){
       return E_SEM;  // uz byla deklarovana, je v lokalni tabulce tridy
     }
     else{
-      CurrentClass->lVarTable = insertVN(tmp);
+      CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
     }
   }
   else {
@@ -121,7 +174,7 @@ int newVar(){
       return E_SEM;  // uz byla deklarovana, je v lokalni tabulce funkce
     }
     else{
-      CurrentMethod->lVarTable = insertVN(tmp);
+      CurrentMethod->lVarTable = insertVN(CurrentMethod->lVarTable, tmp);
     }
   }
 
@@ -131,18 +184,19 @@ int newVar(){
 
 int completize(String *s){   // predela string s na uplny identifikator
   String *tmp = newString();
-  for(int i = 0; i < CurrentClass->name->data->len){
-    appendChar(tmp, CurrentClass->data->data[i]);
+  for(int i = 0; i < CurrentClass->name->len; i++){
+    appendChar(tmp, CurrentClass->name->data[i]);
   }
 
   appendChar(tmp, '.');
 
-  for(int i = 0; i < s->data->len){
-    appendChar(tmp, s->data->data[i]);
+  for(int i = 0; i < s->len; i++){
+    appendChar(tmp, s->data[i]);
   }
 
   destroyString(s);
   s = tmp;
+  return E_OK;
 }
 
 
@@ -155,92 +209,92 @@ int completize(String *s){   // predela string s na uplny identifikator
 
 //////////////////////////////////////STARE FUNKCE
 
-String *createCompleteIdent(){
-  String *tmp = newString();
-  for(int i = 0; i < CurrentClass->name->data->len){
-    appendChar(tmp, CurrentClass->data->data[i]);
-  }
+// String *createCompleteIdent(){
+//   String *tmp = newString();
+//   for(int i = 0; i < CurrentClass->name->data->len){
+//     appendChar(tmp, CurrentClass->data->data[i]);
+//   }
+//
+//   appendChar(tmp, '.');
+//
+//   for(int i = 0; i < token->data->len){
+//     appendChar(tmp, token->data->data[i]);
+//   }
+//
+//   destroyString(token->data);
+//   token->data = tmp;
+// }
+//
+// int addToTable(tListItem *token){
+//   createCompleteIdent(token);
+//
+//   switch (token->id) {
+//     case T_CLASS:
+//     break;
+//
+//     case T_IDENT:
+//     break;
+//   }
+//   if (searchT(GTRoot, token->data->data) == NULL){
+//           /// vytvorit novou node v globalni tabulce trid
+//           /// error check
+//           CurrentMethod = newTN(token);
+//           if (CurrentMethod == NULL) return E_INTERNAL;
+//
+//           // vlozi novou node do tabulky, jmeno, id
+//           GTRoot = insertTN(GTRoot, CurrentMethod);
+//
+//           //TODO vytvorit lokalni tabulku
+//   }
+// }
+//
+// TableNode *findInTable(tListItem *token){
+//   switch (token->id){
+//     case T_CLASS:
+//       return searchT(CTRoot, token->data->data);
+//     case T_IDENT:
+//       if (isCompleteIdent(token->data)){
+//         return searchT(GTRoot->localTable, token->data->data);
+//       }
+//       if (CurrentMethod == NULL){
+//         if (CTRoot->localTable == NULL) return NULL;
+//         return searchT(CTRoot->localTable, token->data->data);
+//       }
+//       else
+//       {
+//         if (CurrentClass->localTable == NULL) return NULL;
+//         return searchT(CurrentClass->localTable, token->data->data);
+//       }
+//     break;
+//
+//     default: return NULL;
+//   }
+// }
+//
 
-  appendChar(tmp, '.');
-
-  for(int i = 0; i < token->data->len){
-    appendChar(tmp, token->data->data[i]);
-  }
-
-  destroyString(token->data);
-  token->data = tmp;
-}
-
-int addToTable(tListItem *token){
-  createCompleteIdent(token);
-
-  switch (token->id) {
-    case T_CLASS:
-    break;
-
-    case T_IDENT:
-    break;
-  }
-  if (searchT(GTRoot, token->data->data) == NULL){
-          /// vytvorit novou node v globalni tabulce trid
-          /// error check
-          CurrentMethod = newTN(token);
-          if (CurrentMethod == NULL) return E_INTERNAL;
-
-          // vlozi novou node do tabulky, jmeno, id
-          GTRoot = insertTN(GTRoot, CurrentMethod);
-
-          //TODO vytvorit lokalni tabulku
-  }
-}
-
-TableNode *findInTable(tListItem *token){
-  switch (token->id){
-    case T_CLASS:
-      return searchT(CTRoot, token->data->data);
-    case T_IDENT:
-      if (isCompleteIdent()){
-        return searchT(GTRoot->localTable, token->data->data);
-      }
-      if (CurrentMethod == NULL){
-        if (CTRoot->localTable == NULL) return NULL;
-        return searchT(CTRoot->localTable, token->data->data);
-      }
-      else
-      {
-        if (CurrentClass->localTable == NULL) return NULL;
-        return searchT(CurrentClass->localTable, token->data->data);
-      }
-    break;
-
-    default: return NULL;
-  }
-}
-
-
-int getType(tListItem *token){
-
-  return T_INT;
-
-}
-
-int get
-
-
-
-
-struct {
-  int type;
-  union{
-    String *s;
-    int i;
-    double d;
-  } data;
-}
-
-
-                operace op1 op2   vysledek
-insertInstruction(MUL, , , );
-
-
-insertInstruction(assign, , , );
+// int getType(tListItem *token){
+//
+//   return T_INT;
+//
+// }
+//
+// int get
+//
+//
+//
+//
+// struct {
+//   int type;
+//   union{
+//     String *s;
+//     int i;
+//     double d;
+//   } data;
+// }
+//
+//
+//                 operace op1 op2   vysledek
+// insertInstruction(MUL, , , );
+//
+//
+// insertInstruction(assign, , , );
