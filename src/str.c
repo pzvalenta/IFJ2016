@@ -130,3 +130,12 @@ String *copyString(String* old){
 	return new;
 	}
 }
+
+char *concatenate(char *s1, char *s2){
+	s1 = (char*) realloc(s1, strlen(s1) + strlen(s2) + 1);
+	if(s1 == NULL){ //chyba pri realokaci pameti
+		return NULL;
+	}
+	strcat(s1, s2);
+	return s1;
+}

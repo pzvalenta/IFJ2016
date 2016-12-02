@@ -16,6 +16,7 @@
 #include "str.h"
 #include "ial.h"
 #include "interpret.h"
+#include "main.h"
 
 //TODO dodelat push a pop funkce v ramci jednotlivych instrukci ?
 
@@ -31,7 +32,7 @@ int interpret(tInstrList *instrList){
 
 stack = Init_stack(); //Inicializace zasobniku
 if(stack == NULL){
-  //ERROR
+  return E_INTERNAL; //error - chyba pri inicializaci zasobniku
 }
 
   while(instrList->act->instruct.Inst_type != I_STOP && instrList->act != NULL){
@@ -51,7 +52,7 @@ if(stack == NULL){
 
       case I_IFGOTO:
         //podmineny skok
-        if(address1->data != 0){
+        if(address1->data->data != 0){
           list_goto(instrList, address2->data); //??? bude ukazatel address2->data
         }
         break;
@@ -68,7 +69,7 @@ if(stack == NULL){
           //destroyStringData();
           value1 = GetDataofString(address1->data);
           value2 = GetDataofString(address2->data);
-          address3->data = value1 + value2; //scitani ulozeno do address3
+          address3->data->data = value1 + value2; //scitani ulozeno do address3
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_D;
@@ -77,15 +78,15 @@ if(stack == NULL){
           if(address1->data->type != T_NUMBER_D){ //address1->type ?
             //pretypovani
             double val1 = (double *)value1;
-            address3->data = val1 + value2;
+            address3->data->data = val1 + value2;
           }
           if(address2->data->type != T_NUMBER_D){
             //pretypovani
             double val = (double *)value2;
-            address3->data = value1 + val2;
+            address3->data->data = value1 + val2;
           }
           if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
-            address3->data = value1 + value2; //nasobeni ulozeno do address3
+            address3->data->data = value1 + value2; //nasobeni ulozeno do address3
           }
         }
         else if(address1->id == T_STRING_L || address2->id == T_STRING_L){ //alespon jeden operator je string
@@ -95,14 +96,18 @@ if(stack == NULL){
           if(address1->id != T_STRING_L)){
             //pretypovani
             char* val1 = (char*)value1;
-            address3->data = strcat(); //!!!
+            address3->data->data = concatenate((char*) value1, (char*) value2); //!!!
+            // TODO??? zvetseni len a size ve stringu???
           }
           if(address2->id != T_STRING_L)){
             //pretypovani
             char* val2 = (char*)value2;
+            address3->data->data = concatenate((char*) value1, (char*) value2); //!!!
+            // TODO??? zvetseni len a size ve stringu???
           }
           if(address1->id == T_STRING_L && address2->id == T_STRING_L){
-            address3->data = strcat; //nasobeni ulozeno do address3 //TODO
+            address3->data->data = concatenate((char*) value1, (char*) value2); //konkatenace ulozena do address3 //TODO
+            // TODO??? zvetseni len a size ve stringu???
           }
           //uvolneni stringu (destroyStringData)
           //address3->data = strcat(mem, address2->data); //konkatenace ulozena do address3
@@ -121,7 +126,7 @@ if(stack == NULL){
           //destroyStringData();
           value1 = GetDataofString(address1->data);
           value2 = GetDataofString(address2->data);
-          address3->data = value1 - value2; //odcitani ulozeno do address3
+          address3->data->data = value1 - value2; //odcitani ulozeno do address3
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_D;
@@ -130,15 +135,15 @@ if(stack == NULL){
           if(address1->id != T_NUMBER_D){
             //pretypovani
             double val1 = (double *)value1;
-            address3->data = val1 - value2;
+            address3->data->data = val1 - value2;
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
             double val = (double *)value2;
-            address3->data = value1 - val2;
+            address3->data->data = value1 - val2;
           }
           if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
-            address3->data = value1 - value2; //nasobeni ulozeno do address3
+            address3->data->data = value1 - value2; //nasobeni ulozeno do address3
           }
           //uvolneni stringu (destroyStringData)
         }
@@ -155,7 +160,7 @@ if(stack == NULL){
           //destroyStringData();
           value1 = GetDataofString(address1->data);
           value2 = GetDataofString(address2->data);
-          address3->data = value1 * value2; //nasobeni ulozeno do address3
+          address3->data->data = value1 * value2; //nasobeni ulozeno do address3
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_D;
@@ -164,15 +169,15 @@ if(stack == NULL){
           if(address1->id != T_NUMBER_D){
             //pretypovani
             double val1 = (double *)value1;
-            address3->data = val1 * value2;
+            address3->data->data = val1 * value2;
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
             double val = (double *)value2;
-            address3->data = value1 * val2;
+            address3->data->data = value1 * val2;
           }
           if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
-            address3->data = value1 * value2; //nasobeni ulozeno do address3
+            address3->data->data = value1 * value2; //nasobeni ulozeno do address3
           }
           //uvolneni stringu (destroyStringData)
 
@@ -190,7 +195,7 @@ if(stack == NULL){
           //destroyStringData();
           value1 = GetDataofString(address1->data);
           value2 = GetDataofString(address2->data);
-          address3->data = value1 / value2; //deleni ulozeno do address3
+          address3->data->data = value1 / value2; //deleni ulozeno do address3
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
           address3->id = T_NUMBER_D;
@@ -199,15 +204,15 @@ if(stack == NULL){
           if(address1->id != T_NUMBER_D){
             //pretypovani
             double val1 = (double *)value1;
-            address3->data = val1 / value2;
+            address3->data->data = val1 / value2;
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
             double val = (double *)value2;
-            address3->data = value1 / val2;
+            address3->data->data = value1 / val2;
           }
           if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
-            address3->data = value1 / value2; //nasobeni ulozeno do address3
+            address3->data->data = value1 / value2; //nasobeni ulozeno do address3
           }
           //uvolneni stringu (destroyStringData)
         }
@@ -227,10 +232,10 @@ if(stack == NULL){
           value1 = GetDataofString(address1->data);
           value2 = GetDataofString(address2->data);
           if((value1) == (value2)){
-            address3->data = 1;  // !0 TRUE
+            address3->data->data = 1;  // !0 TRUE
           }
           else{
-            address3->data = 0;  // 0 FALSE
+            address3->data->data = 0;  // 0 FALSE
           }
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
@@ -241,28 +246,28 @@ if(stack == NULL){
             //pretypovani
             double val1 = (double *)value1;
             if((val1) == (value2)){
-              address3->data = 1;  // !0 TRUE
+              address3->data->data = 1;  // !0 TRUE
             }
             else{
-              address3->data = 0;  // 0 FALSE
+              address3->data->data = 0;  // 0 FALSE
             }
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
             double val2 = (double *)value2;
             if((value1) == (val2)){
-              address3->data = 1;  // !0 TRUE
+              address3->data->data = 1;  // !0 TRUE
             }
             else{
-              address3->data = 0;  // 0 FALSE
+              address3->data->data = 0;  // 0 FALSE
             }
           }
           if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
             if((value1) == (value2)){
-              address3->data = 1;  // !0 TRUE
+              address3->data->data = 1;  // !0 TRUE
             }
             else{
-              address3->data = 0;  // 0 FALSE
+              address3->data->data = 0;  // 0 FALSE
             }
           }
 
@@ -281,10 +286,10 @@ if(stack == NULL){
         value1 = GetDataofString(address1->data);
         value2 = GetDataofString(address2->data);
         if((value1) != (value2)){
-          address3->data = 1;  // !0 TRUE
+          address3->data->data = 1;  // !0 TRUE
         }
         else{
-          address3->data = 0;  // 0 FALSE
+          address3->data->data = 0;  // 0 FALSE
         }
       }
       else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
@@ -295,28 +300,28 @@ if(stack == NULL){
           //pretypovani
           double val1 = (double *)value1;
           if((val1) != (value2)){
-            address3->data = 1;  // !0 TRUE
+            address3->data->data = 1;  // !0 TRUE
           }
           else{
-            address3->data = 0;  // 0 FALSE
+            address3->data->data = 0;  // 0 FALSE
           }
         }
         if(address2->id != T_NUMBER_D){
           //pretypovani
           double val2 = (double *)value2;
           if((value1) != (val2)){
-            address3->data = 1;  // !0 TRUE
+            address3->data->data = 1;  // !0 TRUE
           }
           else{
-            address3->data = 0;  // 0 FALSE
+            address3->data->data = 0;  // 0 FALSE
           }
         }
         if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
           if((value1) != (value2)){
-            address3->data = 1;  // !0 TRUE
+            address3->data->data = 1;  // !0 TRUE
           }
           else{
-            address3->data = 0;  // 0 FALSE
+            address3->data->data = 0;  // 0 FALSE
           }
         }
 
@@ -335,10 +340,10 @@ if(stack == NULL){
           value1 = GetDataofString(address1->data);
           value2 = GetDataofString(address2->data);
           if((value1) >= (value2)){
-            address3->data = 1;  // !0 TRUE
+            address3->data->data = 1;  // !0 TRUE
           }
           else{
-            address3->data = 0;  // 0 FALSE
+            address3->data->data = 0;  // 0 FALSE
           }
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
@@ -349,28 +354,28 @@ if(stack == NULL){
             //pretypovani
             double val1 = (double *)value1;
             if((val1) >= (value2)){
-              address3->data = 1;  // !0 TRUE
+              address3->data->data = 1;  // !0 TRUE
             }
             else{
-              address3->data = 0;  // 0 FALSE
+              address3->data->data = 0;  // 0 FALSE
             }
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
             double val2 = (double *)value2;
             if((value1) >= (val2)){
-              address3->data = 1;  // !0 TRUE
+              address3->data->data = 1;  // !0 TRUE
             }
             else{
-              address3->data = 0;  // 0 FALSE
+              address3->data->data = 0;  // 0 FALSE
             }
           }
           if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
             if((value1) >= (value2)){
-              address3->data = 1;  // !0 TRUE
+              address3->data->data = 1;  // !0 TRUE
             }
             else{
-              address3->data = 0;  // 0 FALSE
+              address3->data->data = 0;  // 0 FALSE
             }
           }
 
@@ -389,10 +394,10 @@ if(stack == NULL){
           value1 = GetDataofString(address1->data);
           value2 = GetDataofString(address2->data);
           if((value1) <= (value2)){
-            address3->data = 1;  // !0 TRUE
+            address3->data->data = 1;  // !0 TRUE
           }
           else{
-            address3->data = 0;  // 0 FALSE
+            address3->data->data = 0;  // 0 FALSE
           }
         }
         else if(address1->id == T_NUMBER_D || address2->id == T_NUMBER_D){ //alespon jeden operator je double
@@ -403,28 +408,28 @@ if(stack == NULL){
             //pretypovani
             double val1 = (double *)value1;
             if((val1) <= (value2)){
-              address3->data = 1;  // !0 TRUE
+              address3->data->data = 1;  // !0 TRUE
             }
             else{
-              address3->data = 0;  // 0 FALSE
+              address3->data->data = 0;  // 0 FALSE
             }
           }
           if(address2->id != T_NUMBER_D){
             //pretypovani
             double val2 = (double *)value2;
             if((value1) <= (val2)){
-              address3->data = 1;  // !0 TRUE
+              address3->data->data = 1;  // !0 TRUE
             }
             else{
-              address3->data = 0;  // 0 FALSE
+              address3->data->data = 0;  // 0 FALSE
             }
           }
           if(address1->id == T_NUMBER_D && address2->id == T_NUMBER_D){
             if((value1) <= (value2)){
-              address3->data = 1;  // !0 TRUE
+              address3->data->data = 1;  // !0 TRUE
             }
             else{
-              address3->data = 0;  // 0 FALSE
+              address3->data->data = 0;  // 0 FALSE
             }
           }
 
@@ -474,6 +479,26 @@ if(stack == NULL){
       break;
 
       case I_MOV:
+        if(address1->id == T_NUMBER_I){
+          value1 = GetDataofString(address1->data);
+          address3->id = T_NUMBER_I;
+          address3->data->data = value1;
+        }
+        else if(address1->id == T_NUMBER_D){
+          value1 = GetDataofString(address1->data);
+          address3->id = T_NUMBER_D;
+          address3->data->data = value1;
+        }
+        else if(address1->id == T_STRING_L){
+          value1 = GetDataofString(address1->data);
+          address3->id = T_STRING_L;
+          address3->data->data = value1;
+        }
+        else{
+          return E_TYP; //ERROR
+        }
+        break;
+
       case I_INPUT: //jen treti adresa
 
       case I_CALL:
@@ -481,28 +506,25 @@ if(stack == NULL){
 
       case I_CMP_STR:
         if (address1->id == T_STRING_L && address2->id == T_STRING_L){
+          address3->id = T_STRING_L;
           value1 = GetDataofString(address1->data);
           value2 = GetDataofString(address2->data);
           int ret_c = NULL; //sem se ulozi navratova hodnota strcmp
           ret_c = strcmp(value1, value2);
           if (ret_c == 0){
-            address3->data = 0;  // 0 TRUE stringy se rovnaji
+            address3->data->data = 0;  // 0 TRUE stringy se rovnaji
           }
           else if (ret_c > 0){
-            address3->data = 1; // prvni string je vetsi nez druhy string
+            address3->data->data = 1; // prvni string je vetsi nez druhy string
           }
           else{
-            address3->data = -1; // jine, resp. druhy je vetsi nez prvni
+            address3->data->data = -1; // jine, resp. druhy je vetsi nez prvni
           }
         }
         else{
           return E_TYP;
         }
         break;
-
-
-
-
 
     } //konec switch
 

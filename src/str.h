@@ -49,6 +49,10 @@ void destroyStringData(String *string);
 
 String *copyString(String* old);
 
+void *GetDataofString (String *str);
+
+String *concatenate(String *s1, String *s2);
+
 ///////////////////////////////////////////////
 
 

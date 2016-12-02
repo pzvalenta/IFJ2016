@@ -48,6 +48,8 @@
 /* list_insert_last(*List instrukci, I_POP, co se popuje, , )*/
  #define I_CMP_STR      15    //porovnavani sringu
 /* list_insert_last(*List instrukci, I_CMP_STR, prvni string, druhy string, vysledek)*/
+ #define I_MOV          16    //presouvani z adresy 1 - source do adresy 3 - dest
+/* list_insert_last(*List instrukci, I_MOV, source, , destination)*/
 
 
 
