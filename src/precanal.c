@@ -429,7 +429,6 @@ int prec_anal(int until)
     insert_terminal_last(l,'$'); //na spodek zasobniku se dava terminal $
 
     int result; //vraceni vysledku
-    token=token->next; //nacte se prvni vstup
     if(token->id==until) //expession nemuze byt prazdny
     {
         dispose_list(l);
