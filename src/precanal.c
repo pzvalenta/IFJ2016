@@ -461,7 +461,7 @@ int prec_anal(int until)
             else
             {
                 //kontrola zda token muze byt ve vyrazu
-                if(token->id==T_C_IDENT ||token->id==T_IDENT || (token->id>=T_NUMBER_I && token->id<=T_NUMBER_D ) ||
+                if(token->id==T_C_IDENT ||token->id==T_IDENT || (token->id>=T_NUMBER_I && token->id<=T_STRING_L ) ||
                    (token->id>=T_EQUAL && token->id<=T_SLASH ) ||(token->id>=T_LBRACKET && token->id<=T_RBRACKET) ||token->id==36 ) //36 ascii $
                     {}
                 else
