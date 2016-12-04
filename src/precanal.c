@@ -25,6 +25,21 @@ void init_list(tList *l) //vola se pouze alokovany ukazatel na seznam
     l->lastTerminal=NULL;
 }
 
+<<<<<<< HEAD
+void dispose_list(tList *l) //uvolni seznam
+{
+    tItem *tmp=l->first;
+
+    if(tmp!=NULL)
+    {
+      while(tmp->next!=NULL)
+      {
+        tmp=tmp->next;
+        free(tmp->prev);
+      }
+      free(tmp);
+    }
+=======
 void dispose_list(tList *l)
 {
     tItem *tmp=l->first;
@@ -35,6 +50,7 @@ void dispose_list(tList *l)
       free(tmp->prev);
     }
     free(tmp);
+>>>>>>> origin/petr-jares
 }
 
 int insert_terminal_last(tList *l, int c)
@@ -54,6 +70,10 @@ int insert_terminal_last(tList *l, int c)
           tmp->c=getType();
           if(tmp->c==-1) return E_SEM;
           //prida se offset
+<<<<<<< HEAD
+          //TODO identifikator funkce
+=======
+>>>>>>> origin/petr-jares
         }
         else
         {
@@ -81,6 +101,10 @@ int insert_terminal_last(tList *l, int c)
       tmp->c=getType();
       if(tmp->c==-1) return E_SEM;
       //prida se offset
+<<<<<<< HEAD
+      //TODO identifikator funkce, stejne jak radek 60
+=======
+>>>>>>> origin/petr-jares
     }
     else
     {
@@ -369,7 +393,7 @@ int is_rule (tList*l)
 
 /** indexy precedenci tabulky*/
 int index[14]={T_PLUS,T_MINUS,T_MUL,T_SLASH,T_LBRACKET,T_RBRACKET,
-                T_GREAT,T_LESS,T_GEQUAL,T_LEQUAL,T_EQUAL,T_EXCLAIM,T_IDENT,'$'}; //ok
+                T_GREAT,T_LESS,T_GEQUAL,T_LEQUAL,T_EQUAL,T_EXCLAIM,T_IDENT,T_DOLLAR}; //ok
 
 /** pravidla pro analyzu v tabulce*/
 char prec_table[14][14]={
@@ -419,6 +443,8 @@ char rule(tList *l)
 
 int prec_anal(int until)
 {
+  if(!SECOND_RUN) return expr(until);
+
     tList *l;
     l=malloc(sizeof(tList));
     if(l==NULL)
@@ -426,9 +452,13 @@ int prec_anal(int until)
         return E_INTERNAL;
     }
     init_list(l);
-    insert_terminal_last(l,'$'); //na spodek zasobniku se dava terminal $
+    insert_terminal_last(l,T_DOLLAR); //na spodek zasobniku se dava terminal $
 
     int result; //vraceni vysledku
+<<<<<<< HEAD
+    token=token->next; //nacte se prvni vstup
+=======
+>>>>>>> origin/petr-jares
     if(token->id==until) //expession nemuze byt prazdny
     {
         dispose_list(l);
@@ -438,7 +468,7 @@ int prec_anal(int until)
 
     int end=until;
     int vratit=token->id; //timto prepsat posledni token z $ zpet na puvodni
-    while(token->id!=end || l->lastTerminal->c!='$') //dokud neni na vstupu zakoncujici znak a na zasobniku je pouze jede terminal $
+    while(token->id!=end || l->lastTerminal->c!=T_DOLLAR) //dokud neni na vstupu zakoncujici znak a na zasobniku je pouze jede terminal $
     {
         //kontrola posledniho znaku
         if(token->id==end)
@@ -447,14 +477,14 @@ int prec_anal(int until)
                 {
                     if(bracket_balance(l)==0)
                     {
-                        end='$';
-                        token->id='$';
+                        end=T_DOLLAR;
+                        token->id=T_DOLLAR;
                     }
                 }
                 else
                 {
-                    end='$';
-                    token->id='$';
+                    end=T_DOLLAR;
+                    token->id=T_DOLLAR;
                 }
             }
             else
@@ -462,7 +492,7 @@ int prec_anal(int until)
                 //kontrola zda token muze byt ve vyrazu
                 if(token->id==T_C_IDENT ||token->id==T_IDENT || (token->id>=T_NUMBER_I && token->id<=T_STRING_L ) ||
                    (token->id>=T_EQUAL && token->id<=T_SLASH ) ||(token->id>=T_LBRACKET && token->id<=T_RBRACKET) ||token->id==36 ) //36 ascii $
-                    {}
+                    {}                                                                                            //asi define $ neco, kryje se s void
                 else
                     {
                         dispose_list(l);
@@ -476,22 +506,48 @@ int prec_anal(int until)
         //jednotlive algoritmy pravidel u precedencni analyzy
         switch(rule(l))
         {
+        //pravidlo =
         case '=':
             result=insert_terminal_last(l,token->id);
+<<<<<<< HEAD
+            if(result!=E_OK)
+            {
+              dispose_list(l);
+              free(l);
+              return result;
+            }
+=======
             if(result!=E_OK) return result;
+>>>>>>> origin/petr-jares
             token=token->next;
             vratit=token->id;
             break;
-
+        //pravidlo <
         case '<':
             result=insert_handle(l);
+<<<<<<< HEAD
+              if(result!=E_OK)
+              {
+                dispose_list(l);
+                free(l);
+                return result;
+              }
+            result=insert_terminal_last(l,token->id);
+              if(result!=E_OK)
+              {
+                dispose_list(l);
+                free(l);
+                return result;
+              }
+=======
             if(result!=E_OK) return result;
             result=insert_terminal_last(l,token->id);
             if(result!=E_OK) return result;
+>>>>>>> origin/petr-jares
             token=token->next;
             vratit=token->id;
             break;
-
+        //pravidlo >
         case '>':  //pokud je handle na zasobniku a existuje pravidlo ze ktereho je vysledek za handlem
             if(is_handle(l))
             {
@@ -537,4 +593,45 @@ int prec_anal(int until)
 //    dispose_list(l);
 //    free(l);
     return E_OK;
+<<<<<<< HEAD
+}
+////////////////////////////////////////////////
+///prvni pruchod, kontrola indetifikatoru a funkci
+int expr(int until)
+{
+    tList *l;
+    l=malloc(sizeof(tList));
+    if(l==NULL)
+    {
+      return E_INTERNAL;
+    }
+
+    while(token!=until || bracket_balance(l)!=0)
+    {
+      if(token->id==T_C_IDENT ||token->id==T_IDENT || (token->id>=T_NUMBER_I && token->id<=T_NUMBER_D ) ||
+         (token->id>=T_EQUAL && token->id<=T_SLASH ) ||(token->id>=T_LBRACKET && token->id<=T_RBRACKET) )
+          {}
+      else
+          {
+            dispose_list(l);
+            free(l);
+            return E_SYN;
+          }
+
+      if(token->id==T_INDENT || token->id==T_C_IDENT)
+      {
+        if(token->next->id==T_LBRACKET)
+        {
+          //funkce ve vyrazu
+        }
+        //identifikator
+      }
+
+      insert_terminal_last(l,token->id);
+      token=token->next;
+    }
+
+    return E_OK;
+=======
+>>>>>>> origin/petr-jares
 }
