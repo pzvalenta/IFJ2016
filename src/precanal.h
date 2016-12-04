@@ -22,7 +22,7 @@
 #include "main.h"
 #include "parser.h"
 
-
+extern int SECOND_RUN;
 
 typedef struct item{
     int c;             //ID terminalu
@@ -54,5 +54,6 @@ int is_rule (tList*l);
 int get_index(int c);
 char rule(tList *l);
 int prec_anal(int until);
+int expr(int until);
 
 #endif // PRECANAL_H_INCLUDED
