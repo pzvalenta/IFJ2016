@@ -25,7 +25,6 @@ void init_list(tList *l) //vola se pouze alokovany ukazatel na seznam
     l->lastTerminal=NULL;
 }
 
-<<<<<<< HEAD
 void dispose_list(tList *l) //uvolni seznam
 {
     tItem *tmp=l->first;
@@ -39,19 +38,8 @@ void dispose_list(tList *l) //uvolni seznam
       }
       free(tmp);
     }
-=======
-void dispose_list(tList *l)
-{
-    tItem *tmp=l->first;
-
-    while(tmp->next!=NULL)
-    {
-      tmp=tmp->next;
-      free(tmp->prev);
-    }
-    free(tmp);
->>>>>>> origin/petr-jares
 }
+
 
 int insert_terminal_last(tList *l, int c)
 {
@@ -70,10 +58,7 @@ int insert_terminal_last(tList *l, int c)
           tmp->c=getType();
           if(tmp->c==-1) return E_SEM;
           //prida se offset
-<<<<<<< HEAD
           //TODO identifikator funkce
-=======
->>>>>>> origin/petr-jares
         }
         else
         {
@@ -101,10 +86,7 @@ int insert_terminal_last(tList *l, int c)
       tmp->c=getType();
       if(tmp->c==-1) return E_SEM;
       //prida se offset
-<<<<<<< HEAD
       //TODO identifikator funkce, stejne jak radek 60
-=======
->>>>>>> origin/petr-jares
     }
     else
     {
@@ -132,7 +114,7 @@ int insert_handle(tList *l)
         {
             return E_INTERNAL;
         }
-        tmp->c=NULL;
+        tmp->c=0;
         tmp->terminal=false;
         tmp->handle=true;
         tmp->next=NULL;
@@ -148,7 +130,7 @@ int insert_handle(tList *l)
         {
             return E_INTERNAL;
         }
-        tmp->c=NULL;
+        tmp->c=0;
         tmp->terminal=false;
         tmp->handle=true;
         tmp->next=l->lastTerminal->next;
@@ -299,7 +281,7 @@ void reduce (tList *l)
     if(s) tmp->c=T_STRING_L;
     else if(d) tmp->c=T_NUMBER_D;
         else if(in) tmp->c=T_NUMBER_I;
-            else tmp->c=NULL;
+            else tmp->c=0;
 
   ///zamena handle na pozdeji vypocitany neterminal
 
@@ -392,7 +374,7 @@ int is_rule (tList*l)
 ///prace s precedenci tabulkou
 
 /** indexy precedenci tabulky*/
-int index[14]={T_PLUS,T_MINUS,T_MUL,T_SLASH,T_LBRACKET,T_RBRACKET,
+int prec_index[14]={T_PLUS,T_MINUS,T_MUL,T_SLASH,T_LBRACKET,T_RBRACKET,
                 T_GREAT,T_LESS,T_GEQUAL,T_LEQUAL,T_EQUAL,T_EXCLAIM,T_IDENT,T_DOLLAR}; //ok
 
 /** pravidla pro analyzu v tabulce*/
@@ -423,10 +405,11 @@ int get_index(int c) //ok
 
     for(i=0;i<14;i++)
     {
-        if(index[i]==c)
+        if(prec_index[i]==c)
             return i;
     }
 
+    return -1;
     //pokud nenalezne- ve vyrazu se vyskytl nepovoleny token- syntakticka chyba
 }
 
@@ -455,10 +438,7 @@ int prec_anal(int until)
     insert_terminal_last(l,T_DOLLAR); //na spodek zasobniku se dava terminal $
 
     int result; //vraceni vysledku
-<<<<<<< HEAD
     token=token->next; //nacte se prvni vstup
-=======
->>>>>>> origin/petr-jares
     if(token->id==until) //expession nemuze byt prazdny
     {
         dispose_list(l);
@@ -509,23 +489,20 @@ int prec_anal(int until)
         //pravidlo =
         case '=':
             result=insert_terminal_last(l,token->id);
-<<<<<<< HEAD
             if(result!=E_OK)
             {
               dispose_list(l);
               free(l);
               return result;
             }
-=======
+
             if(result!=E_OK) return result;
->>>>>>> origin/petr-jares
             token=token->next;
             vratit=token->id;
             break;
         //pravidlo <
         case '<':
             result=insert_handle(l);
-<<<<<<< HEAD
               if(result!=E_OK)
               {
                 dispose_list(l);
@@ -539,11 +516,9 @@ int prec_anal(int until)
                 free(l);
                 return result;
               }
-=======
             if(result!=E_OK) return result;
             result=insert_terminal_last(l,token->id);
             if(result!=E_OK) return result;
->>>>>>> origin/petr-jares
             token=token->next;
             vratit=token->id;
             break;
@@ -593,7 +568,6 @@ int prec_anal(int until)
 //    dispose_list(l);
 //    free(l);
     return E_OK;
-<<<<<<< HEAD
 }
 ////////////////////////////////////////////////
 ///prvni pruchod, kontrola indetifikatoru a funkci
@@ -606,7 +580,7 @@ int expr(int until)
       return E_INTERNAL;
     }
 
-    while(token!=until || bracket_balance(l)!=0)
+    while(token->id!=until || bracket_balance(l)!=0)
     {
       if(token->id==T_C_IDENT ||token->id==T_IDENT || (token->id>=T_NUMBER_I && token->id<=T_NUMBER_D ) ||
          (token->id>=T_EQUAL && token->id<=T_SLASH ) ||(token->id>=T_LBRACKET && token->id<=T_RBRACKET) )
@@ -618,7 +592,7 @@ int expr(int until)
             return E_SYN;
           }
 
-      if(token->id==T_INDENT || token->id==T_C_IDENT)
+      if(token->id==T_IDENT || token->id==T_C_IDENT)
       {
         if(token->next->id==T_LBRACKET)
         {
@@ -632,6 +606,4 @@ int expr(int until)
     }
 
     return E_OK;
-=======
->>>>>>> origin/petr-jares
 }

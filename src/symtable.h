@@ -37,5 +37,6 @@ int setCurrentMethod();
 int setCurrentClass();
 
 int isFunction();
+int getType(); //TODO predelat na getType(tListItem *token)
 
 #endif
