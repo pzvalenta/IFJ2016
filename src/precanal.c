@@ -18,23 +18,62 @@
 ///////////////////////////////////////////////////////////
 ///prace se zasobnikem(dvousmerny linearni seznam)
 
-void init_list(tList *l) //ok
+void init_list(tList *l) //vola se pouze alokovany ukazatel na seznam
 {
     l->first=NULL;
     l->last=NULL;
     l->lastTerminal=NULL;
 }
 
-void insert_terminal_last(tList *l, int c) //ok
+<<<<<<< HEAD
+void dispose_list(tList *l) //uvolni seznam
+{
+    tItem *tmp=l->first;
+
+    if(tmp!=NULL)
+    {
+      while(tmp->next!=NULL)
+      {
+        tmp=tmp->next;
+        free(tmp->prev);
+      }
+      free(tmp);
+    }
+=======
+void dispose_list(tList *l)
+{
+    tItem *tmp=l->first;
+
+    while(tmp->next!=NULL)
+    {
+      tmp=tmp->next;
+      free(tmp->prev);
+    }
+    free(tmp);
+>>>>>>> origin/petr-jares
+}
+
+int insert_terminal_last(tList *l, int c)
 {
     ///pokud je terminal identifikator, tak zjistit jeho typ a ulozit ho jako cislo nebo string
     if(l->first==NULL)
     {
         tItem *tmp;
         tmp=malloc(sizeof(tItem));
+        if(tmp==NULL)
+        {
+            return E_INTERNAL;
+        }
+
         if(c==T_IDENT || c==T_C_IDENT)
         {
-            tmp->c=T_NUMBER_I;///pridat z tabulky symbolu
+          tmp->c=getType();
+          if(tmp->c==-1) return E_SEM;
+          //prida se offset
+<<<<<<< HEAD
+          //TODO identifikator funkce
+=======
+>>>>>>> origin/petr-jares
         }
         else
         {
@@ -52,9 +91,20 @@ void insert_terminal_last(tList *l, int c) //ok
     {
     tItem *tmp;
     tmp=malloc(sizeof(tItem));
+    if(tmp==NULL)
+    {
+        return E_INTERNAL;
+    }
+
     if(c==T_IDENT || c==T_C_IDENT)
     {
-        tmp->c=T_NUMBER_I;//pridat z tabulky symbolu
+      tmp->c=getType();
+      if(tmp->c==-1) return E_SEM;
+      //prida se offset
+<<<<<<< HEAD
+      //TODO identifikator funkce, stejne jak radek 60
+=======
+>>>>>>> origin/petr-jares
     }
     else
     {
@@ -68,15 +118,21 @@ void insert_terminal_last(tList *l, int c) //ok
     l->last=tmp;
     l->lastTerminal=tmp;
     }
+
+    return E_OK;
 }
 /** handle slouzi jako vnoreni, co se bude jako prvni pocitat ve vyrazu*/
-void insert_handle(tList *l) //ok
+int insert_handle(tList *l)
 {
     if(l->last==l->lastTerminal)
     {
         tItem *tmp;
         tmp=malloc(sizeof(tItem));
-        tmp->c=-1; //TODO
+        if(tmp==NULL)
+        {
+            return E_INTERNAL;
+        }
+        tmp->c=NULL;
         tmp->terminal=false;
         tmp->handle=true;
         tmp->next=NULL;
@@ -88,7 +144,11 @@ void insert_handle(tList *l) //ok
     {
         tItem *tmp;
         tmp=malloc(sizeof(tItem));
-        tmp->c=-1; //TODO
+        if(tmp==NULL)
+        {
+            return E_INTERNAL;
+        }
+        tmp->c=NULL;
         tmp->terminal=false;
         tmp->handle=true;
         tmp->next=l->lastTerminal->next;
@@ -96,10 +156,12 @@ void insert_handle(tList *l) //ok
         tmp->prev=l->lastTerminal;
         l->lastTerminal->next=tmp;
     }
+
+    return E_OK;
 }
 
 /** testovani zda je handle na zasobniku, musi byt vzdy pokud probehne redukce*/
-bool is_handle(tList *l) //ok
+bool is_handle(tList *l)
 {
     tItem *tmp=l->last;
 
@@ -144,10 +206,10 @@ tItem * get_last_handle(tList *l)
     {
         tmp=tmp->prev;
     }
-    if(tmp==NULL)
+/*    if(tmp==NULL)
     {
         //nemelo by nastat, tato funkce bude zavolana v pripade ze je handle v zasobniku
-    }
+    } */
     return tmp;
 }
 /** hledani posledniho terminalu, aby bylo mozne zjistit jake pravidlo z prec. tabulky se ma pouzit*/
@@ -162,19 +224,20 @@ void find_last_terminal(tList *l)
     //vzdy by melo najit aspon terminal $
 
 }
-/** vyjmuti operandu nebo operatoru pro posladni instrukce na spocitani vyrazu*/
+/** vyjmuti operandu nebo operatoru pro poslani instrukce na spocitani vyrazu*/
 tItem * cut_item(tList *l, int *typ)
 {
-    tItem *tmp=get_last_handle(l);
+    tItem *tmp=get_last_handle(l); //redukovat vyrazy od nejvnorenejsiho handlu
 
     tmp=tmp->next;
 
     if(tmp==NULL)
     {
         // nemelo by nastat, po vkladani handle by mel byt dalsi prvek na zasobniku
+        return NULL; //nevim jestli je potreba
     }
 
-    tItem *tmpReturn=tmp; //tmp se uvolni ze asobniku, tmpReturn se vrati dany operand/operator
+    tItem *tmpReturn=tmp; //tmp se uvolni ze zasobniku, tmpReturn se vrati dany operand/operator
     *typ=tmp->c;
     if(tmp==l->last)
     {
@@ -213,6 +276,7 @@ void reduce (tList *l)
         i++;
     }
 
+    //pri konvertovani ma nejvetsi prioritu string pak double, nakonec int
     bool s=false, d=false, in=false;
     int j;
     for(j=0;j<i;j++)
@@ -235,8 +299,7 @@ void reduce (tList *l)
     if(s) tmp->c=T_STRING_L;
     else if(d) tmp->c=T_NUMBER_D;
         else if(in) tmp->c=T_NUMBER_I;
-            else tmp->c=-1; //TODO
-
+            else tmp->c=NULL;
 
   ///zamena handle na pozdeji vypocitany neterminal
 
@@ -277,6 +340,7 @@ int is_rule (tList*l)
         switch(tmp->c)
         {
             case T_IDENT: ///oddela se, identifikator se rouvnou bude ukladat jako cislo nebo string
+            case T_C_IDENT:
             case T_NUMBER_I:
             case T_NUMBER_D:
             case T_STRING_L:
@@ -328,8 +392,8 @@ int is_rule (tList*l)
 ///prace s precedenci tabulkou
 
 /** indexy precedenci tabulky*/
-int t_index[14]={T_PLUS,T_MINUS,T_MUL,T_SLASH,T_LBRACKET,T_RBRACKET,
-                T_GREAT,T_LESS,T_GEQUAL,T_LEQUAL,T_EQUAL,T_EXCLAIM,T_IDENT,'$'}; //ok
+int index[14]={T_PLUS,T_MINUS,T_MUL,T_SLASH,T_LBRACKET,T_RBRACKET,
+                T_GREAT,T_LESS,T_GEQUAL,T_LEQUAL,T_EQUAL,T_EXCLAIM,T_IDENT,T_DOLLAR}; //ok
 
 /** pravidla pro analyzu v tabulce*/
 char prec_table[14][14]={
@@ -359,11 +423,10 @@ int get_index(int c) //ok
 
     for(i=0;i<14;i++)
     {
-        if(t_index[i]==c)
+        if(index[i]==c)
             return i;
     }
 
-    return -1;
     //pokud nenalezne- ve vyrazu se vyskytl nepovoleny token- syntakticka chyba
 }
 
@@ -380,6 +443,8 @@ char rule(tList *l)
 
 int prec_anal(int until)
 {
+  if(!SECOND_RUN) return expr(until);
+
     tList *l;
     l=malloc(sizeof(tList));
     if(l==NULL)
@@ -387,17 +452,23 @@ int prec_anal(int until)
         return E_INTERNAL;
     }
     init_list(l);
-    insert_terminal_last(l,'$'); //na spodek zasobniku se dava terminal $
+    insert_terminal_last(l,T_DOLLAR); //na spodek zasobniku se dava terminal $
 
-    //token=token->next; //nacte se prvni vstup
+    int result; //vraceni vysledku
+<<<<<<< HEAD
+    token=token->next; //nacte se prvni vstup
+=======
+>>>>>>> origin/petr-jares
     if(token->id==until) //expession nemuze byt prazdny
     {
+        dispose_list(l);
+        free(l);
         return E_SYN;
     }
 
     int end=until;
     int vratit=token->id; //timto prepsat posledni token z $ zpet na puvodni
-    while(token->id!=end || l->lastTerminal->c!='$') //dokud neni na vstupu zakoncujici znak a na zasobniku je pouze jede terminal $
+    while(token->id!=end || l->lastTerminal->c!=T_DOLLAR) //dokud neni na vstupu zakoncujici znak a na zasobniku je pouze jede terminal $
     {
         //kontrola posledniho znaku
         if(token->id==end)
@@ -406,14 +477,14 @@ int prec_anal(int until)
                 {
                     if(bracket_balance(l)==0)
                     {
-                        end='$';
-                        token->id='$';
+                        end=T_DOLLAR;
+                        token->id=T_DOLLAR;
                     }
                 }
                 else
                 {
-                    end='$';
-                    token->id='$';
+                    end=T_DOLLAR;
+                    token->id=T_DOLLAR;
                 }
             }
             else
@@ -421,10 +492,12 @@ int prec_anal(int until)
                 //kontrola zda token muze byt ve vyrazu
                 if(token->id==T_C_IDENT ||token->id==T_IDENT || (token->id>=T_NUMBER_I && token->id<=T_STRING_L ) ||
                    (token->id>=T_EQUAL && token->id<=T_SLASH ) ||(token->id>=T_LBRACKET && token->id<=T_RBRACKET) ||token->id==36 ) //36 ascii $
-                    {}
+                    {}                                                                                            //asi define $ neco, kryje se s void
                 else
                     {
-                    return E_SYN;
+                        dispose_list(l);
+                        free(l);
+                        return E_SYN;
                     }
 
             }
@@ -433,19 +506,48 @@ int prec_anal(int until)
         //jednotlive algoritmy pravidel u precedencni analyzy
         switch(rule(l))
         {
+        //pravidlo =
         case '=':
-            insert_terminal_last(l,token->id);
+            result=insert_terminal_last(l,token->id);
+<<<<<<< HEAD
+            if(result!=E_OK)
+            {
+              dispose_list(l);
+              free(l);
+              return result;
+            }
+=======
+            if(result!=E_OK) return result;
+>>>>>>> origin/petr-jares
             token=token->next;
             vratit=token->id;
             break;
-
+        //pravidlo <
         case '<':
-            insert_handle(l);
-            insert_terminal_last(l,token->id);
+            result=insert_handle(l);
+<<<<<<< HEAD
+              if(result!=E_OK)
+              {
+                dispose_list(l);
+                free(l);
+                return result;
+              }
+            result=insert_terminal_last(l,token->id);
+              if(result!=E_OK)
+              {
+                dispose_list(l);
+                free(l);
+                return result;
+              }
+=======
+            if(result!=E_OK) return result;
+            result=insert_terminal_last(l,token->id);
+            if(result!=E_OK) return result;
+>>>>>>> origin/petr-jares
             token=token->next;
             vratit=token->id;
             break;
-
+        //pravidlo >
         case '>':  //pokud je handle na zasobniku a existuje pravidlo ze ktereho je vysledek za handlem
             if(is_handle(l))
             {
@@ -457,27 +559,79 @@ int prec_anal(int until)
                     }
                     else
                     {
+                        dispose_list(l);
+                        free(l);
                         return E_TYP;  //semanticka chyba, nepovolede operace s retezcem
                     }
 
                 }
                 else //spatne zapsany vyraz
                 {
+                    dispose_list(l);
+                    free(l);
                     return E_SYN;
                 }
 
             }
             else //neni handle na zasobniku, zase spatne zapsany vyraz
             {
+                dispose_list(l);
+                free(l);
                 return E_SYN;
             }
 
             break;
 
         default: //pokud je pravidlo ' ' taky spatne zapsany vyraz
-           return E_SYN;
+            dispose_list(l);
+            free(l);
+            return E_SYN;
         }
     }
     token->id=vratit;
-    return 0;
+    //mozna uvolnit list kde na konci bude jenom jeden neterminal
+//    dispose_list(l);
+//    free(l);
+    return E_OK;
+<<<<<<< HEAD
+}
+////////////////////////////////////////////////
+///prvni pruchod, kontrola indetifikatoru a funkci
+int expr(int until)
+{
+    tList *l;
+    l=malloc(sizeof(tList));
+    if(l==NULL)
+    {
+      return E_INTERNAL;
+    }
+
+    while(token!=until || bracket_balance(l)!=0)
+    {
+      if(token->id==T_C_IDENT ||token->id==T_IDENT || (token->id>=T_NUMBER_I && token->id<=T_NUMBER_D ) ||
+         (token->id>=T_EQUAL && token->id<=T_SLASH ) ||(token->id>=T_LBRACKET && token->id<=T_RBRACKET) )
+          {}
+      else
+          {
+            dispose_list(l);
+            free(l);
+            return E_SYN;
+          }
+
+      if(token->id==T_INDENT || token->id==T_C_IDENT)
+      {
+        if(token->next->id==T_LBRACKET)
+        {
+          //funkce ve vyrazu
+        }
+        //identifikator
+      }
+
+      insert_terminal_last(l,token->id);
+      token=token->next;
+    }
+
+    return E_OK;
+=======
+>>>>>>> origin/petr-jares
 }
