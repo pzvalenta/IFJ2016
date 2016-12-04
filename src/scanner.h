@@ -87,6 +87,7 @@ struct tListItem {
   int id;
   String *data;
   struct tListItem *next;
+  struct tListItem *prev;
 };
 
 

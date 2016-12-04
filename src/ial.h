@@ -17,12 +17,14 @@ struct varNode{
 	int offset;
 	int declared;
 	int initialized;
-	
+
 	struct varNode *global;
 
 	struct varNode *left;
 	struct varNode *right;
-}
+};
+
+struct tListItem;
 
 //funkce pro praci s lok / glob tabulkami promennych
 struct varNode *newVN(struct tListItem *token);
@@ -33,6 +35,7 @@ struct varNode *findMaxVN(struct varNode *root);
 struct varNode *searchVT(struct varNode *root, char *exp);
 void destroyVN (struct varNode *node);
 void destroyVT (struct varNode *root);
+void printSpecialV(struct varNode *node);
 
 
 
@@ -41,15 +44,15 @@ void destroyVT (struct varNode *root);
 struct funNode{
 	String *name;
 
-	String types; // void func(int a, double b)   =  "vid"
+	String *types; // void func(int a, double b)   =  "vid"
 	int varc; //pocet lok. promennych
-	varNode *lVarTable;
+	struct varNode *lVarTable;
 	// TODO ukazatel na prvni instrukci
 	// TODO deklarace, definice?
 
 	struct funNode *left;
 	struct funNode *right;
-}
+};
 
 //funkce pro praci s glob. tabulkou funkci
 struct funNode *newFN(struct tListItem *token);
@@ -57,9 +60,11 @@ struct funNode *insertFN(struct funNode *root, struct funNode *node);
 void deleteFN(struct funNode *root, struct funNode *node);
 void replaceFN(struct funNode *out, struct funNode *in);
 struct funNode *findMaxFN(struct funNode *root);
-struct funNode *searchFT(struct funNode *root, char *exp);
+struct funNode *searchFT(struct funNode *root, char *expression);
 void destroyFN (struct funNode *node);
 void destroyFT (struct funNode *root);
+void printInOrderF(struct funNode *node);
+void printSpecialF(struct funNode *node);
 
 
 ////////////////////////CLASSES
@@ -67,11 +72,12 @@ void destroyFT (struct funNode *root);
 struct classNode{
 	String *name;
 
-	varNode *lVarTable;
+	struct varNode *lVarTable;
+	int varc;
 
 	struct classNode *left;
 	struct classNode *right;
-}
+};
 
 //funkce pro praci s glob. tabulkou trid
 struct classNode *newCN(struct tListItem *token);
@@ -82,7 +88,8 @@ struct classNode *findMaxCN(struct classNode *root);
 struct classNode *searchCT(struct classNode *root, char *exp);
 void destroyCN (struct classNode *node);
 void destroyCT (struct classNode *root);
-
+void printInOrderC(struct classNode *node);
+void printSpecialC(struct classNode *node);
 
 
 

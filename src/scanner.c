@@ -91,6 +91,7 @@ int insertLastToken(){
                 head->id = tokenValue;
                 head->data = string;
                 head->next = NULL;
+                head->prev = NULL;
                 tail = head;
         }
         else{
@@ -99,6 +100,7 @@ int insertLastToken(){
                 struct tListItem *tmp = malloc(sizeof(struct tListItem));
                 if (tmp == NULL) return E_INTERNAL;
 
+                tmp->prev = tail;
                 tmp->next = NULL;
                 tmp->data = string;
                 tmp->id = tokenValue;

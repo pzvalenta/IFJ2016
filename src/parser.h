@@ -6,20 +6,25 @@
 #include "str.h"
 #include "main.h"
 #include "debug.h"
+#include "symtable.h"
 
-struct TableNode;
+
 struct tListItem;
 
 
 extern struct tListItem *token;    // globalni promena, ukazatel na momentalni token v tokenlistu
-extern struct TableNode *CTRoot; //koren globalni tabulky trid
-extern struct TableNode *GTRoot; //koren globalni tabulky funkci a promennych
 
-extern struct TableNode *CurrentClass;
-extern struct TableNode *CurrentMethod;
+extern struct classNode *CTRoot; //koren globalni tabulky trid
+extern struct varNode *GVRoot; //koren globalni tabulky promennych
+extern struct funNode *FTRoot; // koren glob tabulky funkci
 
 
-int parse(struct TableNode *CTRoot, struct TableNode *GTRoot, struct tListItem *head);
+extern struct classNode *CurrentClass;
+extern struct funNode *CurrentMethod;
+extern struct varNode *CurrentVar;
+extern int SECOND_RUN;
+
+int parse(struct tListItem *head);
 
 
 #endif

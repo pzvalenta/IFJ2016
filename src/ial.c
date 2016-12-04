@@ -36,8 +36,8 @@ struct varNode *newVN(struct tListItem *token){
 	}
 
 	ret->name = token->data;
-	ret->type = E_SYM;
-	ret->offset = 0;
+	ret->type = -1;
+	ret->offset = -1;
 	ret->declared = 0;
 	ret->initialized = 0;
 
@@ -84,7 +84,7 @@ void deleteVN(struct varNode *root, struct varNode *node){
 			replaceVN(node, node->left);
 		}
 		else if (node->right != NULL && node->left != NULL){
-			TableNode *tmp = findMaxVN(node->left);
+			struct varNode *tmp = findMaxVN(node->left);
 			tmp->right = node->right;
 			replaceVN(node, tmp);
 			deleteVN(root, tmp);
@@ -186,7 +186,7 @@ struct funNode *newFN(struct tListItem *token){
 	if (ret->types == NULL) return NULL;
 
 	ret->lVarTable = NULL;
-	int varc = 0;
+	ret-> varc = 0;
 
 	// TODO ukazatel na prvni instrukci
 	// TODO deklarace, definice?	ret->offset = 0;
@@ -234,7 +234,7 @@ void deleteFN(struct funNode *root, struct funNode *node){
 			replaceFN(node, node->left);
 		}
 		else if (node->right != NULL && node->left != NULL){
-			TableNode *tmp = findMaxFN(node->left);
+			struct funNode *tmp = findMaxFN(node->left);
 			tmp->right = node->right;
 			replaceFN(node, tmp);
 			deleteFN(root, tmp);
@@ -253,6 +253,7 @@ void replaceFN(struct funNode *out, struct funNode *in){
 	out->types = in->types;
 
 	out->lVarTable = in->lVarTable;
+	out->varc = in->varc;
 
 	out->left = in->left;
 	out->right = in->right;
@@ -268,13 +269,14 @@ struct funNode *findMaxFN(struct funNode *root){
 	else return root;
 }
 
-struct funNode *searchFT(struct funNode *root, char *exp){
+struct funNode *searchFT(struct funNode *root, char *expression){
 	if (root == NULL) return NULL;
+	if (expression == NULL) return NULL;
 
-	int a = strcmp(exp, root->name->data);
+	int a = strcmp(expression, root->name->data);
 	if (a == 0) return root;
-	else if (a > 0) return searchFT(root->right, exp);
-	else return searchFT(root->left, exp);
+	else if (a > 0) return searchFT(root->right, expression);
+	else return searchFT(root->left, expression);
 
 	return NULL; // not found
 }
@@ -282,6 +284,7 @@ struct funNode *searchFT(struct funNode *root, char *exp){
 void destroyFN (struct funNode *node){
 	if (node == NULL) return;
 	destroyString(node->name);
+	destroyVT(node->lVarTable);
 	free(node);
 	node = NULL;
 }
@@ -299,49 +302,50 @@ void destroyFT (struct funNode *root){
 
 
 
+// ////////////////////////CLASSES
+// //struktura pro  glob. tabulku trid
+// struct classNode{
+// 	String *name;
+//
+// 	varNode *lVarTable;
+//
+// 	struct classNode *left;
+// 	struct classNode *right;
+// }
+//
+// //funkce pro praci s glob. tabulkou trid
+// struct classNode *newCN(struct tListItem *token);
+// struct classNode *insertCN(struct classNode *root, struct classNode *node);
+// void deleteCN(struct classNode *root, struct classNode *node);
+// void replaceCN(struct classNode *out, struct classNode *in);
+// struct classNode *findMaxCN(struct classNode *root);
+// struct classNode *searchCT(struct classNode *root, char *exp);
+// void destroyCN (struct classNode *node);
+// void destroyCT (struct classNode *root);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/////////////////////////////////////////////////////////stare funkce
-TableNode *newTN(struct tListItem *token){
-
-	TableNode *ret = malloc(sizeof(TableNode));
+struct classNode *newCN(struct tListItem *token){
+	struct classNode *ret = malloc(sizeof(struct classNode));
 	if (ret == NULL){
 		fprintf(stderr, "Not enough memory, can't alloc.\n");
 		return NULL;
 	}
 
 	ret->name = token->data;
-	ret->id = token->id;
-	ret->state = 0;
-	ret->data = NULL;
-	ret->global = NULL;
-	ret->localTable = NULL;
-	//ret->funcStart = NULL;
+
+
+	ret->lVarTable = NULL;
+	ret->varc = 0;
+
+	// TODO ukazatel na prvni instrukci
+	// TODO deklarace, definice?	ret->offset = 0;
 
 	ret->left = NULL;
 	ret->right = NULL;
+
 	return ret;
 }
 
-
-TableNode *insertTN(TableNode *root, TableNode *node){
+struct classNode *insertCN(struct classNode *root, struct classNode *node){
 	if (root == NULL){
 		root = node;
 		return root;
@@ -349,106 +353,94 @@ TableNode *insertTN(TableNode *root, TableNode *node){
 
 	int cmp = strcmp(node->name->data, root->name->data);
 	if (cmp > 0)
-		root->right = insertTN(root->right, node);
+		root->right = insertCN(root->right, node);
 	else if (cmp < 0)
-		root->left = insertTN(root->left, node);
+		root->left = insertCN(root->left, node);
 	else { //already in table
-		destroyTN(node);
+		destroyCN(node);
 	}
 	return root;
 }
 
-
-void deleteTN(TableNode *root, TableNode *node){
+void deleteCN(struct classNode *root, struct classNode *node){
 	if (root == NULL || node == NULL) return;
 	int cmp = strcmp(node->name->data, root->name->data);
 	if (cmp > 0)
-		deleteTN(root->right, node);
+		deleteCN(root->right, node);
 	else if (cmp < 0)
-		deleteTN(root->left, node);
+		deleteCN(root->left, node);
 	else { //root == node
 		if (node->right == NULL && node->left == NULL){
-			destroyTN(node);
+			destroyCN(node);
 			root = NULL;
 		}
 		else if (node->right != NULL && node->left == NULL){
-			replaceTN(node, node->right);
+			replaceCN(node, node->right);
 		}
 		else if (node->right == NULL && node->left != NULL){
-			replaceTN(node, node->left);
+			replaceCN(node, node->left);
 		}
 		else if (node->right != NULL && node->left != NULL){
-			TableNode *tmp = findMaxTN(node->left);
+			struct classNode *tmp = findMaxCN(node->left);
 			tmp->right = node->right;
-			replaceTN(node, tmp);
-			deleteTN(root, tmp);
+			replaceCN(node, tmp);
+			deleteCN(root, tmp);
 		}
 	}
 }
 
-
-
-void replaceTN(TableNode *out, TableNode *in){
-	destroyString(out->data);
+void replaceCN(struct classNode *out, struct classNode *in){
 	destroyString(out->name);
-	destroyT(out->localTable);
-//DONE pokud je localTable != NULL, destroy LT
+
+	// TODO ukazatel na prvni instrukci
+	// TODO deklarace, definice?	ret->offset = 0;
 
 	out->name = in->name;
-	out->id = in->id;
-	out->state = in->state;
-	out->data = in->data;
-	out->global = in->global;
-	out->localTable = in->localTable;
+
+	out->lVarTable = in->lVarTable;
+	out->varc = in->varc;
 
 	out->left = in->left;
 	out->right = in->right;
+
 	free(in);
 	in = NULL;
 }
 
-
-TableNode *findMaxTN(TableNode *root){
+struct classNode *findMaxCN(struct classNode *root){
 	if (root == NULL) return NULL;
 
-	if (root->right != NULL) return findMaxTN(root->right);
+	if (root->right != NULL) return findMaxCN(root->right);
 	else return root;
 }
 
-
-TableNode *searchT(TableNode *root, char *exp){
+struct classNode *searchCT(struct classNode *root, char *exp){
 	if (root == NULL) return NULL;
 
 	int a = strcmp(exp, root->name->data);
 	if (a == 0) return root;
-	else if (a > 0) return searchT(root->right, exp);
-	else return searchT(root->left, exp);
+	else if (a > 0) return searchCT(root->right, exp);
+	else return searchCT(root->left, exp);
 
 	return NULL; // not found
 }
 
-
-void destroyTN (TableNode *node){
+void destroyCN (struct classNode *node){
 	if (node == NULL) return;
-	destroyString(node->data);
-
 	destroyString(node->name);
-
-	destroyT(node->localTable);
-
-
+	destroyVT(node->lVarTable);
 
 	free(node);
 	node = NULL;
 }
 
-void destroyT (TableNode *root){
+void destroyCT (struct classNode *root){
 	if (root == NULL) return;
 	if (root->left != NULL)
-		destroyT(root->left);
+		destroyCT(root->left);
 	if (root->right != NULL)
-		destroyT(root->right);
-	destroyTN(root);
+		destroyCT(root->right);
+	destroyCN(root);
 }
 
 
@@ -457,9 +449,69 @@ void destroyT (TableNode *root){
 
 
 
+void printInOrderF(struct funNode *node){
+	if (node == NULL) return;
+	printInOrderF(node->left);
+	fprintf(stderr,"%s\n", node->name->data);
+	printInOrderF(node->right);
+}
+
+
+void printInOrderC(struct classNode *node){
+	if (node == NULL) return;
+	printInOrderC(node->left);
+	fprintf(stderr,"%s\n", node->name->data);
+	printInOrderC(node->right);
+}
+
+void printSpecialV(struct varNode *node){
+	if (node == NULL) return;
+	char c;
+	int type;
+	if (node->global != NULL){
+		type = node->global->type;
+	} else type = node->type;
+	switch (type) {
+		case T_STRING:
+			c = 's';
+		break;
+		case T_DOUBLE:
+			c = 'd';
+		break;
+		case T_INT:
+			c = 'i';
+		break;
+		default:
+			c = '?';
+		break;
+	}
+	printSpecialV(node->left);
+	fprintf(stderr,"\t%c\t%s\n", c, node->name->data);
+	printSpecialV(node->right);
+}
+
+void printSpecialF(struct funNode *node){
+	if (node == NULL) return;
+	printSpecialF(node->left);
+	char * vars = node->types->data + 1;
+	fprintf(stderr,"%c\t%s(%s)\n",node->types->data[0], node->name->data, vars);
+	printSpecialV(node->lVarTable);
+	fprintf(stderr, "_______________________________\n");
+	printSpecialF(node->right);
+}
+
+void printSpecialC(struct classNode *node){
+	if (node == NULL) return;
+	printSpecialC(node->left);
+	fprintf(stderr,"%s\n", node->name->data);
+	printSpecialV(node->lVarTable);
+	fprintf(stderr, "_______________________________\n");
+	printSpecialC(node->right);
+}
 
 
 
+// STARE FUNKCE:
 // void printInorder(TableNode *node){
 // 	if (node == NULL) return;
 // 	printInorder(node->left);
@@ -467,6 +519,7 @@ void destroyT (TableNode *root){
 // 	printInorder(node->right);
 // }
 
+// NEFUNKCNI:
 //  TableNode *findParent(TableNode *root, TableNode *node){
 // 	if (root == NULL || node == NULL) return NULL;
 //

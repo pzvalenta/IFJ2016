@@ -39,4 +39,7 @@ pˇríkazové ˇrádky atd.).
 #include "parser.h"
 //#include "ilist.h"
 
+extern int SECOND_RUN;
+
+
 #endif
