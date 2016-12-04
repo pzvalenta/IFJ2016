@@ -18,7 +18,7 @@
 #define KEYWORDS 17   // pocet klicovych slov
 #define ASCII 48
 //#define MAX_ESCAPE  377 // maximalni hodnota escape sekvence //TODO overflow
-//error. musi to byt mensi jak 255
+// error. musi to byt mensi jak 255
 
 //=======
 FILE *file;
@@ -151,7 +151,7 @@ int getToken() {
      * v nekonecnem cyklu nacitame znaky
      */
     current_char = getc(file);
-    printf("current_char: %c\n", current_char);
+    // printf("current_char: %c\n", current_char);
 
     switch (state) {
     case S_START:
@@ -210,6 +210,8 @@ int getToken() {
       } else if (current_char == EOF) {
         tokenValue = T_END;
         return E_OK;
+      } else if (current_char == '\n') {
+        state = S_EOL;
       }
 
       /*..............................................*/
@@ -282,7 +284,7 @@ int getToken() {
       } else if (current_char == '*') { // /* - zacatek blokoveho komentare
         state = S_BL_COMM;
       } else if (current_char == '\n') { // pouze lomitko
-        printf("slash\n");
+        // printf("slash\n");
         return T_SLASH; // /
       }
       break;
@@ -397,7 +399,9 @@ int getToken() {
       break;
     /*........................STRING......................*/
     case S_STRING: // "
-      if (current_char == '"') {
+      if (current_char == '\n') {
+        return E_LEX;
+      } else if (current_char == '"') {
         tokenValue = T_STRING_L; // "string"
         return E_OK;
       } else if (current_char == '\\') { /*   "..\    */
@@ -412,42 +416,53 @@ int getToken() {
       break;
 
     /*........................ESCAPE......................*/
+
     case S_ESCAPE:
+      // printf("%d current_char0\n", current_char);
       if (current_char == 'n') {
-        appendChar(string, current_char);
+        appendChar(string, '\n');
         state = S_STRING;
       } else if (current_char == 't') {
-        appendChar(string, current_char);
+        appendChar(string, '\t');
         state = S_STRING;
       } else if (current_char == '\\') {
-        appendChar(string, current_char);
+        appendChar(string, '\\');
         state = S_STRING;
       } else if (current_char == '\"') {
-        appendChar(string, current_char);
+        appendChar(string, '\"');
         state = S_STRING;
-      } else if (isdigit(current_char) < 4) { // je to cislo, mensi
+      } else if (isdigit(current_char) != 0) { // je to cislo, mensi
+        //  printf("%s\n", current_char);
+        // printf("%d current_char\n", current_char);
+        if ((current_char < '4') && (current_char >= '0')) {
+          // printf("prosel1\n");
+          // appendChar(string, num);
+          // printf("%d\n", num);
+          // printf("%d\n", current_char);
+          int esc = (current_char - ASCII) * 8 * 8; // 8^2 (nejlevejsi cislo)
+          // printf("%d\n", esc);
+          current_char = getc(file); // dalsi cislo v escape sekvenci
 
-        state = S_ESCAPE_N;
+          if ((current_char < '8') && (current_char >= '0')) { // \0-30-7
+            // printf("prosel2\n");
+            esc = esc + (current_char - ASCII) * 8; // 8^1 (prostredni cislo)
+            // printf("%d\n", esc);
+            current_char = getc(file); // dalsi cislo v escape sekvenci
 
-      } else {
-        return E_LEX;
+            if ((current_char < '8') && (current_char >= '0')) { // \0-30-70-7
+              // printf("prosel3\n");
+              esc = esc + (current_char - ASCII); // 8^0 (nejpravejsi cislo)
+              // printf("%d\n", esc);
+              appendChar(string,
+                         (char)esc); // pridani cele escape sekvence do stringu
+              state = S_STRING;
+            }
+          }
+        }
       }
-      break;
 
-    case S_ESCAPE_N:
-      if (isdigit(current_char) < 8) { // \0-30-7
-
-        state = S_ESCAPE_N2;
-      } else {
-        return E_LEX;
-      }
-      break;
-
-    case S_ESCAPE_N2:
-      if (isdigit(current_char) < 8) { // \0-30-70-7
-        //
-        state = S_STRING;
-      } else {
+      else {
+        // printf("escape \n");
         return E_LEX;
       }
       break;
@@ -474,31 +489,36 @@ int getToken() {
       }
       break;
 
-    case S_NUM_DOT:                     // 0-9.
-      if (isdigit(current_char) != 0) { // test na cislo
-        appendChar(string, current_char);
-        // jinak error
-        state = S_NUM_DOT_NUM;
-      } else {
-        return E_LEX;
-      }
-      break;
+    // case S_NUM_DOT:                     // 0-9.
+    //   if (isdigit(current_char) != 0) { // test na cislo
+    //     appendChar(string, current_char);
+    //     // jinak error
+    //     state = S_NUM_DOT_NUM;
+    //   } else {
+    //     return E_LEX;
+    //   }
+    //   break;
 
-    case S_NUM_DOT_NUM:                 // 0-9.0-9
+    case S_NUM_DOT:                     // 0-9.0-9
       if (isdigit(current_char) != 0) { // test na cislo
         appendChar(string, current_char);
         // jinak error
-        state = S_NUM_DOT_NUM;
-      } else if ((current_char == 'e') || (current_char = 'E')) {
+        state = S_NUM_DOT;
+      } else if ((current_char == 'e') || (current_char == 'E')) {
         appendChar(string, current_char);
         // jinak error
         state = S_NUM_EX;
+      } else if ((current_char == '.') || (current_char == ',') ||
+                 (current_char == '!') || (current_char == '/')) {
+        // printf("CHYBA S_NUM_DOT\n");
+        ungetc(current_char, file);
+        return E_LEX;
       } else {
         ungetc(current_char, file);
-        tokenValue = T_NUMBER_D;
-        return E_OK;
+        return T_NUMBER_D;
       }
       break;
+    /*......................................................*/
 
     case S_NUM_EX: // 0-9eE || 0-9.0-9Ee
       if (current_char == '+' || current_char == '-' ||
@@ -514,18 +534,25 @@ int getToken() {
 
     case S_NUM_EX_NUM: // 0-9eE+-0-9 || 0-9.0-9Ee+-0-9
       if (isdigit(current_char) != 0) {
-        state = S_NUM_EX_NUM; // dokud budou nacitana cisla - cyklus
         appendChar(string, current_char);
-      } else {
+        state = S_NUM_EX_NUM; // dokud budou nacitana cisla - cyklus
+
+      }
+
+      else if (current_char == ';' || current_char == '+' ||
+               current_char == '-' || current_char == '/' ||
+               current_char == '*' || current_char == '(' ||
+               current_char == ')') {
         ungetc(current_char, file);
-        tokenValue = T_NUMBER_D;
-        return E_OK;
+        return T_NUMBER_D;
         // destroyString(string);
+      } else {
+        // printf("CHYBA\n");
+        ungetc(current_char, file);
+        return E_LEX;
       }
 
       break;
-
-      /*......................................................*/
 
     } // konec switch
 
