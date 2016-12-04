@@ -3,34 +3,40 @@ PROGRAM --> BODY EOF
 //TODO class Main { static void run() {...} }
 
 BODY --> epsilon
-BODY --> STATEMENT BODY
-BODY --> METHOD BODY
 BODY --> CLASS BODY
 
-CLASS --> class id { CLASS_BODY }  // teoreticky to muze byt rovnou { BODY }, ale asi nepotrebujeme nested classes
+CLASS --> class id { CLASS_BODY }
 
 CLASS_BODY --> epsilon
 CLASS_BODY --> STATEMENT_LIST CLASS_BODY
 CLASS_BODY --> METHOD CLASS_BODY
 
-METHOD --> static TYPE id ( PARAM ) { STATEMENT_LIST } // fce jsou vždy static
+METHOD --> static TYPE id ( MPARAM ) { STATEMENT_LIST } // fce jsou vždy static
+
+MPARAM --> epsilon
+MPARAM --> TYPE id MPARAM
+MPARAM --> , TYPE id MPARAM
+
 
 PARAM --> epsilon
-PARAM --> id PARAMETER
-PARAM --> , id PARAMETER
+PARAM --> id PARAM
+PARAM --> , id PARAM
 
 STATEMENT_LIST --> epsilon
 STATEMENT_LIST --> STATEMENT STATEMENT_LIST
 
 STATEMENT --> epsilon
-STATEMENT --> STATEMENT STATEMENT
 STATEMENT --> id = EXPRESSION ;
 STATEMENT --> return EXPRESSION ;
 STATEMENT --> if ( EXPRESSION ) { STATEMENT_LIST } else { STATEMENT_LIST }
 STATEMENT --> while ( EXPRESSION ) { STATEMENT_LIST }
 
+STATEMENT --> static TYPE id ;
+STATEMENT --> TYPE id ;
+STATEMENT --> TYPE id = EXPRESSION ;
 
 STATEMENT --> id = id (PARAM) ;
+
 STATEMENT --> id (PARAM) ;
 
 
@@ -47,4 +53,4 @@ EXPRESSION --> EXPRESSION == EXPRESSION
 EXPRESSION --> EXPRESSION != EXPRESSION
 
 EXPRESSION --> ( EXPRESSION )
-EXPRESSION --> id ( PARAM )
+//EXPRESSION --> id ( PARAM )

@@ -8,58 +8,92 @@
 #include "str.h"
 #include "token.h"
 
-enum {
-	DEFINED = 1,
-	INITIALIZED
+
+////////////////////////VARIABLES
+//struktura pro lokalni tabulky / globalni tabulku promennych
+struct varNode{
+	String *name;
+	int type;   // TODO pridat type "ukazatel", data.s pak bude ukazatelem do prislusne globalni tabulky
+	int offset;
+	int declared;
+	int initialized;
+
+	struct varNode *global;
+
+	struct varNode *left;
+	struct varNode *right;
 };
-//TODO zmenit state a global na flags
 
-// //typedef struct tableNode TableNode;
-//
-// struct TableNode{
-// 	String *name; // identifikator / klic
-// 	char id; //typ (funkce/char/string ...)
-// 	char state; // DEFINED / INITIALIZED
-//
-// 	TableNode *global; // pokud je global != NULL, je v nem odkaz do global table, na prislusnou polozku
-//
-// 	TableNode *localTable; // pokud je to funkce nebo class, je tu odkaz na lokalni tabulku
-// 	String *data; //data
-//
-// 	//pokud je definovana lokalni promenna i pres to, ze uz je definovana globalni, vytvori se novy string
-//
-// 	TableNode *left;
-//   TableNode *right;
-// };
+struct tListItem;
 
-struct TableNode{
-	String *name; // identifikator / klic
-	char id; //typ (funkce/char/string ...)
-	char state; // DEFINED / INITIALIZED
+//funkce pro praci s lok / glob tabulkami promennych
+struct varNode *newVN(struct tListItem *token);
+struct varNode *insertVN(struct varNode *root, struct varNode *node);
+void deleteVN(struct varNode *root, struct varNode *node);
+void replaceVN(struct varNode *out, struct varNode *in);
+struct varNode *findMaxVN(struct varNode *root);
+struct varNode *searchVT(struct varNode *root, char *exp);
+void destroyVN (struct varNode *node);
+void destroyVT (struct varNode *root);
+void printSpecialV(struct varNode *node);
 
-	struct TableNode *global; // pokud je global != NULL, je v nem odkaz do global table, na prislusnou polozku
 
-	struct TableNode *localTable; // pokud je to funkce nebo class, je tu odkaz na lokalni tabulku
-	String *data; //data
 
-	//pokud je definovana lokalni promenna i pres to, ze uz je definovana globalni, vytvori se novy string
+////////////////////////FUNCTIONS
+//struktura pro glob. tabulku funkci
+struct funNode{
+	String *name;
 
-	struct TableNode *left;
-  struct TableNode *right;
+	String *types; // void func(int a, double b)   =  "vid"
+	int varc; //pocet lok. promennych
+	struct varNode *lVarTable;
+	// TODO ukazatel na prvni instrukci
+	// TODO deklarace, definice?
+
+	struct funNode *left;
+	struct funNode *right;
 };
-typedef struct TableNode TableNode;
+
+//funkce pro praci s glob. tabulkou funkci
+struct funNode *newFN(struct tListItem *token);
+struct funNode *insertFN(struct funNode *root, struct funNode *node);
+void deleteFN(struct funNode *root, struct funNode *node);
+void replaceFN(struct funNode *out, struct funNode *in);
+struct funNode *findMaxFN(struct funNode *root);
+struct funNode *searchFT(struct funNode *root, char *expression);
+void destroyFN (struct funNode *node);
+void destroyFT (struct funNode *root);
+void printInOrderF(struct funNode *node);
+void printSpecialF(struct funNode *node);
+
+
+////////////////////////CLASSES
+//struktura pro  glob. tabulku trid
+struct classNode{
+	String *name;
+
+	struct varNode *lVarTable;
+	int varc;
+
+	struct classNode *left;
+	struct classNode *right;
+};
+
+//funkce pro praci s glob. tabulkou trid
+struct classNode *newCN(struct tListItem *token);
+struct classNode *insertCN(struct classNode *root, struct classNode *node);
+void deleteCN(struct classNode *root, struct classNode *node);
+void replaceCN(struct classNode *out, struct classNode *in);
+struct classNode *findMaxCN(struct classNode *root);
+struct classNode *searchCT(struct classNode *root, char *exp);
+void destroyCN (struct classNode *node);
+void destroyCT (struct classNode *root);
+void printInOrderC(struct classNode *node);
+void printSpecialC(struct classNode *node);
 
 
 
-TableNode *newTN(String *str, char token_id);
-TableNode *insertTN(TableNode *root, TableNode *node);
-void deleteTN(TableNode *root, TableNode *node);
-void replaceTN(TableNode *out, TableNode *in);
-TableNode *findMaxTN(TableNode *root);
-TableNode *searchT(TableNode *root, char *exp);
-void destroyTN (TableNode *node);
-void destroyT (TableNode *root);
 
-void printInorder(TableNode *node);
+//void printInorder(TableNode *node);
 
 #endif

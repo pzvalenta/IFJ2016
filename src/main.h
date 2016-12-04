@@ -21,7 +21,7 @@ pˇríkazové ˇrádky atd.).
 
 #define E_OK    0
 #define E_LEX   1
-#define E_SYM   2
+#define E_SYN   2
 #define E_DEF   3
 #define E_TYP   4
 #define E_SEM   6
@@ -31,9 +31,15 @@ pˇríkazové ˇrádky atd.).
 #define E_OTHR  10
 #define E_INTERNAL  99
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "ial.h"
+
 #include "scanner.h"
 #include "parser.h"
-#include "ial.h"
-#include "ilist.h"
+//#include "ilist.h"
+
+extern int SECOND_RUN;
+
 
 #endif

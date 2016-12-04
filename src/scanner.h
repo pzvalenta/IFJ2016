@@ -22,6 +22,7 @@
 #include "str.h"
 #include "token.h"
 #include "ial.h"
+#include "main.h"
 
 
 #define START       		 255 // pocatecni nastaveni tokenu (id)
@@ -49,7 +50,7 @@
 #define T_VOID           36
 #define T_WHILE          37
 
-
+#define T_DOLLAR         38
 
 #define T_NUMBER_I       41 //celociselny literal
 #define T_NUMBER_D       42 //desetinny literal
@@ -70,21 +71,30 @@
 #define T_EXCLAIM        64 // !=
 #define T_SLASH          65 // /
 
-#define T_LBRACKET      81 // (
-#define T_RBRACKET      82 // )
-#define T_LCBRACKET     83 // {
-#define T_RCBRACKET     84 // }
-#define T_LSBRACKET     85 // [
-#define T_RSBRACKET     86 // ]
-#define T_SEMICLN       87 // ;
-#define T_COMMA         88 // ,
-#define T_DOT           89 // .
+#define T_LBRACKET       81 // (
+#define T_RBRACKET       82 // )
+#define T_LCBRACKET      83 // {
+#define T_RCBRACKET      84 // }
+#define T_LSBRACKET      85 // [
+#define T_RSBRACKET      86 // ]
+#define T_SEMICLN        87 // ;
+#define T_COMMA          88 // ,
+#define T_DOT            89 // .
 
 
+
+struct tListItem {
+  int id;
+  String *data;
+  struct tListItem *next;
+  struct tListItem *prev;
+};
 
 
 int getToken();
-void set_data(String *addr);
+int returnToken();
 void set_file(FILE *source);
+void set_token_list(struct tListItem *list);
+int loadTokens();
 
 #endif // SCANNER

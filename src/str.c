@@ -15,11 +15,15 @@ String *newString(){
 		destroyString(ret);
 		return NULL; //TODO handle error
 	}
+
+
 	else
 		ret->data[0]='\0';
 
+
 	ret->size = BASE_STRING_SIZE;
 	ret->len = 0;
+
 	return ret;
 }
 
@@ -88,6 +92,7 @@ String *eraseString(String *in){
 	in->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
 	if (in->data == NULL){
 		destroyString(in);
+		fprintf(stderr ,"erase string malloc error\n");
 		return NULL; //TODO handle error
 	}
 	else
@@ -117,16 +122,14 @@ void *GetDataofString (String *str){
 }
 
 
-//TODO navratova hodnota z realloc
-String *copyString(String* old){
+String *copyString(String *old){
+	if (old == NULL) return NULL;
 	String *new = newString();
 
-//		if (old->size > BASE_STRING_SIZE)
-// 			new->data = realloc(new->data, old->size*sizeof(char)); //TODO handle error
+	for(int i = 0; i < old->len; i++){
+		appendChar(new, old->data[i]);
+	}
 
- 	new->size = old->size;
- 	new->len = old->len;
-	strcpy(new->data, old->data);
 	return new;
 }
 

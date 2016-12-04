@@ -17,11 +17,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-///includnout ostatni soubory
+//potrebne hlavickove soubory
+#include "scanner.h"
+#include "main.h"
+#include "parser.h"
+
+extern int SECOND_RUN;
 
 typedef struct item{
-    char c;             //ID terminalu
-    ///string value  //pokud bude terminal identifikator, int, float, string prida se hodnota
+    int c;             //ID terminalu
+    //tady bude offset zasobniku interpetu kde bude hodnota
     bool terminal;      //pokud je terminal-> TRUE
     bool handle;        //pokud je to handle -> TRUE
     struct item *next;  //ukazatel na dalsi
@@ -35,18 +40,20 @@ typedef struct {
 }tList;
 
 void init_list(tList *l);
-void insert_terminal_last(tList *l, char c);
-void insert_handle(tList *l);
+void dispose_list(tList *l);
+int insert_terminal_last(tList *l, int c);
+int insert_handle(tList *l);
 bool is_handle(tList *l);
 int bracket_balance(tList *l);
 tItem * get_last_handle(tList *l);
 void find_last_terminal(tList *l);
-tItem * cut_item(tList *l);
+tItem * cut_item(tList *l, int *typ);
 void reduce (tList *l);
 int sem_correct (tList *l);
 int is_rule (tList*l);
-int get_index(char c);
+int get_index(int c);
 char rule(tList *l);
-int prec_anal(char until);
+int prec_anal(int until);
+int expr(int until);
 
 #endif // PRECANAL_H_INCLUDED

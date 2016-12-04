@@ -11,68 +11,33 @@
  *      Petr Jares
  *
  */
- #include "main.h"
 
  // typy instrukci
  #define I_STOP         0     //stop
-
- #define I_ADD          1     //scitani
-/* list_insert_last(*List instrukci, I_ADD, scitanec, scitanec, vysledek)*/
- #define I_SUB          2     //odcitani
-/* list_insert_last(*List instrukci, I_SUB, mensenec, mensitel, vysledek)*/
- #define I_MUL          3     //nasobeni
-/* list_insert_last(*List instrukci, I_MUL, cinitel, cinitel, vysledek)*/
- #define I_DIV          4     //deleni
-/* list_insert_last(*List instrukci, I_DIV, delenec, delitel, vysledek)*/
-
- #define I_GREAT        5     //vetsi nez >
- /* list_insert_last(*List instrukci, I_GREAT, 1. porovnavany, 2. porovnavany, vysledek)*/
- #define I_LESS         6     //mensi nez <
- /* list_insert_last(*List instrukci, I_LESS, 1. porovnavany, 2. porovnavany, vysledek)*/
- #define I_GREQ         7     //vetsirovno >=
- /* list_insert_last(*List instrukci, I_GREQ, 1. porovnavany, 2. porovnavany, vysledek)*/
- #define I_LESEQ        8     //mensirovno <=
- /* list_insert_last(*List instrukci, I_LESEQ, 1. porovnavany, 2. porovnavany, vysledek)*/
- #define I_EQUAL        9     //rovna se ==
- /* list_insert_last(*List instrukci, I_EQUAL, 1. porovnavany, 2. porovnavany, vysledek)*/
- #define I_NEQUAL       10    //nerovna se !=
-/* list_insert_last(*List instrukci, I_NEQUAL, 1. porovnavany, 2. porovnavany, vysledek)*/
-
- #define I_GOTO         11    //skok
- /* list_insert_last(*List instrukci, I_GOTO,??,adresa kam skocit, )*/
- #define I_IFGOTO       12    //podmineny skok
- /* list_insert_last(*List instrukci, I_IFGOTO, 1/0 = skok/neskok, adresa kam skocit, )*/
- #define I_PUSH         13    //push
-/* list_insert_last(*List instrukci, I_PUSH, co se pushuje, , )*/
- #define I_POP          14    //pop
-/* list_insert_last(*List instrukci, I_POP, co se popuje, , )*/
- #define I_CMP_STR      15    //porovnavani sringu
-/* list_insert_last(*List instrukci, I_CMP_STR, prvni string, druhy string, vysledek)*/
- #define I_MOV          16    //presouvani z adresy 1 - source do adresy 3 - dest
-/* list_insert_last(*List instrukci, I_MOV, source, , destination)*/
-
-
-
-
- // #define I_FIND         9     //find
- // #define I_INC          10    //inkrementace
- // #define I_DEC          11    //dekrementace
- // #define I_NOT          12    //not
- // #define I_IFGOTO       13    //podmineny skok !
-
- // input
- // read (3 ruzne) (zatim vynechat)
- // print
-
+ #define I_ADD_INT      1     //int + int
+ #define I_ADD_DOUBLE   2     //double + double
+ #define I_SUB_INT      3     //int - int
+ #define I_SUB_DOUBLE   4     //double - double
+ #define I_MUL_INT      5     //int * int
+ #define I_MUL_DOUBLE   6     //double * double
+ #define I_DIV_INT      7     //dividing integers
+ #define I_DIV_DOUBLE   8     //dividing doubles
+ #define I_FIND         9     //find
+ #define I_INC          10    //inkrementace
+ #define I_DEC          11    //dekrementace
+ #define I_NOT          12    //not
+ #define I_IFGOTO       13    //podmineny skok
+ #define I_GOTO         14    //skok
+ #define I_EQUAL        15    //rovna se
+ #define I_NEQUAL       16    //nerovna se
  #define I_LABEL        17    //navesti
-
 
 
 typedef struct{
   int Inst_type;     //typ instrukce
-  void *addr1;       //operator 1
-  void *addr2;       //operator 2
-  void *addr3;       //vysledek
+  void *addr1;       //zdroj 1
+  void *addr2;       //zdroj 2
+  void *addr3;       //cil
 } tInstr;
 
 typedef struct list_item{
@@ -91,7 +56,7 @@ typedef struct {
 
 void list_init (tInstrList *L);
 void list_free (tInstrList *L);
-int list_insert_last (tInstrList *L, tInstr I);
+void list_insert_last (tInstrList *L, tInstr I);
 void list_first (tInstrList *L);
 void list_next (tInstrList *L);
 void list_goto (tInstrList *L, void *goto_instr);

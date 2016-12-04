@@ -39,7 +39,7 @@ void list_free (tInstrList *L){
 
 }
 
-int list_insert_last (tInstrList *L, int i_type, void* adresa1, void* adresa2, void* adresa3){
+void list_insert_last (tInstrList *L, int i_type, void* adresa1, void* adresa2, void* adresa3){
   /*
   * vkladani nove instrukce na konec listu
   */
@@ -51,9 +51,6 @@ int list_insert_last (tInstrList *L, int i_type, void* adresa1, void* adresa2, v
 
   tList_item *new;
   new = malloc (sizeof(tList_item));
-  if(new == NULL){
-    return E_INTERNAL; //chyba alokace
-  }
   new->instruct = new_instruction;      //ulozeni novych dat
   new->next_item = NULL;  //next_item == new, tudiz ukazatel nikam ukazovat nemuze
   if (L->first == NULL){  //pokud je list prazdny == prvni vlozeni
@@ -64,7 +61,6 @@ int list_insert_last (tInstrList *L, int i_type, void* adresa1, void* adresa2, v
   }
 
   L->last = new;          //ulozeni noveho prvku na konec
-  return E_OK;
 }
 
 void list_first (tInstrList *L){

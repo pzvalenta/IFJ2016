@@ -12,34 +12,86 @@
  *
  */
 
- #include "main.h"
+#include "main.h"
 
-int main(void){
-  char result = E_OK;
+int main(int argc, char **argv) {
+  int result = E_OK;
 
-  if (argv)
-  //TODO zpracovat vstupy + nastavit input streamu pro scanner
-  FILE *source = fopen(argv[1]);
-  set_file(source);
+  if (argc == 2) {
+    // TODO zpracovat vstupy + nastavit input streamu pro scanner
+    fprintf(stderr, "opening: %s\n", argv[1]);
+    FILE *source = fopen(argv[1], "r");
+    // errorcheck TODO
+    set_file(source);
+    fprintf(stderr, "opened: %p\n", source);
+  } else /// REMOVE!!! TODO
+  {
+    FILE *source =
+        fopen("/home/petr/Code/IFJ2016/testing/input/example3.java", "r");
+    set_file(source);
+  }
 
-  //deklarace tabulek
-  TableNode *CTRoot = NULL;
-  TableNode *GTRoot = NULL;
+  // zabalit do inicializace
+  struct tListItem *tokenListHead = malloc(sizeof(struct tListItem));
+  if (tokenListHead == NULL)
+    return E_INTERNAL;
+  else {
+    tokenListHead->next = NULL;
+    tokenListHead->id = START;
+  }
 
-  //TODO inicializace ilistu
+  fprintf(stderr, "############## Start Scanneru ##############\n");
 
-  //volani parseru
-  result = parse(CTRoot, GTRoot)
-  //TODO errorcheck
+  set_token_list(tokenListHead);
+  result = loadTokens();
+  if (result != E_OK) {
+    // TODO dealokace
+    return result;
+  }
+  fprintf(stderr, "############# Vysledek Scanneru ############\n");
+  eprint(result);
 
-  //TODO druhy pruchod?
+  // //DEBUG TOKEN LIST PRINT
+  // printf("pointer na head %p\n", tokenListHead);
+  //
+  // while(tokenListHead != NULL){
+  //   dprint(tokenListHead);
+  //   tokenListHead = tokenListHead->next;
+  // }
 
+  // testing //
 
-  //volani interpretu   TODO odkaz na main v ilistu, jak?
-  result = interpret(ilist);
+  // TODO inicializace ilistu
 
-  //TODO errorcheck
+  fprintf(stderr, "############### Start Parseru 1st RUN ##############\n");
 
+  // volani parseru
+  printf("token list head = %s\n", tokenListHead->data->data);
+  result = parse(tokenListHead);
+  fprintf(stderr, "############# Vysledek Parseru 1st RUN #############\n");
+  eprint(result);
+  if (result != E_OK) {
+    // TODO dealokace
+    return result;
+  }  // TODO errorcheck
+
+  // TODO druhy pruchod?
+  fprintf(stderr, "############### Start Parseru 2nd RUN ##############\n");
+  printf("token list head = %s\n", tokenListHead->data->data);
+
+  SECOND_RUN = 1;
+  // volani parseru
+  result = parse(tokenListHead);
+  fprintf(stderr, "############# Vysledek Parseru 2nd RUN #############\n");
+  eprint(result);
+  if (result != E_OK) {
+    // TODO dealokace
+    return result;
+  }
+  // volani interpretu   TODO odkaz na main v ilistu, jak?
+  // result = interpret(ilist);
+
+  // TODO errorcheck
 
   return result;
 }
