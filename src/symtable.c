@@ -21,7 +21,25 @@ int isCompleteIdent(String *str);
 
 
 void setVarType(int type){
-  CurrentVar->type = type;
+  int ret;
+
+  switch (type) {
+    case T_STRING:
+      ret = T_STRING_L;
+    break;
+    case T_INT:
+      ret = T_NUMBER_D;
+    break;
+    case T_DOUBLE:
+      ret = T_NUMBER_I;
+    break;
+    default:
+      ret = type;
+  }
+
+
+  CurrentVar->type = ret;
+
 }
 
 void addMparam(int type) {
@@ -33,7 +51,7 @@ void addMparam(int type) {
   case T_DOUBLE:
     c = 'd';
     break;
-  case T_STRING_L:
+  case T_STRING:
     c = 's';
     break;
   case T_VOID:
