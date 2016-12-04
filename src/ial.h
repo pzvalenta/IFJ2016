@@ -35,6 +35,7 @@ struct varNode *findMaxVN(struct varNode *root);
 struct varNode *searchVT(struct varNode *root, char *exp);
 void destroyVN (struct varNode *node);
 void destroyVT (struct varNode *root);
+void printSpecialV(struct varNode *node);
 
 
 

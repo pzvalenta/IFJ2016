@@ -37,6 +37,9 @@ int body();
 int param();
 int buildIn();
 int ifjprint();
+void debugTablePrint();
+
+
 
 int ifjprint() {
   // TODO placeholder
@@ -118,7 +121,6 @@ int static_rule() {
 
   // ted je v tokenu type
   int type = token->id;
-  printf("DEBUG DEBUG DEBUG DEBUG %d\n", type);
 
   token = token->next;
   if (token->id != T_IDENT && token->id != T_C_IDENT)
@@ -565,8 +567,6 @@ int method() {
 
   token = token->next;
   dprint(token);
-  printf("\n\n\nFTRoot = %p\n\n\n", FTRoot);
-  // printf("Value = %s\n", FTRoot->name->data);
   if (token->id != T_IDENT && token->id != T_C_IDENT)
     return E_SYN; // id
 
@@ -863,6 +863,17 @@ int parse(struct tListItem *head) {
   dprint(token); // DEBUG
   result = program();
 
+
+  debugTablePrint();
+
+
+  return result;
+}
+
+
+
+
+void debugTablePrint(){
   if (!SECOND_RUN) {
     fprintf(stderr, "///////////END OF FIRST RUN/////////\n");
 
@@ -888,5 +899,12 @@ int parse(struct tListItem *head) {
   printSpecialF(FTRoot);
   fprintf(stderr, "\n");
 
-  return result;
+
+  fprintf(stderr, "####################################\n");
+  fprintf(stderr, "#  current state of global var     #\n");
+  fprintf(stderr, "####################################\n");
+  fprintf(stderr, "\ttype\tvar\n");
+  fprintf(stderr, "_______________________________\n\n");
+  printSpecialV(GVRoot);
+  fprintf(stderr, "\n");
 }

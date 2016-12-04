@@ -19,11 +19,11 @@ int main(int argc, char **argv) {
 
   if (argc == 2) {
     // TODO zpracovat vstupy + nastavit input streamu pro scanner
-    printf("opening: %s\n", argv[1]);
+    fprintf(stderr, "opening: %s\n", argv[1]);
     FILE *source = fopen(argv[1], "r");
     // errorcheck TODO
     set_file(source);
-    printf("opened: %p\n", source);
+    fprintf(stderr, "opened: %p\n", source);
   } else /// REMOVE!!! TODO
   {
     FILE *source =
@@ -70,7 +70,10 @@ int main(int argc, char **argv) {
   result = parse(tokenListHead);
   fprintf(stderr, "############# Vysledek Parseru 1st RUN #############\n");
   eprint(result);
-  // TODO errorcheck
+  if (result != E_OK) {
+    // TODO dealokace
+    return result;
+  }  // TODO errorcheck
 
   // TODO druhy pruchod?
   fprintf(stderr, "############### Start Parseru 2nd RUN ##############\n");
@@ -81,7 +84,10 @@ int main(int argc, char **argv) {
   result = parse(tokenListHead);
   fprintf(stderr, "############# Vysledek Parseru 2nd RUN #############\n");
   eprint(result);
-
+  if (result != E_OK) {
+    // TODO dealokace
+    return result;
+  }
   // volani interpretu   TODO odkaz na main v ilistu, jak?
   // result = interpret(ilist);
 

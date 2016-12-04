@@ -56,17 +56,13 @@ struct classNode *findClass() {
 
 int isFunction() {
   int result;
-  printf("token->data %p \n", token->data);
 
   String *tmp = completize(token->data);
-  printf("token->data %p   completized %p\n", token->data, tmp);
   if (findFunction(FTRoot, tmp->data) == NULL)
     result = 0;
   else
     result = 1;
-  printf("\n PREDESTROY\n");
   destroyString(tmp);
-  printf("\n POSTDESTROY\n");
 
   return result;
 }
@@ -89,7 +85,7 @@ int getOffset() {
 
 int getType() {
   struct varNode *tmp = findVar();
-  if (tmp == NULL)
+  if (tmp == NULL) 
     return -1;
   else
     return tmp->type;
@@ -130,16 +126,13 @@ int newFunction() {
     return E_INTERNAL;
 
   if (!isCompleteIdent(tmp->name)) {
-    printf("not complete, %p\n", tmp->name);
     tmp->name = completize(tmp->name);
     if (tmp->name == NULL) {
       destroyFN(tmp);
       return E_INTERNAL;
     }
-    printf("complete, %p\n", tmp->name);
   }
 
-  printf("ABOUT TO SEARCH FTRoot with %s\n", tmp->name->data);
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
     destroyFN(tmp);
     return E_SEM; // TODO uz byla deklarovana, je v tabulce
@@ -264,19 +257,37 @@ int newVar() {
     return E_SYN;
   }
 
+  struct varNode *node;
+
   if (CurrentMethod == NULL) {
-    if (searchVT(CurrentClass->lVarTable, tmp->name->data) != NULL) {
-      destroyVN(tmp);
-      fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
-      return E_SEM; // uz byla deklarovana, je v lokalni tabulce tridy
+    node = searchVT(CurrentClass->lVarTable, tmp->name->data);
+    if (node != NULL) {
+      if (node->global != NULL){
+        node->global = NULL;
+        CurrentVar = node;
+        fprintf(stderr, "INFO, lokalni deklarace promenne po jeji globalni deklaraci\n");
+        return E_OK;
+      } else {
+        destroyVN(tmp);
+        fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
+        return E_SEM; // uz byla deklarovana, je v lokalni tabulce trid
+      }
     } else {
       CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
     }
   } else {
-    if (searchVT(CurrentMethod->lVarTable, tmp->name->data) != NULL) {
-      destroyVN(tmp);
-      fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
-      return E_SEM; // uz byla deklarovana, je v lokalni tabulce funkce
+    node = searchVT(CurrentMethod->lVarTable, tmp->name->data);
+    if (node != NULL) {
+      if (node->global != NULL){
+        node->global = NULL;
+        CurrentVar = node;
+        fprintf(stderr, "INFO, lokalni deklarace promenne po jeji globalni deklaraci\n");
+        return E_OK;
+      } else {
+        destroyVN(tmp);
+        fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
+        return E_SEM; // uz byla deklarovana, je v lokalni tabulce trid
+      }
     } else {
       CurrentMethod->lVarTable = insertVN(CurrentMethod->lVarTable, tmp);
     }
