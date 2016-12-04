@@ -16,7 +16,7 @@
 
 ///////////////////////////////////////////////////////////
 /// prace se zasobnikem(dvousmerny linearni seznam)
-void print_list(tList *l) //ok
+void print_list(tList *l) //pomocna funkce pro prubezne tisknuti zasobniku
 {
    tItem *tmp=l->first;
 
@@ -24,24 +24,24 @@ void print_list(tList *l) //ok
    {
        if(tmp->handle==true)
        {
-           printf("< ");
+           fprintf(stderr,"< ");
        }
        else
           if(tmp->terminal==true)
           {
-              if(tmp->c=='$')
+              if(tmp->c==T_DOLLAR)
               {
-                  printf("$ ");
+                  fprintf(stderr,"$ ");
               }
               else
-              printf("%d ",tmp->c);
+              fprintf(stderr,"%d ",tmp->c);
           }
           else
-           printf("E ");
+           fprintf(stderr,"E ");
 
        tmp=tmp->next;
    }
-   printf("\n");
+   fprintf(stderr,"\n");
 }
 
 
@@ -82,7 +82,6 @@ int insert_terminal_last(tList *l, int c) {
       if (tmp->c == -1)
         return E_SEM;
       // prida se offset
-      // TODO identifikator funkce
     } else {
       tmp->c = c;
     }
@@ -105,7 +104,6 @@ int insert_terminal_last(tList *l, int c) {
       if (tmp->c == -1)
         return E_SEM;
       // prida se offset
-      // TODO identifikator funkce, stejne jak radek 60
     } else {
       tmp->c = c;
     }
@@ -425,22 +423,20 @@ int prec_anal(int until) {
   print_list(l);
 
   int result;             // vraceni vysledku
-  printf("prec_anal test1\n");
+  fprintf(stderr,"PREC_ANAL TEST\n");
   dprint(token);
   if (token->id == until) // expession nemuze byt prazdny
   {
     dispose_list(l);
     free(l);
-    printf("tady1\n");
     return E_SYN;
   }
 
   int end = until;
   int vratit = token->id; // timto prepsat posledni token z $ zpet na puvodni
-  while (token->id != end ||
-         l->lastTerminal->c != T_DOLLAR) // dokud neni na vstupu zakoncujici
-                                         // znak a na zasobniku je pouze jede
-                                         // terminal $
+  while (token->id != end || l->lastTerminal->c != T_DOLLAR) // dokud neni na vstupu zakoncujici
+                                                             // znak a na zasobniku je pouze jeden
+                                                             // terminal $
   {
     // kontrola posledniho znaku
     if (token->id == end) {
@@ -459,13 +455,12 @@ int prec_anal(int until) {
           (token->id >= T_NUMBER_I && token->id <= T_STRING_L) ||
           (token->id >= T_EQUAL && token->id <= T_SLASH) ||
           (token->id >= T_LBRACKET && token->id <= T_RBRACKET) ||
-          token->id == 36) // 36 ascii $
+          token->id == T_DOLLAR)
       {
-      } // asi define $ neco, kryje se s void
+      }
       else {
         dispose_list(l);
         free(l);
-        printf("tady2\n");
         return E_SYN;
       }
     }
@@ -478,12 +473,8 @@ int prec_anal(int until) {
       if (result != E_OK) {
         dispose_list(l);
         free(l);
-        printf("tady3\n");
         return result;
       }
-
-      if (result != E_OK)
-        return result;
       token = token->next;
       vratit = token->id;
       print_list(l);
@@ -494,14 +485,12 @@ int prec_anal(int until) {
       if (result != E_OK) {
         dispose_list(l);
         free(l);
-        printf("tady4\n");
         return result;
       }
       result = insert_terminal_last(l, token->id);
       if (result != E_OK) {
         dispose_list(l);
         free(l);
-        printf("tady5\n");
         return result;
       }
       token = token->next;
@@ -527,8 +516,6 @@ int prec_anal(int until) {
 
           dispose_list(l);
           free(l);
-          printf("tady7\n");
-
           return E_SYN;
         }
 
@@ -536,8 +523,6 @@ int prec_anal(int until) {
       {
         dispose_list(l);
         free(l);
-        printf("tady8\n");
-
         return E_SYN;
       }
       print_list(l);
@@ -545,11 +530,10 @@ int prec_anal(int until) {
       break;
 
     default: // pokud je pravidlo ' ' taky spatne zapsany vyraz
-      dispose_list(l);
-      free(l);
-      printf("tady9\n");
       print_list(l);
 
+      dispose_list(l);
+      free(l);
       return E_SYN;
     }
   }
@@ -572,10 +556,10 @@ int expr(int until) {
         (token->id >= T_EQUAL && token->id <= T_SLASH) ||
         (token->id >= T_LBRACKET && token->id <= T_RBRACKET)) {
 
-      if (token->id == T_LBRACKET)
-        brackets++;
-      if (token->id == T_RBRACKET)
-        brackets--;
+          if (token->id == T_LBRACKET)
+            brackets++;
+          if (token->id == T_RBRACKET)
+            brackets--;
 
     } else {
       return E_SYN;
