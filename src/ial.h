@@ -62,6 +62,8 @@ struct funNode *findMaxFN(struct funNode *root);
 struct funNode *searchFT(struct funNode *root, char *expression);
 void destroyFN (struct funNode *node);
 void destroyFT (struct funNode *root);
+void printInOrderF(struct funNode *node);
+void printSpecialF(struct funNode *node);
 
 
 ////////////////////////CLASSES
@@ -85,7 +87,8 @@ struct classNode *findMaxCN(struct classNode *root);
 struct classNode *searchCT(struct classNode *root, char *exp);
 void destroyCN (struct classNode *node);
 void destroyCT (struct classNode *root);
-
+void printInOrderC(struct classNode *node);
+void printSpecialC(struct classNode *node);
 
 
 

@@ -31,7 +31,10 @@ int newFunction();  // vytvori novou polozku v globalni tabulce funkci, name = t
 int newClass();     //                                          trid
 int newStaticVar(); //                                          promennych + v lokalni tabulce
 int newVar();       //                         lokalni tabulce, podle CurrentMethod/CurrentClass
+void addMparam();
 
+int setCurrentMethod();
+int setCurrentClass();
 
 int isFunction();
 

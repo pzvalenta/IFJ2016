@@ -22,7 +22,7 @@ extern struct funNode *FTRoot; // koren glob tabulky funkci
 extern struct classNode *CurrentClass;
 extern struct funNode *CurrentMethod;
 extern struct varNode *CurrentVar;
-
+extern int SECOND_RUN;
 
 int parse(struct tListItem *head);
 

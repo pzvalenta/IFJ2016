@@ -449,7 +449,65 @@ void destroyCT (struct classNode *root){
 
 
 
+void printInOrderF(struct funNode *node){
+	if (node == NULL) return;
+	printInOrderF(node->left);
+	fprintf(stderr,"%s\n", node->name->data);
+	printInOrderF(node->right);
+}
 
+
+void printInOrderC(struct classNode *node){
+	if (node == NULL) return;
+	printInOrderC(node->left);
+	fprintf(stderr,"%s\n", node->name->data);
+	printInOrderC(node->right);
+}
+
+void printSpecialV(struct varNode *node){
+	if (node == NULL) return;
+	char c;
+	int type;
+	if (node->global != NULL){
+		type = node->global->type;
+	} else type = node->type;
+	switch (type) {
+		case T_STRING:
+			c = 's';
+		break;
+		case T_DOUBLE:
+			c = 'd';
+		break;
+		case T_INT:
+			c = 'i';
+		break;
+		default:
+			c = '?';
+		break;
+	}
+	printSpecialV(node->left);
+	fprintf(stderr,"\t%c\t%s\n", c, node->name->data);
+	printSpecialV(node->right);
+}
+
+void printSpecialF(struct funNode *node){
+	if (node == NULL) return;
+	printSpecialF(node->left);
+	char * vars = node->types->data + 1;
+	fprintf(stderr,"%c\t%s(%s)\n",node->types->data[0], node->name->data, vars);
+	printSpecialV(node->lVarTable);
+	fprintf(stderr, "_______________________________\n");
+	printSpecialF(node->right);
+}
+
+void printSpecialC(struct classNode *node){
+	if (node == NULL) return;
+	printSpecialC(node->left);
+	fprintf(stderr,"%s\n", node->name->data);
+	printSpecialV(node->lVarTable);
+	fprintf(stderr, "_______________________________\n");
+	printSpecialC(node->right);
+}
 
 
 

@@ -1,7 +1,7 @@
 #include "symtable.h"
 
-
-// extern struct tListItem *token;    // globalni promena, ukazatel na momentalni token v tokenlistu
+// extern struct tListItem *token;    // globalni promena, ukazatel na
+// momentalni token v tokenlistu
 
 //
 // extern struct TableNode *CurrentClass;
@@ -11,93 +11,145 @@
 // extern struct funNode *FTRoot; //koren globalni tabulky funkci
 // extern struct classNode *CTRoot; //koren globalni tabulky trid
 
+String *completize(String *s); // predela string->name z neuplneho
+                               // identifikatoru na uplny, pomoci CurrentClass
 
-String *completize(String *s); // predela string->name z neuplneho identifikatoru na uplny, pomoci CurrentClass
-
-int getOffset(); //najde offset z tabulky symbolu podle tokenu
-struct varNode* findVar();
+int getOffset(); // najde offset z tabulky symbolu podle tokenu
+struct varNode *findVar();
 int isCompleteIdent(String *str);
 
-// struct funNode *findFunction(){
-//
-// }
-//
-// struct classNode *findClass(){
-//
-// }
 
-int isFunction(){
-  if (findFunction(FTRoot, token->data->data) == NULL)
-  return 0;
-  else return 1;
-}
-
-int isCompleteIdent(String *str){
-  for(int i = 0; str->data[i] != '\0'; i++){
-    if (str->data[i] == '.') return 1;
-  }
-  return 0;
-}
-
-int getOffset(){
-  struct varNode *tmp = findVar();
-  if (tmp == NULL) return -1;
-  else return tmp->offset;
-}
-
-int getType(){
-  struct varNode *tmp = findVar();
-  if (tmp == NULL) return -1;
-  else return tmp->type;
-}
 
 void setVarType(int type){
   CurrentVar->type = type;
 }
 
-struct varNode* findVar(){
-  if (isCompleteIdent(token->data)) return searchVT(GVRoot, token->data->data);
+void addMparam(int type) {
+  char c;
+  switch (type) {
+  case T_INT:
+    c = 'i';
+    break;
+  case T_DOUBLE:
+    c = 'd';
+    break;
+  case T_STRING_L:
+    c = 's';
+    break;
+  case T_VOID:
+    c = 'v';
+    break;
+  }
+  appendChar(CurrentMethod->types, c);
+}
 
-  if (CurrentMethod != NULL) return searchVT(CurrentMethod->lVarTable, token->data->data);
+struct funNode *findFunction() {
+  String *tmp = completize(token->data);
+  struct funNode *result = searchFT(FTRoot, tmp->data);
+  destroyString(tmp);
+  return result;
+}
 
-  if (CurrentClass != NULL){
-    struct varNode *tmp = searchVT(CurrentClass->lVarTable, token->data->data);
-    if (tmp == NULL) {
-      token->data = completize(token->data);
-      return searchVT(GVRoot, token->data->data);
+struct classNode *findClass() {
+  return searchCT(CTRoot, token->data->data);
+}
+
+int isFunction() {
+  int result;
+  printf("token->data %p \n", token->data);
+
+  String *tmp = completize(token->data);
+  printf("token->data %p   completized %p\n", token->data, tmp);
+  if (findFunction(FTRoot, tmp->data) == NULL)
+    result = 0;
+  else
+    result = 1;
+  printf("\n PREDESTROY\n");
+  destroyString(tmp);
+  printf("\n POSTDESTROY\n");
+
+  return result;
+}
+
+int isCompleteIdent(String *str) {
+  for (int i = 0; str->data[i] != '\0'; i++) {
+    if (str->data[i] == '.')
+      return 1;
+  }
+  return 0;
+}
+
+int getOffset() {
+  struct varNode *tmp = findVar();
+  if (tmp == NULL)
+    return -1;
+  else
+    return tmp->offset;
+}
+
+int getType() {
+  struct varNode *tmp = findVar();
+  if (tmp == NULL)
+    return -1;
+  else
+    return tmp->type;
+}
+
+
+struct varNode *findVar() {
+  if (isCompleteIdent(token->data))
+    return searchVT(GVRoot, token->data->data);
+
+  struct varNode *tmp;
+
+  if (CurrentMethod != NULL){
+    tmp = searchVT(CurrentMethod->lVarTable, token->data->data);
+    if (tmp->global != NULL) {// toto by nikdy nemelo nastat
+      fprintf(stderr,"THIS SHOULD NEVER HAPPEN! method variable has global pointer\n");
+      return tmp->global;
     }
+    else return tmp;
+  }
+
+
+  if (CurrentClass != NULL) {
+    struct varNode *tmp = searchVT(CurrentClass->lVarTable, token->data->data);
+    if (tmp->global != NULL) return tmp->global;
+    else return tmp;
   }
 
   return NULL;
 }
 
-
-int newFunction(){
-  if (CurrentClass == NULL) return E_SYN;
+int newFunction() {
+  if (CurrentClass == NULL)
+    return E_SYN;
 
   struct funNode *tmp = newFN(token);
-  if (tmp == NULL) return E_INTERNAL;
+  if (tmp == NULL)
+    return E_INTERNAL;
 
-  if (!isCompleteIdent(tmp->name)){
-    printf("not complete, %p\n",tmp->name);
+  if (!isCompleteIdent(tmp->name)) {
+    printf("not complete, %p\n", tmp->name);
     tmp->name = completize(tmp->name);
-    if(tmp->name == NULL){
+    if (tmp->name == NULL) {
       destroyFN(tmp);
       return E_INTERNAL;
     }
     printf("complete, %p\n", tmp->name);
-
   }
 
-  printf("ABOUT TO SEARCH FTRoot with %s\n",tmp->name->data);
+  printf("ABOUT TO SEARCH FTRoot with %s\n", tmp->name->data);
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
     destroyFN(tmp);
-    return E_SEM;  // TODO uz byla deklarovana, je v tabulce
+    return E_SEM; // TODO uz byla deklarovana, je v tabulce
   }
 
   if (searchVT(GVRoot, tmp->name->data) != NULL) {
     destroyFN(tmp);
-    fprintf(stderr, "ERROR, deklarace funkce se jmenem totoznym jako globalni promenna \n");
+    fprintf(
+        stderr,
+        "ERROR, deklarace funkce se jmenem totoznym jako globalni promenna \n");
     return E_SEM;
   }
 
@@ -107,13 +159,34 @@ int newFunction(){
   return E_OK;
 }
 
-int newClass(){
-  struct classNode *tmp = newCN(token);
+int setCurrentMethod(){
+  int result = E_OK;
+  String *s = completize(token->data);
+  struct funNode *tmp = searchFT(FTRoot, s->data);
+  if (tmp == NULL) result = E_INTERNAL;
+  CurrentMethod = tmp;
+  CurrentVar = NULL;
+  destroyString(s);
+  return result;
+}
+
+int setCurrentClass(){
+  struct classNode *tmp = searchCT(CTRoot, token->data->data);
   if (tmp == NULL) return E_INTERNAL;
+  CurrentClass = tmp;
+  CurrentMethod = NULL;
+  CurrentVar = NULL;
+  return E_OK;
+}
+
+int newClass() {
+  struct classNode *tmp = newCN(token);
+  if (tmp == NULL)
+    return E_INTERNAL;
 
   if (searchCT(CTRoot, tmp->name->data) != NULL) {
     destroyCN(tmp);
-    return E_SEM;  // TODO uz byla deklarovana, je v tabulce
+    return E_SEM; // TODO uz byla deklarovana, je v tabulce
   }
 
   CTRoot = insertCN(CTRoot, tmp);
@@ -121,17 +194,18 @@ int newClass(){
   return E_OK;
 }
 
-int newStaticVar(){
+int newStaticVar() {
   struct varNode *tmp = newVN(token);
-  if (tmp == NULL) return E_INTERNAL;
+  if (tmp == NULL)
+    return E_INTERNAL;
 
-  if (CurrentMethod != NULL){
+  if (CurrentMethod != NULL) {
     destroyVN(tmp);
     fprintf(stderr, "ERROR, pokus o deklaraci static promenne ve funkci\n");
     return E_SYN;
   }
 
-  if (CurrentClass == NULL){
+  if (CurrentClass == NULL) {
     destroyVN(tmp);
     fprintf(stderr, "ERROR, pokus o deklaraci static promenne mimo tridu\n");
     return E_SYN;
@@ -139,71 +213,71 @@ int newStaticVar(){
 
   if (searchVT(CurrentClass->lVarTable, tmp->name->data) != NULL) {
     destroyVN(tmp);
-    fprintf(stderr, "ERROR, pokus o deklaraci static var, ktera uz byla deklarovana jako lokalni\n");
-    return E_SEM;  // uz byla deklarovana, je v lokalni tabulce tridy
+    fprintf(stderr, "ERROR, pokus o deklaraci static var, ktera uz byla "
+                    "deklarovana jako lokalni\n");
+    return E_SEM; // uz byla deklarovana, je v lokalni tabulce tridy
   }
 
   if (searchVT(GVRoot, tmp->name->data) != NULL) {
     destroyVN(tmp);
     fprintf(stderr, "ERROR, redeklarace globalni promenne\n");
-    return E_SEM;  // uz byla deklarovana, je v globalni tabulce promennych
+    return E_SEM; // uz byla deklarovana, je v globalni tabulce promennych
   }
 
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
     destroyVN(tmp);
-    fprintf(stderr, "ERROR, deklarace globalni promenne se jmenem totoznym jako funkce\n");
+    fprintf(
+        stderr,
+        "ERROR, deklarace globalni promenne se jmenem totoznym jako funkce\n");
     return E_SEM;
   }
-  //vytvoreni polozky v lokalni tabulce
+  // vytvoreni polozky v lokalni tabulce
   CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
 
-  //vytvoreni polozky v glob. tabulce
+  // vytvoreni polozky v glob. tabulce
   struct varNode *tmp2 = newVN(token);
-  if (tmp2 == NULL) return E_INTERNAL;
+  if (tmp2 == NULL)
+    return E_INTERNAL;
 
   tmp2->name = completize(tmp2->name);
-  if (tmp2->name == NULL){
+  if (tmp2->name == NULL) {
     destroyVN(tmp2);
     return E_INTERNAL;
   }
-
 
   tmp->global = tmp2;
 
   CurrentVar = tmp2;
   GVRoot = insertVN(GVRoot, tmp2);
 
-
   return E_OK;
 }
 
-int newVar(){
+int newVar() {
   struct varNode *tmp = newVN(token);
-  if (tmp == NULL) return E_INTERNAL;
+  if (tmp == NULL)
+    return E_INTERNAL;
 
-  if (CurrentClass == NULL){
+  if (CurrentClass == NULL) {
     destroyVN(tmp);
     fprintf(stderr, "ERROR, pokus promenne mimo tridu\n");
     return E_SYN;
   }
 
-  if (CurrentMethod == NULL){
+  if (CurrentMethod == NULL) {
     if (searchVT(CurrentClass->lVarTable, tmp->name->data) != NULL) {
       destroyVN(tmp);
       fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
-      return E_SEM;  // uz byla deklarovana, je v lokalni tabulce tridy
-    }
-    else{
+      return E_SEM; // uz byla deklarovana, je v lokalni tabulce tridy
+    } else {
       CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
     }
-  }
-  else {
+  } else {
     if (searchVT(CurrentMethod->lVarTable, tmp->name->data) != NULL) {
       destroyVN(tmp);
       fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
-      return E_SEM;  // uz byla deklarovana, je v lokalni tabulce funkce
-    }
-    else{
+      return E_SEM; // uz byla deklarovana, je v lokalni tabulce funkce
+    } else {
       CurrentMethod->lVarTable = insertVN(CurrentMethod->lVarTable, tmp);
     }
   }
@@ -212,33 +286,22 @@ int newVar(){
   return E_OK;
 }
 
-
-String *completize(String *s){   // predela string s na uplny identifikator
+String *completize(String *s) { // predela string s na uplny identifikator
+  if (isCompleteIdent(s))
+    return copyString(s);
   String *tmp = newString();
-  printf("completizing string %s, with class %s\n", s->data, CurrentClass->name->data);
-  for(int i = 0; i < CurrentClass->name->len; i++){
+  for (int i = 0; i < CurrentClass->name->len; i++) {
     appendChar(tmp, CurrentClass->name->data[i]);
   }
 
   appendChar(tmp, '.');
-  printf("Current completizing state = %s\n", tmp->data);
 
-  for(int i = 0; i < s->len; i++){
+  for (int i = 0; i < s->len; i++) {
     appendChar(tmp, s->data[i]);
   }
-  printf("Current completizing state = %s\n", tmp->data);
 
-  destroyString(s);
   return tmp;
 }
-
-
-
-
-
-
-
-
 
 //////////////////////////////////////STARE FUNKCE
 

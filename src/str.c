@@ -116,3 +116,14 @@ String *eraseString(String *in){
 // 	strcpy(new->data, old->data);
 // 	return new;
 // }
+
+String *copyString(String *old){
+	if (old == NULL) return NULL;
+	String *new = newString();
+
+	for(int i = 0; i < old->len; i++){
+		appendChar(new, old->data[i]);
+	}
+
+	return new;
+}
