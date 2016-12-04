@@ -85,7 +85,7 @@ int getOffset() {
 
 int getType() {
   struct varNode *tmp = findVar();
-  if (tmp == NULL) 
+  if (tmp == NULL)
     return -1;
   else
     return tmp->type;
