@@ -50,7 +50,7 @@
 #define T_VOID           36
 #define T_WHILE          37
 
-
+#define T_DOLLAR         38
 
 #define T_NUMBER_I       41 //celociselny literal
 #define T_NUMBER_D       42 //desetinny literal
