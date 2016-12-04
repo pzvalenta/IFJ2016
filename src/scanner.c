@@ -22,7 +22,7 @@
 
 //=======
 FILE *file;
-String *string = NULL;
+struct String *string = NULL;
 struct tListItem *head = NULL;
 struct tListItem *tail = NULL;
 int tokenValue = E_LEX;
@@ -151,7 +151,7 @@ int getToken() {
      * v nekonecnem cyklu nacitame znaky
      */
     current_char = getc(file);
-    // printf("current_char: %c\n", current_char);
+    printf("current_char: %c\n", current_char);
 
     switch (state) {
     case S_START:

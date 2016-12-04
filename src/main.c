@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   } else /// REMOVE!!! TODO
   {
     FILE *source =
-        fopen("/home/petr/Code/IFJ2016/testing/input/example3.java", "r");
+        fopen("/home/petr/Code/IFJ2016/testing/input/example1.java", "r");
     set_file(source);
   }
 

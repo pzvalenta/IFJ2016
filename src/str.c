@@ -6,8 +6,8 @@
 
 
 // returns pointer to an array of chars BASE_STRING_SIZE long
-String *newString(){
-	String *ret = (String *) malloc(sizeof(String));
+struct String *newString(){
+	struct String *ret = (struct String *) malloc(sizeof(struct String));
 	if (ret == NULL) return NULL; //TODO handle error
 
 	ret->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
@@ -27,7 +27,7 @@ String *newString(){
 	return ret;
 }
 
-String *resizeString(String *string){
+struct String *resizeString(struct String *string){
 	int size = string->size;
 	int len = string->len;
 	char *new = realloc(string->data, 2*size*sizeof(char));
@@ -60,7 +60,7 @@ String *resizeString(String *string){
 	// }
 }
 
-void appendChar(String *str, char c){
+void appendChar(struct String *str, char c){
 	if (str->len + 1 >= str->size) resizeString(str);
 
 	str->data[str->len++] = c;
@@ -69,7 +69,7 @@ void appendChar(String *str, char c){
 	//TODO realloc on string end
 }
 
-void destroyStringData(String *string){
+void destroyStringData(struct String *string){
 	if (string->data != NULL){
 		free(string->data);
 		string->data = NULL;
@@ -79,14 +79,14 @@ void destroyStringData(String *string){
 	string->size = -1;
 }
 
-void destroyString(String *string){
+void destroyString(struct String *string){
 	if (string == NULL) return;
 	destroyStringData(string);
 	free(string);
 	string = NULL;
 }
 
-String *eraseString(String *in){
+struct String *eraseString(struct String *in){
 	destroyStringData(in);
 
 	in->data = (char *) malloc(BASE_STRING_SIZE*sizeof(char));
@@ -103,28 +103,29 @@ String *eraseString(String *in){
 	return in;
 }
 //vytazeni hodnot ze stringu (konverze typu)
-void *GetDataofString (String *str){
+void *GetDataofString (struct String *str){
 	if(str->type == T_NUMBER_D){
 		double *dbl_num = malloc(sizeof(double));
-		sscanf(str->data, "%lf", &dbl_num);
+		sscanf(str->data, "%lf", dbl_num);
 		return (void*) dbl_num;
 	}
 	if(str->type == T_NUMBER_I){
 		int *int_num = malloc(sizeof(int));;
-		sscanf(str->data, "%d", &int_num);
+		sscanf(str->data, "%d", int_num);
 		return (void*) int_num;
 	}
 	if(str->type == T_STRING_L){
-		String *str = newString(*str);
-		str = copyString(*str);
+		struct String *str = newString();
+		str = copyString(str);
 		return str;
 	}
+	return NULL;
 }
 
 
-String *copyString(String *old){
+struct String *copyString(struct String *old){
 	if (old == NULL) return NULL;
-	String *new = newString();
+	struct String *new = newString();
 
 	for(int i = 0; i < old->len; i++){
 		appendChar(new, old->data[i]);
@@ -134,7 +135,7 @@ String *copyString(String *old){
 }
 
 
-String *concatenate(String *str1, String *str2){
+struct String *concatenate(struct String *str1, struct String *str2){
 	char *s1 = NULL;
 	char *s2 = NULL;
 	if(str1->type != T_STRING_L){
@@ -152,7 +153,7 @@ String *concatenate(String *str1, String *str2){
 		s2 = str2->data;
 	}
 	else{
-		return E_TYP;
+		return NULL;
 	}
 
 	s1 = (char*) realloc(s1, strlen(s1) + strlen(s2) + 1);
@@ -161,7 +162,7 @@ String *concatenate(String *str1, String *str2){
 	}
 	strcat(s1, s2);
 	str1->data = s1;
-	str1->size = /*TODO*/;
-	str1->len = /*TODO*/;
+	str1->size = 0/*TODO*/;
+	str1->len = 0/*TODO*/;
 	return str1;
 }

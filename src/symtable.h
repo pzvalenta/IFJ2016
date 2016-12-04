@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include "str.h"
-#include "token.h"
 
 
 extern struct tListItem *token;    // globalni promena, ukazatel na momentalni token v tokenlistu
@@ -24,6 +23,8 @@ extern struct varNode *CurrentVar;
 struct TableNode;
 
 struct tListItem;
+
+struct String;
 
 
 void setVarType(int type);

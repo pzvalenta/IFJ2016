@@ -99,12 +99,8 @@ int assign_rule() {
     return function_rule();
 
   result = prec_anal(T_SEMICLN); // id = expression ;
-  if (result != E_OK){
-    printf("assign test\n");
-    dprint(token);
+  if (result != E_OK)
     return result;
-  }
-
 
   token = token->next;
   return result;
@@ -519,6 +515,7 @@ int statement_list() {
     // TODO check proti metodam
     fprintf(stderr, "going from statement_list() to statement()\n");
     result = statement();
+    dprint(token);
     if (result != E_OK)
       return result;
 

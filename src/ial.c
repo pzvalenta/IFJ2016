@@ -472,13 +472,13 @@ void printSpecialV(struct varNode *node){
 		type = node->global->type;
 	} else type = node->type;
 	switch (type) {
-		case T_STRING:
+		case T_STRING_L:
 			c = 's';
 		break;
-		case T_DOUBLE:
+		case T_NUMBER_D:
 			c = 'd';
 		break;
-		case T_INT:
+		case T_NUMBER_I:
 			c = 'i';
 		break;
 		default:

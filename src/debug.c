@@ -2,7 +2,7 @@
 
 
 void dprint(struct tListItem *token){
-  String *data = token->data;
+  struct String *data = token->data;
   int id = token->id;
 
   fprintf(stderr, "current token is: ");

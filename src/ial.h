@@ -6,13 +6,14 @@
 #include <string.h>
 
 #include "str.h"
-#include "token.h"
 
 
 ////////////////////////VARIABLES
 //struktura pro lokalni tabulky / globalni tabulku promennych
+struct String;
+
 struct varNode{
-	String *name;
+	struct String *name;
 	int type;   // TODO pridat type "ukazatel", data.s pak bude ukazatelem do prislusne globalni tabulky
 	int offset;
 	int declared;
@@ -42,9 +43,9 @@ void printSpecialV(struct varNode *node);
 ////////////////////////FUNCTIONS
 //struktura pro glob. tabulku funkci
 struct funNode{
-	String *name;
+	struct String *name;
 
-	String *types; // void func(int a, double b)   =  "vid"
+	struct String *types; // void func(int a, double b)   =  "vid"
 	int varc; //pocet lok. promennych
 	struct varNode *lVarTable;
 	// TODO ukazatel na prvni instrukci
@@ -70,7 +71,7 @@ void printSpecialF(struct funNode *node);
 ////////////////////////CLASSES
 //struktura pro  glob. tabulku trid
 struct classNode{
-	String *name;
+	struct String *name;
 
 	struct varNode *lVarTable;
 	int varc;

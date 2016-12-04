@@ -11,12 +11,12 @@
 // extern struct funNode *FTRoot; //koren globalni tabulky funkci
 // extern struct classNode *CTRoot; //koren globalni tabulky trid
 
-String *completize(String *s); // predela string->name z neuplneho
+struct String *completize(struct String *s); // predela string->name z neuplneho
                                // identifikatoru na uplny, pomoci CurrentClass
 
 int getOffset(); // najde offset z tabulky symbolu podle tokenu
 struct varNode *findVar();
-int isCompleteIdent(String *str);
+int isCompleteIdent(struct String *str);
 
 
 
@@ -62,7 +62,7 @@ void addMparam(int type) {
 }
 
 struct funNode *findFunction() {
-  String *tmp = completize(token->data);
+  struct String *tmp = completize(token->data);
   struct funNode *result = searchFT(FTRoot, tmp->data);
   destroyString(tmp);
   return result;
@@ -75,7 +75,7 @@ struct classNode *findClass() {
 int isFunction() {
   int result;
 
-  String *tmp = completize(token->data);
+  struct String *tmp = completize(token->data);
   if (findFunction(FTRoot, tmp->data) == NULL)
     result = 0;
   else
@@ -85,7 +85,7 @@ int isFunction() {
   return result;
 }
 
-int isCompleteIdent(String *str) {
+int isCompleteIdent(struct String *str) {
   for (int i = 0; str->data[i] != '\0'; i++) {
     if (str->data[i] == '.')
       return 1;
@@ -172,7 +172,7 @@ int newFunction() {
 
 int setCurrentMethod(){
   int result = E_OK;
-  String *s = completize(token->data);
+  struct String *s = completize(token->data);
   struct funNode *tmp = searchFT(FTRoot, s->data);
   if (tmp == NULL) result = E_INTERNAL;
   CurrentMethod = tmp;
@@ -315,10 +315,10 @@ int newVar() {
   return E_OK;
 }
 
-String *completize(String *s) { // predela string s na uplny identifikator
+struct String *completize(struct String *s) { // predela string s na uplny identifikator
   if (isCompleteIdent(s))
     return copyString(s);
-  String *tmp = newString();
+  struct String *tmp = newString();
   for (int i = 0; i < CurrentClass->name->len; i++) {
     appendChar(tmp, CurrentClass->name->data[i]);
   }
@@ -334,8 +334,8 @@ String *completize(String *s) { // predela string s na uplny identifikator
 
 //////////////////////////////////////STARE FUNKCE
 
-// String *createCompleteIdent(){
-//   String *tmp = newString();
+// struct String *createCompleteIdent(){
+//   struct String *tmp = newString();
 //   for(int i = 0; i < CurrentClass->name->data->len){
 //     appendChar(tmp, CurrentClass->data->data[i]);
 //   }
@@ -411,7 +411,7 @@ String *completize(String *s) { // predela string s na uplny identifikator
 // struct {
 //   int type;
 //   union{
-//     String *s;
+//     struct String *s;
 //     int i;
 //     double d;
 //   } data;

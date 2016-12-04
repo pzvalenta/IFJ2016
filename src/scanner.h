@@ -20,7 +20,6 @@
 #include <ctype.h>
 #include <string.h>
 #include "str.h"
-#include "token.h"
 #include "ial.h"
 #include "main.h"
 
@@ -81,11 +80,11 @@
 #define T_COMMA          88 // ,
 #define T_DOT            89 // .
 
-
+struct String;
 
 struct tListItem {
   int id;
-  String *data;
+  struct String *data;
   struct tListItem *next;
   struct tListItem *prev;
 };
