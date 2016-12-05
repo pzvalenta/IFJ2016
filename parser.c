@@ -36,10 +36,60 @@ int program();
 int body();
 int param();
 int buildIn();
-int ifjprint();
 void debugTablePrint();
 
+int isBuiltIn();
+int builtInCall();
+int ifjprint();
+int ifjsort();
+int ifjcompare();
+int ifjsubstr();
+int ifjlength();
+int ifjfind();
+int ifjreadInt();
+int ifjreadString();
+int ifjreadDouble();
 
+
+int isBuiltIn(){
+  if (findFunction() != NULL) return 1;
+  else return 0;
+}
+
+
+int builtInCall() {
+  if (strcmp(token->data->data, "ifj16.print") == 0)
+    return ifjprint();
+
+  if (strcmp(token->data->data, "ifj16.sort") == 0)
+    return ifjsort();
+
+  if (strcmp(token->data->data, "ifj16.compare") == 0)
+    return ifjcompare();
+
+  if (strcmp(token->data->data, "ifj16.substr") == 0)
+    return ifjsubstr();
+
+  if (strcmp(token->data->data, "ifj16.length") == 0)
+    return ifjlength();
+
+  if (strcmp(token->data->data, "ifj16.find") == 0)
+    return ifjfind();
+
+  if (strcmp(token->data->data, "ifj16.readInt") == 0)
+    return ifjreadInt();
+
+  if (strcmp(token->data->data, "ifj16.readString") == 0)
+    return ifjreadString();
+
+  if (strcmp(token->data->data, "ifj16.readDouble") == 0)
+    return ifjreadDouble();
+
+
+  fprintf(stderr, "pokus o volani neexistujici vestavene funkce: %s\n",
+          token->data->data);
+  return E_SEM;
+}
 
 int ifjprint() {
   // TODO placeholder
@@ -50,6 +100,94 @@ int ifjprint() {
   token = token->next;
   return E_OK;
 }
+
+
+int ifjsort() {
+  // TODO placeholder
+  while (token->id != T_SEMICLN && token->id != T_END) {
+    token = token->next;
+    dprint(token);
+  }
+  token = token->next;
+  return E_OK;
+}
+int ifjcompare() {
+  // TODO placeholder
+  while (token->id != T_SEMICLN && token->id != T_END) {
+    token = token->next;
+    dprint(token);
+  }
+  token = token->next;
+  return E_OK;
+}
+int ifjsubstr() {
+  // TODO placeholder
+  while (token->id != T_SEMICLN && token->id != T_END) {
+    token = token->next;
+    dprint(token);
+  }
+  token = token->next;
+  return E_OK;
+}
+int ifjlength() {
+  // TODO placeholder
+  while (token->id != T_SEMICLN && token->id != T_END) {
+    token = token->next;
+    dprint(token);
+  }
+  token = token->next;
+  return E_OK;
+}
+int ifjfind() {
+  // TODO placeholder
+  while (token->id != T_SEMICLN && token->id != T_END) {
+    token = token->next;
+    dprint(token);
+  }
+  token = token->next;
+  return E_OK;
+}
+int ifjreadInt() {
+  // TODO placeholder
+  while (token->id != T_SEMICLN && token->id != T_END) {
+    token = token->next;
+    dprint(token);
+  }
+  token = token->next;
+  return E_OK;
+}
+int ifjreadString() {
+  // TODO placeholder
+  while (token->id != T_SEMICLN && token->id != T_END) {
+    token = token->next;
+    dprint(token);
+  }
+  token = token->next;
+  return E_OK;
+}
+int ifjreadDouble() {
+  // TODO placeholder
+  while (token->id != T_SEMICLN && token->id != T_END) {
+    token = token->next;
+    dprint(token);
+  }
+  token = token->next;
+  return E_OK;
+}
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////
+
+
 
 int function_rule() {
   fprintf(stderr, "entering function_rule()\n");
@@ -243,8 +381,8 @@ int void_func_call_rule() {
     return E_SYN;
   // TODO zknotrolovat symtable
   // TODO vygenerovat volani fce
-  if (strcmp(token->data->data, "ifj16.print") == 0)
-    return ifjprint();
+  if (isBuiltIn())
+    return builtInCall();
 
   token = token->next;
   if (token->id != T_LBRACKET)
@@ -761,6 +899,7 @@ int buildIn() {
     return result;
 
   // vestavena funkce ifj16.print
+  token->id = T_IDENT;
   token->data = newString();
   for (int i = 0; i < 5; i++) {
     appendChar(token->data, "print"[i]);
@@ -768,8 +907,12 @@ int buildIn() {
   result = newFunction();
   if (result != E_OK)
     return result;
+  addMparam(T_VOID);
+
+
 
   // vestavena funkce ifj16.sort
+  token->id = T_IDENT;
   token->data = newString();
   for (int i = 0; i < 4; i++) {
     appendChar(token->data, "sort"[i]);
@@ -777,8 +920,11 @@ int buildIn() {
   result = newFunction();
   if (result != E_OK)
     return result;
+  addMparam(T_STRING);
+  addMparam(T_STRING);
 
   // vestavena funkce ifj16.compare
+  token->id = T_IDENT;
   token->data = newString();
   for (int i = 0; i < 7; i++) {
     appendChar(token->data, "compare"[i]);
@@ -786,8 +932,12 @@ int buildIn() {
   result = newFunction();
   if (result != E_OK)
     return result;
+  addMparam(T_INT);
+  addMparam(T_STRING);
+  addMparam(T_STRING);
 
   // vestavena funkce ifj16.substr
+  token->id = T_IDENT;
   token->data = newString();
   for (int i = 0; i < 6; i++) {
     appendChar(token->data, "substr"[i]);
@@ -795,8 +945,14 @@ int buildIn() {
   result = newFunction();
   if (result != E_OK)
     return result;
+  addMparam(T_STRING);
+  addMparam(T_STRING);
+  addMparam(T_INT);
+  addMparam(T_INT);
+
 
   // vestavena funkce ifj16.length
+  token->id = T_IDENT;
   token->data = newString();
   for (int i = 0; i < 6; i++) {
     appendChar(token->data, "length"[i]);
@@ -804,8 +960,11 @@ int buildIn() {
   result = newFunction();
   if (result != E_OK)
     return result;
+  addMparam(T_STRING);
+  addMparam(T_INT);
 
   // vestavena funkce ifj16.find
+  token->id = T_IDENT;
   token->data = newString();
   for (int i = 0; i < 4; i++) {
     appendChar(token->data, "find"[i]);
@@ -814,8 +973,13 @@ int buildIn() {
   if (result != E_OK)
     return result;
   // TODO ! pridat parametry
+  addMparam(T_INT);
+  addMparam(T_STRING);
+  addMparam(T_STRING);
+
 
   // vestavena funkce ifj16.readInt
+  token->id = T_IDENT;
   token->data = newString();
   for (int i = 0; i < 7; i++) {
     appendChar(token->data, "readInt"[i]);
@@ -823,8 +987,11 @@ int buildIn() {
   result = newFunction();
   if (result != E_OK)
     return result;
+  addMparam(T_INT);
+
 
   // vestavena funkce ifj16.readString
+  token->id = T_IDENT;
   token->data = newString();
   for (int i = 0; i < 10; i++) {
     appendChar(token->data, "readString"[i]);
@@ -832,8 +999,11 @@ int buildIn() {
   result = newFunction();
   if (result != E_OK)
     return result;
+  addMparam(T_STRING);
+
 
   // vestavena funkce ifj16.readDouble
+  token->id = T_IDENT;
   token->data = newString();
   for (int i = 0; i < 10; i++) {
     appendChar(token->data, "readDouble"[i]);
@@ -841,6 +1011,8 @@ int buildIn() {
   result = newFunction();
   if (result != E_OK)
     return result;
+  addMparam(T_DOUBLE);
+
 
   fprintf(stderr, "#######FINISHED ADDING BUILTIN FUNCTIONS#########\n");
 
@@ -863,17 +1035,12 @@ int parse(struct tListItem *head) {
   dprint(token); // DEBUG
   result = program();
 
-
   debugTablePrint();
-
 
   return result;
 }
 
-
-
-
-void debugTablePrint(){
+void debugTablePrint() {
   if (!SECOND_RUN) {
     fprintf(stderr, "///////////END OF FIRST RUN/////////\n");
 
@@ -898,7 +1065,6 @@ void debugTablePrint(){
 
   printSpecialF(FTRoot);
   fprintf(stderr, "\n");
-
 
   fprintf(stderr, "####################################\n");
   fprintf(stderr, "#  current state of global var     #\n");

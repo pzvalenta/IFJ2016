@@ -151,7 +151,7 @@ int getToken() {
      * v nekonecnem cyklu nacitame znaky
      */
     current_char = getc(file);
-    // printf("current_char: %c\n", current_char);
+    // fprintf(stderr,"current_char: %c\n", current_char);
 
     switch (state) {
     case S_START:
@@ -186,7 +186,7 @@ int getToken() {
         tokenValue = T_RBRACKET;
         return E_OK;
       } else if (current_char == '{') {
-        // printf("debug, {\n");
+        // fprintf(stderr,"debug, {\n");
         tokenValue = T_LCBRACKET;
         return E_OK;
       } else if (current_char == '}') {
@@ -217,7 +217,7 @@ int getToken() {
       /*..............................................*/
 
       else if (current_char == '>') {
-        // printf("debug, char: %c\n", current_char);
+        // fprintf(stderr,"debug, char: %c\n", current_char);
         state = S_GREATER;
       } else if (current_char == '<') {
         state = S_LESS;
@@ -284,7 +284,7 @@ int getToken() {
       } else if (current_char == '*') { // /* - zacatek blokoveho komentare
         state = S_BL_COMM;
       } else if (current_char == '\n') { // pouze lomitko
-        // printf("slash\n");
+        // fprintf(stderr,"slash\n");
         return T_SLASH; // /
       }
       break;
@@ -311,15 +311,15 @@ int getToken() {
 
     case S_LN_COMM: // // - radkovy komentar
       do {
-        //  printf("KOMENT\n");
+        //  fprintf(stderr,"KOMENT\n");
         if (current_char == '\n' || current_char == EOF) {
-          //  printf("KOMENT1\n");
+          //  fprintf(stderr,"KOMENT1\n");
           break;
         }
-        // printf("KOMENT2\n");
+        // fprintf(stderr,"KOMENT2\n");
         current_char = getc(file);
       } while (current_char != EOF && current_char != '\n');
-      // printf("KOMENT3\n");
+      // fprintf(stderr,"KOMENT3\n");
       state = S_START;
       break;
 
@@ -359,7 +359,7 @@ int getToken() {
         // identifikator
         appendChar(string, current_char);
         state = S_IDENT;
-        // printf("scanner, current state of indetificator = %s\n",
+        // fprintf(stderr,"scanner, current state of indetificator = %s\n",
         // string->data);
       } else if (current_char == '.') {
         appendChar(string, current_char);
@@ -377,9 +377,9 @@ int getToken() {
         // neni identifikator - testy na nepovolene znaky
         ungetc(current_char, file); // vrati posledni znak zpet do souboru,
                                     // takze dalsi funkce jej precte znovu
-        // printf("DEBUG %s\n", string->data);
+        // fprintf(stderr,"DEBUG %s\n", string->data);
         for (int a = 0; a < KEYWORDS; a++) {
-          // printf("Comparing with %s\n", klicova_slova[a]);
+          // fprintf(stderr,"Comparing with %s\n", klicova_slova[a]);
 
           if ((strcmp(string->data, klicova_slova[a])) ==
               0) /****JAK POZNAT TO, CO MAM NACTENO***/
@@ -418,7 +418,7 @@ int getToken() {
     /*........................ESCAPE......................*/
 
     case S_ESCAPE:
-      // printf("%d current_char0\n", current_char);
+      // fprintf(stderr,"%d current_char0\n", current_char);
       if (current_char == 'n') {
         appendChar(string, '\n');
         state = S_STRING;
@@ -432,27 +432,27 @@ int getToken() {
         appendChar(string, '\"');
         state = S_STRING;
       } else if (isdigit(current_char) != 0) { // je to cislo, mensi
-        //  printf("%s\n", current_char);
-        // printf("%d current_char\n", current_char);
+        //  fprintf(stderr,"%s\n", current_char);
+        // fprintf(stderr,"%d current_char\n", current_char);
         if ((current_char < '4') && (current_char >= '0')) {
-          // printf("prosel1\n");
+          // fprintf(stderr,"prosel1\n");
           // appendChar(string, num);
-          // printf("%d\n", num);
-          // printf("%d\n", current_char);
+          // fprintf(stderr,"%d\n", num);
+          // fprintf(stderr,"%d\n", current_char);
           int esc = (current_char - ASCII) * 8 * 8; // 8^2 (nejlevejsi cislo)
-          // printf("%d\n", esc);
+          // fprintf(stderr,"%d\n", esc);
           current_char = getc(file); // dalsi cislo v escape sekvenci
 
           if ((current_char < '8') && (current_char >= '0')) { // \0-30-7
-            // printf("prosel2\n");
+            // fprintf(stderr,"prosel2\n");
             esc = esc + (current_char - ASCII) * 8; // 8^1 (prostredni cislo)
-            // printf("%d\n", esc);
+            // fprintf(stderr,"%d\n", esc);
             current_char = getc(file); // dalsi cislo v escape sekvenci
 
             if ((current_char < '8') && (current_char >= '0')) { // \0-30-70-7
-              // printf("prosel3\n");
+              // fprintf(stderr,"prosel3\n");
               esc = esc + (current_char - ASCII); // 8^0 (nejpravejsi cislo)
-              // printf("%d\n", esc);
+              // fprintf(stderr,"%d\n", esc);
               appendChar(string,
                          (char)esc); // pridani cele escape sekvence do stringu
               state = S_STRING;
@@ -462,7 +462,7 @@ int getToken() {
       }
 
       else {
-        // printf("escape \n");
+        // fprintf(stderr,"escape \n");
         return E_LEX;
       }
       break;
@@ -510,7 +510,7 @@ int getToken() {
         state = S_NUM_EX;
       } else if ((current_char == '.') || (current_char == ',') ||
                  (current_char == '!') || (current_char == '/')) {
-        // printf("CHYBA S_NUM_DOT\n");
+        // fprintf(stderr,"CHYBA S_NUM_DOT\n");
         ungetc(current_char, file);
         return E_LEX;
       } else {
@@ -547,7 +547,7 @@ int getToken() {
         return T_NUMBER_D;
         // destroyString(string);
       } else {
-        // printf("CHYBA\n");
+        // fprintf(stderr,"CHYBA\n");
         ungetc(current_char, file);
         return E_LEX;
       }

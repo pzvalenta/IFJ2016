@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
   eprint(result);
 
   // //DEBUG TOKEN LIST PRINT
-  // printf("pointer na head %p\n", tokenListHead);
+  // fprintf(stderr, "pointer na head %p\n", tokenListHead);
   //
   // while(tokenListHead != NULL){
   //   dprint(tokenListHead);
@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
   fprintf(stderr, "############### Start Parseru 1st RUN ##############\n");
 
   // volani parseru
-  printf("token list head = %s\n", tokenListHead->data->data);
+  fprintf(stderr,"token list head = %s\n", tokenListHead->data->data);
   result = parse(tokenListHead);
   fprintf(stderr, "############# Vysledek Parseru 1st RUN #############\n");
   eprint(result);
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 
   // TODO druhy pruchod?
   fprintf(stderr, "############### Start Parseru 2nd RUN ##############\n");
-  printf("token list head = %s\n", tokenListHead->data->data);
+  fprintf(stderr,"token list head = %s\n", tokenListHead->data->data);
 
   SECOND_RUN = 1;
   // volani parseru

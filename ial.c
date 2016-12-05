@@ -515,7 +515,7 @@ void printSpecialC(struct classNode *node){
 // void printInorder(TableNode *node){
 // 	if (node == NULL) return;
 // 	printInorder(node->left);
-// 	printf("%s\n", node->name->data);
+// 	fprintf(stderr,"%s\n", node->name->data);
 // 	printInorder(node->right);
 // }
 

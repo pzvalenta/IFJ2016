@@ -24,24 +24,24 @@ void print_list(tList *l) //ok
    {
        if(tmp->handle==true)
        {
-           printf("< ");
+           fprintf(stderr,"< ");
        }
        else
           if(tmp->terminal==true)
           {
               if(tmp->c=='$')
               {
-                  printf("$ ");
+                  fprintf(stderr,"$ ");
               }
               else
-              printf("%d ",tmp->c);
+              fprintf(stderr,"%d ",tmp->c);
           }
           else
-           printf("E ");
+           fprintf(stderr,"E ");
 
        tmp=tmp->next;
    }
-   printf("\n");
+   fprintf(stderr,"\n");
 }
 
 
@@ -425,13 +425,13 @@ int prec_anal(int until) {
   print_list(l);
 
   int result;             // vraceni vysledku
-  printf("prec_anal test1\n");
+  fprintf(stderr,"prec_anal test1\n");
   dprint(token);
   if (token->id == until) // expession nemuze byt prazdny
   {
     dispose_list(l);
     free(l);
-    printf("tady1\n");
+    fprintf(stderr,"tady1\n");
     return E_SYN;
   }
 
@@ -465,7 +465,7 @@ int prec_anal(int until) {
       else {
         dispose_list(l);
         free(l);
-        printf("tady2\n");
+        fprintf(stderr,"tady2\n");
         return E_SYN;
       }
     }
@@ -478,7 +478,7 @@ int prec_anal(int until) {
       if (result != E_OK) {
         dispose_list(l);
         free(l);
-        printf("tady3\n");
+        fprintf(stderr,"tady3\n");
         return result;
       }
 
@@ -494,14 +494,14 @@ int prec_anal(int until) {
       if (result != E_OK) {
         dispose_list(l);
         free(l);
-        printf("tady4\n");
+        fprintf(stderr,"tady4\n");
         return result;
       }
       result = insert_terminal_last(l, token->id);
       if (result != E_OK) {
         dispose_list(l);
         free(l);
-        printf("tady5\n");
+        fprintf(stderr,"tady5\n");
         return result;
       }
       token = token->next;
@@ -527,7 +527,7 @@ int prec_anal(int until) {
 
           dispose_list(l);
           free(l);
-          printf("tady7\n");
+          fprintf(stderr,"tady7\n");
 
           return E_SYN;
         }
@@ -536,7 +536,7 @@ int prec_anal(int until) {
       {
         dispose_list(l);
         free(l);
-        printf("tady8\n");
+        fprintf(stderr,"tady8\n");
 
         return E_SYN;
       }
@@ -547,7 +547,7 @@ int prec_anal(int until) {
     default: // pokud je pravidlo ' ' taky spatne zapsany vyraz
       dispose_list(l);
       free(l);
-      printf("tady9\n");
+      fprintf(stderr,"tady9\n");
       print_list(l);
 
       return E_SYN;

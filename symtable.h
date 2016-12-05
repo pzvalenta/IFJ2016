@@ -37,6 +37,10 @@ void addMparam();
 int setCurrentMethod();
 int setCurrentClass();
 
+
+
+struct funNode *findFunction();
+
 int isFunction();
 int getType(); //TODO predelat na getType(tListItem *token)
 

@@ -31,12 +31,12 @@ struct String *resizeString(struct String *string){
 	int size = string->size;
 	int len = string->len;
 	char *new = realloc(string->data, 2*size*sizeof(char));
-	if (new == NULL) printf("ERROR\n");
+	if (new == NULL) fprintf(stderr,"ERROR\n");
 	// if (string == NULL){
 	// 	// char *new2 = (char *) malloc(2*size*sizeof(char)); //TODO je toto nunte?
 	// 	// if (new2 == NULL)
 	// 	// {
-	// 	// 	printf("ERROR\n");
+	// 	// 	fprintf(stderr,"ERROR\n");
 	// 	// 	return NULL; //TODO handle error
 	// 	// }
 	// 	// else {
@@ -47,7 +47,7 @@ struct String *resizeString(struct String *string){
 	// 	// 	string->len = len;
 	// 	// 	return;
 	// 	// }
-	// 	printf("ERROR\n");
+	// 	fprintf(stderr,"ERROR\n");
 	// 	string->size = 2*size;
 	// 	string->len = len;
 	// 	return ret;
