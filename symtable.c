@@ -19,6 +19,41 @@ struct varNode *findVar();
 int isCompleteIdent(struct String *str);
 
 
+int getFuncReturn(){
+  struct funNode *tmp = findFunction();
+  if (tmp == NULL) return -1;
+
+  // TODO types je delsi nez ma byt (debug, found function Game.play, name len = 9, types = v, types len = 2)
+  printf("\n\n\n\ndebug, found function %s, name len = %d, types = %s, types len = %d\n\n\n\n", tmp->name->data, tmp->name->len, tmp->types->data, tmp->types->len);
+
+
+  if (tmp->types->len < 1) return -1;
+
+  char c = tmp->types->data[0];
+  printf("types data 0 = %c\n", c);
+  int ret = -1;
+
+  switch (c) {
+    case 's':
+      ret = T_STRING_L;
+    break;
+    case 'd':
+      ret = T_NUMBER_D;
+    break;
+    case 'i':
+      ret = T_NUMBER_I;
+    break;
+    case 'v':
+      ret = T_VOID;
+    break;
+    default:
+      ret = -1;
+  }
+
+  return ret;
+}
+
+
 
 void setVarType(int type){
   int ret;
@@ -28,10 +63,10 @@ void setVarType(int type){
       ret = T_STRING_L;
     break;
     case T_INT:
-      ret = T_NUMBER_D;
+      ret = T_NUMBER_I;
     break;
     case T_DOUBLE:
-      ret = T_NUMBER_I;
+      ret = T_NUMBER_D;
     break;
     default:
       ret = type;
@@ -189,6 +224,15 @@ int setCurrentClass(){
   CurrentVar = NULL;
   return E_OK;
 }
+
+int setCurrentVar(){
+  struct varNode *tmp = findVar();
+  if (tmp == NULL) return E_SEM;
+  CurrentVar = tmp;
+  return E_OK;
+}
+
+
 
 int newClass() {
   struct classNode *tmp = newCN(token);

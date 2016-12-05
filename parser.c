@@ -25,7 +25,6 @@ int declaration_rule();
 int static_rule();
 int return_rule();
 int void_func_call_rule();
-int func_call_rule();
 int while_rule();
 int statement_list();
 int statement();
@@ -37,6 +36,7 @@ int body();
 int param();
 int buildIn();
 void debugTablePrint();
+int function_rule();
 
 int isBuiltIn();
 int builtInCall();
@@ -52,8 +52,16 @@ int ifjreadDouble();
 
 
 int isBuiltIn(){
-  if (findFunction() != NULL) return 1;
-  else return 0;
+  struct funNode *tmp = findFunction();
+  if (tmp == NULL) return 0;
+
+  if (tmp->name->len < 6) return 0;
+
+  for (int i = 0; i < 6; i++){
+    if (tmp->name->data[i] != "ifj16."[i]) return 0;
+  }
+
+  return 1;
 }
 
 
@@ -91,6 +99,8 @@ int builtInCall() {
   return E_SEM;
 }
 
+
+// TODO TODO TODO resit secondrun v builtin funkcich
 int ifjprint() {
   // TODO placeholder
   while (token->id != T_SEMICLN && token->id != T_END) {
@@ -196,8 +206,27 @@ int function_rule() {
   dprint(token);
 
   // momentalni token by mel byt identifikator funkce
-  if (!isFunction())
-    return E_SEM;
+
+  if (isBuiltIn())
+    return builtInCall();
+
+
+  if (SECOND_RUN){
+    if (!isFunction())
+      return E_SEM;
+
+    fprintf(stderr, "NENI BUILTIN\n");
+
+    // check navratove hodnoty
+    //fprintf(stderr, "DEBUG, CurrentVar = %s\n", CurrentVar->name->data);
+    //fprintf(stderr, "DEBUG, CurrentVar type = %d\n", CurrentVar->type);
+    fprintf(stderr, "DEBUG, function return type = %d\n", getFuncReturn());
+
+    if (CurrentVar == NULL){ //je to voidcall
+      if(getFuncReturn() != T_VOID) return E_SEM;
+    }
+    else if(getFuncReturn() != CurrentVar->type) return E_SEM;
+  }
 
   token = token->next;
   if (token->id != T_LBRACKET)
@@ -225,6 +254,12 @@ int assign_rule() {
 
   // momentalne je v tokenu id
   // TODO vytvoreni polozky v symtable
+  if (SECOND_RUN){
+    //set current var TODO
+    result = setCurrentVar();
+    if (result != E_OK) return result;
+  }
+
 
   token = token->next; // id = EXPRESSION ;
   dprint(token);
@@ -337,43 +372,11 @@ int return_rule() {
   return result;
 }
 
-int func_call_rule() {
-  fprintf(stderr, "entering func_call_rule()\n");
-  dprint(token);
-  int result = E_OK;
-
-  // momentalni token je ID
-
-  // TODO zknotrolovat symtable
-
-  token = token->next;
-  if (token->id != T_ADD)
-    return E_SYN;
-
-  token = token->next;
-  if (token->id != T_IDENT && token->id != T_C_IDENT)
-    return E_SYN;
-  // TODO zknotrolovat symtable
-  // TODO vygenerovat volani fce
-
-  token = token->next;
-  result = param(); // generace parametru
-  if (result != E_OK)
-    return result;
-  // token by mel byt )
-
-  token = token->next;
-  if (token->id != T_SEMICLN)
-    return E_SYN;
-
-  token = token->next;
-  return result;
-}
 
 int void_func_call_rule() {
   fprintf(stderr, "entering void_func_call_rule()\n");
   dprint(token);
-  int result = E_OK;
+  CurrentVar = NULL;
 
   // momentalni token je ID
 
@@ -381,27 +384,8 @@ int void_func_call_rule() {
     return E_SYN;
   // TODO zknotrolovat symtable
   // TODO vygenerovat volani fce
-  if (isBuiltIn())
-    return builtInCall();
 
-  token = token->next;
-  if (token->id != T_LBRACKET)
-    return E_SYN;
-
-  token = token->next;
-  result = param(); // generace parametru
-
-  if (result != E_OK)
-    return result;
-  // token by mel byt )
-
-  token = token->next;
-  if (token->id != T_SEMICLN)
-    return E_SYN;
-
-  dprint(token);
-  token = token->next;
-  return result;
+  return function_rule();
 }
 
 // PARAM --> epsilon

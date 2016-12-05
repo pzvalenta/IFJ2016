@@ -36,8 +36,10 @@ void addMparam();
 
 int setCurrentMethod();
 int setCurrentClass();
+int setCurrentVar();
 
 
+int getFuncReturn();
 
 struct funNode *findFunction();
 
