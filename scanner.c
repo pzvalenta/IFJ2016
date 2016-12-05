@@ -454,6 +454,9 @@ int getToken() {
             if ((current_char < '8') && (current_char >= '0')) { // \0-30-70-7
               // fprintf(stderr,"prosel3\n");
               esc = esc + (current_char - ASCII); // 8^0 (nejpravejsi cislo)
+              if(esc == 0 || esc >= 255){ // 001-377
+                return E_LEX;
+              }
               // fprintf(stderr,"%d\n", esc);
               appendChar(string,
                          (char)esc); // pridani cele escape sekvence do stringu
