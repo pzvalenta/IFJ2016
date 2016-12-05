@@ -225,7 +225,7 @@ int function_rule() {
     if (CurrentVar == NULL){ //je to voidcall
       if(getFuncReturn() != T_VOID) return E_SEM;
     }
-    else if(getFuncReturn() != CurrentVar->type) return E_SEM;
+    else if(getFuncReturn() != CurrentVar->type) return E_TYP;
   }
 
   token = token->next;
