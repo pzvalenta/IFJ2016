@@ -1,9 +1,8 @@
 
 // TODO list:
-// TODO nahradit token = getToken() + error check nejakym onelinerem
-// if (!isok(token = getToken()))
 // TODO class Main { static void run() {...} }    --- check
 // TODO pridat vestavene funkce
+// TODO non static var ve tride neni error
 #include "parser.h"
 #include "precanal.h"
 

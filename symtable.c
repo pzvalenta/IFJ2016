@@ -309,6 +309,11 @@ int newStaticVar() {
 }
 
 int newVar() {
+  if (CurrentMethod == NULL) {
+      fprintf(stderr, "ERROR, pokus o deklaraci non static promenne v tride\n");
+      return E_SYN;
+  }
+  
   struct varNode *tmp = newVN(token);
   if (tmp == NULL)
     return E_INTERNAL;

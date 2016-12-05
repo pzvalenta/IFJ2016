@@ -101,10 +101,11 @@ int loadTokens() {
   int result = E_OK;
   do {
     string = newString();
-    getToken();
+    result = getToken();
+    //fprintf(stderr, "token debug %d\n", result);
     if (result != E_OK) {
       destroyString(string);
-      return tokenValue;
+      return result;
     }
 
     result = insertLastToken();
@@ -285,7 +286,8 @@ int getToken() {
         state = S_BL_COMM;
       } else if (current_char == '\n') { // pouze lomitko
         // fprintf(stderr,"slash\n");
-        return T_SLASH; // /
+        tokenValue = T_SLASH;
+        return E_OK; // /
       }
       break;
 
@@ -515,7 +517,8 @@ int getToken() {
         return E_LEX;
       } else {
         ungetc(current_char, file);
-        return T_NUMBER_D;
+        tokenValue = T_NUMBER_D;
+        return E_OK;
       }
       break;
     /*......................................................*/
@@ -544,7 +547,8 @@ int getToken() {
                current_char == '*' || current_char == '(' ||
                current_char == ')') {
         ungetc(current_char, file);
-        return T_NUMBER_D;
+        tokenValue = T_NUMBER_D;
+        return E_OK;
         // destroyString(string);
       } else {
         // fprintf(stderr,"CHYBA\n");

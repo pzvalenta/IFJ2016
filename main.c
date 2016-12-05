@@ -44,22 +44,13 @@ int main(int argc, char **argv) {
 
   set_token_list(tokenListHead);
   result = loadTokens();
+  fprintf(stderr, "############# Vysledek Scanneru ############\n");
+  eprint(result);
   if (result != E_OK) {
     // TODO dealokace
     return result;
   }
-  fprintf(stderr, "############# Vysledek Scanneru ############\n");
-  eprint(result);
 
-  // //DEBUG TOKEN LIST PRINT
-  // fprintf(stderr, "pointer na head %p\n", tokenListHead);
-  //
-  // while(tokenListHead != NULL){
-  //   dprint(tokenListHead);
-  //   tokenListHead = tokenListHead->next;
-  // }
-
-  // testing //
 
   // TODO inicializace ilistu
 
