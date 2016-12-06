@@ -137,6 +137,7 @@ int getOffset() {
 }
 
 int getType() {
+  fprintf(stderr, "volani gettype\n");
   struct varNode *tmp = findVar();
   if (tmp == NULL)
     return -1;
@@ -146,13 +147,16 @@ int getType() {
 
 
 struct varNode *findVar() {
+  fprintf(stderr, "volani findVar\n");
   if (isCompleteIdent(token->data))
     return searchVT(GVRoot, token->data->data);
 
+  fprintf(stderr, "debug\n");
   struct varNode *tmp;
 
   if (CurrentMethod != NULL){
     tmp = searchVT(CurrentMethod->lVarTable, token->data->data);
+    if (tmp == NULL) return NULL;
     if (tmp->global != NULL) {// toto by nikdy nemelo nastat
       fprintf(stderr,"THIS SHOULD NEVER HAPPEN! method variable has global pointer\n");
       return tmp->global;
@@ -163,6 +167,7 @@ struct varNode *findVar() {
 
   if (CurrentClass != NULL) {
     struct varNode *tmp = searchVT(CurrentClass->lVarTable, token->data->data);
+    if (tmp == NULL) return NULL;
     if (tmp->global != NULL) return tmp->global;
     else return tmp;
   }
@@ -313,7 +318,7 @@ int newVar() {
       fprintf(stderr, "ERROR, pokus o deklaraci non static promenne v tride\n");
       return E_SYN;
   }
-  
+
   struct varNode *tmp = newVN(token);
   if (tmp == NULL)
     return E_INTERNAL;
