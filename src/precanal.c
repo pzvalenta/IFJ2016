@@ -77,8 +77,10 @@ int insert_terminal_last(tList *l, int c) {
     }
 
     if (c == T_IDENT || c == T_C_IDENT) {
+      if(token->next->id==T_LBRACKET)
+        return E_SYN;
 
-      tmp->c = getType(); //TODO segfault
+      tmp->c = getType();
       if (tmp->c == -1)
         return E_SEM;
       // prida se offset
@@ -100,7 +102,10 @@ int insert_terminal_last(tList *l, int c) {
     }
 
     if (c == T_IDENT || c == T_C_IDENT) {
-      tmp->c = getType(); //TODO segfault
+      if(token->next->id==T_LBRACKET)
+        return E_SYN;
+
+      tmp->c = getType();
       if (tmp->c == -1)
         return E_SEM;
       // prida se offset
