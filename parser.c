@@ -511,6 +511,8 @@ int if_rule() {
   if (result != E_OK)
     return result;
 
+
+
   // nacteny token by mel byt )
   if (token->id != T_RBRACKET)
     return E_SYN; // )
@@ -636,7 +638,7 @@ int statement_list() {
     // TODO check proti metodam
     fprintf(stderr, "going from statement_list() to statement()\n");
     result = statement();
-    dprint(token);
+    //dprint(token);
     if (result != E_OK)
       return result;
 
@@ -725,6 +727,8 @@ int method() {
   token = token->next;
   fprintf(stderr, "going from method() to statement_list()\n");
   result = statement_list(); // STATEMENT_LIST
+  if (result != E_OK)
+    return result;
 
   // token nacteny statement listem by mel byt }
   if (token->id != T_RCBRACKET)
