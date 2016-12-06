@@ -415,9 +415,9 @@ char rule(tList *l) {
 //////////////////////////////////////////////////////////////////////////////
 /// algoritmus precedencni analyzy
 
-int prec_anal(int until) {
+int prec_anal(int until, int rel) {
   if (!SECOND_RUN)
-    return expr(until);
+    return expr(until, rel);
 
   tList *l;
   l = malloc(sizeof(tList));
@@ -557,9 +557,9 @@ int prec_anal(int until) {
 }
 ////////////////////////////////////////////////
 /// prvni pruchod, kontrola indetifikatoru a funkci
-int expr(int until) {
+int expr(int until, int rel) {
   int brackets = 0;
-
+  int tmp_rel=0;
 
   while (token->id != until || brackets != 0) {
 
@@ -573,12 +573,22 @@ int expr(int until) {
           if (token->id == T_RBRACKET)
             brackets--;
 
+          if(token->id==T_EQUAL || token->id==T_GREAT ||
+              token->id==T_GEQUAL || token->id==T_LESS ||
+              token->id==T_LEQUAL || token->id==T_EXCLAIM)
+              {
+                tmp_rel=1;
+              }
+
     } else {
       return E_SYN;
     }
 
     token = token->next;
   }
+
+  if(tmp_rel!=rel)
+    return E_SYN;
 
   return E_OK;
 }
