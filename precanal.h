@@ -53,7 +53,7 @@ int sem_correct (tList *l);
 int is_rule (tList*l);
 int get_index(int c);
 char rule(tList *l);
-int prec_anal(int until);
-int expr(int until);
+int prec_anal(int until, int rel);
+int expr(int until, int rel);
 
 #endif // PRECANAL_H_INCLUDED
