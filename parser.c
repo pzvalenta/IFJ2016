@@ -270,7 +270,7 @@ int assign_rule() {
   if (isFunction(token))
     return function_rule();
 
-  result = prec_anal(T_SEMICLN); // id = expression ;
+  result = prec_anal(T_SEMICLN, 0); // id = expression ;
   if (result != E_OK)
     return result;
 
@@ -362,7 +362,7 @@ int return_rule() {
 
   token = token->next;
   if (token->id != T_SEMICLN) {
-    result = prec_anal(T_SEMICLN);
+    result = prec_anal(T_SEMICLN, 0);
     if (result != E_OK)
       return result;
   }
@@ -468,7 +468,7 @@ int while_rule() {
     return E_SYN; // (
 
   token = token->next;
-  result = prec_anal(T_RBRACKET);
+  result = prec_anal(T_RBRACKET, 1);
   if (result != E_OK)
     return result;
 
@@ -507,7 +507,7 @@ int if_rule() {
     return E_SYN; // (
 
   token = token->next;
-  result = prec_anal(T_RBRACKET);
+  result = prec_anal(T_RBRACKET, 1);
   if (result != E_OK)
     return result;
 
