@@ -37,7 +37,7 @@ void print_list(tList *l) //pomocna funkce pro prubezne tisknuti zasobniku
               fprintf(stderr,"%d ",tmp->c);
           }
           else
-           fprintf(stderr,"E ");
+           fprintf(stderr,"E{%d} ",tmp->c);
 
        tmp=tmp->next;
    }
@@ -78,7 +78,7 @@ int insert_terminal_last(tList *l, int c) {
 
     if (c == T_IDENT || c == T_C_IDENT) {
 
-      tmp->c = getType();
+      tmp->c = getType(); //segfault
       if (tmp->c == -1)
         return E_SEM;
       // prida se offset
@@ -100,7 +100,7 @@ int insert_terminal_last(tList *l, int c) {
     }
 
     if (c == T_IDENT || c == T_C_IDENT) {
-      tmp->c = getType();
+      tmp->c = getType(); //segfault
       if (tmp->c == -1)
         return E_SEM;
       // prida se offset
@@ -256,6 +256,8 @@ void reduce(tList *l) {
     cut_item(l, &typ[i]);
     i++;
   }
+  //budou se volat funkce s offsetama prvku na vypocet neterminalu, ktery vyjde
+  // po redukci
 
   // pri konvertovani ma nejvetsi prioritu string pak double, nakonec int
   bool s = false, d = false, in = false;
@@ -270,7 +272,7 @@ void reduce(tList *l) {
       in = true;
     }
   }
-
+  //prirazeni typu vysledku podle operandu
   if (s)
     tmp->c = T_STRING_L;
   else if (d)
@@ -280,7 +282,6 @@ void reduce(tList *l) {
   else
     tmp->c = 0;
 
-  /// zamena handle na pozdeji vypocitany neterminal
 
   tmp->handle = false;
   tmp->terminal = false;
@@ -396,13 +397,13 @@ int get_index(int c) // ok
   }
 
   return -1;
-  // pokud nenalezne- ve vyrazu se vyskytl nepovoleny token- syntakticka chyba
+  //je zde pouze kvuli warningum. hledani indexu probiha pouze pro tokeny co mohou byt ve vyrazu
 }
 
 /** zjisteni co je posledni terminal na zasobniku a co je na vstupu*/
 char rule(tList *l) {
-  int i = get_index(l->lastTerminal->c);
-  int j = get_index(token->id);
+  int i = get_index(l->lastTerminal->c); //sloupec v tabulce
+  int j = get_index(token->id); //radek v tabulce
   return prec_table[i][j];
 }
 
@@ -435,8 +436,7 @@ int prec_anal(int until) {
   int end = until;
   int vratit = token->id; // timto prepsat posledni token z $ zpet na puvodni
   while (token->id != end || l->lastTerminal->c != T_DOLLAR) // dokud neni na vstupu zakoncujici
-                                                             // znak a na zasobniku je pouze jeden
-                                                             // terminal $
+                                                             // znak a na zasobniku je pouze jeden                                                           // terminal $
   {
     // kontrola posledniho znaku
     if (token->id == end) {
@@ -500,17 +500,23 @@ int prec_anal(int until) {
     // pravidlo >
     case '>': // pokud je handle na zasobniku a existuje pravidlo ze ktereho je
               // vysledek za handlem
-      if (is_handle(l)) {
-        if (is_rule(l) == 0) {
-          if (sem_correct(l) == 0) {
+      if (is_handle(l))
+      {
+        if (is_rule(l) == 0)
+        {
+          if (sem_correct(l) == 0)
+          {
             reduce(l);
-          } else {
+          }
+          else
+          {
             dispose_list(l);
             free(l);
             return E_TYP; // semanticka chyba, nepovolede operace s retezcem
           }
 
-        } else // spatne zapsany vyraz
+        }
+        else // spatne zapsany vyraz
         {
           print_list(l);
 
@@ -519,7 +525,8 @@ int prec_anal(int until) {
           return E_SYN;
         }
 
-      } else // neni handle na zasobniku, zase spatne zapsany vyraz
+      }
+      else // neni handle na zasobniku, zase spatne zapsany vyraz
       {
         dispose_list(l);
         free(l);
@@ -538,7 +545,7 @@ int prec_anal(int until) {
     }
   }
   token->id = vratit;
-  // mozna uvolnit list kde na konci bude jenom jeden neterminal
+  // mozna uvolnit list kde na konci bude jenom jeden neterminal a ter $
   //    dispose_list(l);
   //    free(l);
   return E_OK;
@@ -546,7 +553,7 @@ int prec_anal(int until) {
 ////////////////////////////////////////////////
 /// prvni pruchod, kontrola indetifikatoru a funkci
 int expr(int until) {
-  int brackets =0;
+  int brackets = 0;
 
 
   while (token->id != until || brackets != 0) {
