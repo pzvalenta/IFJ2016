@@ -102,8 +102,9 @@ int loadTokens() {
   do {
     string = newString();
     result = getToken();
-    //fprintf(stderr, "token debug %d\n", result);
+    //fprintf(stderr, "string->data: %s\n", string->data);
     if (result != E_OK) {
+      //fprintf(stderr, "CHYBA\n");
       destroyString(string);
       return result;
     }
@@ -152,16 +153,19 @@ int getToken() {
      * v nekonecnem cyklu nacitame znaky
      */
     current_char = getc(file);
-    // fprintf(stderr,"current_char: %c\n", current_char);
+     //fprintf(stderr,"current_char: %c\n", current_char);
 
     switch (state) {
     case S_START:
+    //fprintf(stderr,"case S_START\n");
       if (isspace(current_char) != 0) {
         // testuje, zda je aktualni znak bily znak
         // nic se ale nestane, protoze je ignorujeme
         state = S_START;
       } else if ((isalpha(current_char)) != 0 || current_char == '$' ||
                  current_char == '_') {
+                  // fprintf(stderr, "necotamnapis\n");
+
         // zacina znakem, dolarem nebo podtrzitkem
         // string = eraseString(string);
         // TODO if NULL, handle error
@@ -171,6 +175,8 @@ int getToken() {
         // string = eraseString(string);
         // TODO if NULL, handle error
         state = S_NUM;
+        //fprintf(stderr, "go to S_NUM\n");
+        ungetc(current_char, file);
       } else if (current_char == '+') {
         tokenValue = T_PLUS;
         return E_OK;
@@ -211,6 +217,12 @@ int getToken() {
       } else if (current_char == EOF) {
         tokenValue = T_END;
         return E_OK;
+      } else if (current_char == '\\'){
+        tokenValue = T_B_SLASH;
+        return E_OK;
+      } else if (current_char == '\''){
+        tokenValue = T_APOSTROPHE;
+        return E_OK;
       } else if (current_char == '\n') {
         state = S_EOL;
       }
@@ -227,8 +239,9 @@ int getToken() {
       } else if (current_char == '=') {
         state = S_EQUAL;
       } else if (current_char == '/') {
+        //fprintf(stderr,"lomitko, char: %c\n", current_char);
         state = S_SLASH;
-
+        //ungetc(current_char, file);
       } else if (current_char == '"') {
         // string = eraseString(string);
         // TODO if NULL, handle error
@@ -240,52 +253,65 @@ int getToken() {
     /*..............................................*/
 
     case S_GREATER:
+    ungetc(current_char, file);
       if (current_char == '=') {
         tokenValue = T_GEQUAL; // >=
         return E_OK;
-      } else if (current_char == '\n') {
+      } else /*if (current_char == '\n')*/ {
         tokenValue = T_GREAT; // >
         return E_OK;
       }
       break;
 
     case S_LESS:
+    ungetc(current_char, file);
       if (current_char == '=') {
         tokenValue = T_LEQUAL; // <=
         return E_OK;
-      } else if (current_char == '\n') {
+      } else /*if (current_char == '\n')*/ {
         tokenValue = T_LESS; // <
         return E_OK;
       }
       break;
 
     case S_EXCLAIM:
+    ungetc(current_char, file);
       if (current_char == '=') {
         tokenValue = T_EXCLAIM; // !=
         return E_OK;
-      } else if (current_char == '\n') {
+      } else /*if (current_char == '\n')*/ {
         tokenValue = E_LEX; // pokud za vykricnikem nic neni
         return E_OK;
       }
       break;
 
     case S_EQUAL:
+    ungetc(current_char, file);
+    //fprintf(stderr,"ted: %c\n", current_char);
       if (current_char == '=') {
         tokenValue = T_EQUAL; // ==
         return E_OK;
-      } else if (isWhiteSpace(current_char)) {
+      } else /*if (isWhiteSpace(current_char))*/ {
+        //fprintf(stderr, "T_ADD\n");
+        //ungetc(current_char, file);
         tokenValue = T_ADD; // =
         return E_OK;
       }
       break;
 
     case S_SLASH: // /
+    ungetc(current_char, file);
+    //fprintf(stderr,"s_slash\n");
+    //fprintf(stderr,"ted: %c\n", current_char);
       if (current_char == '/') {
+        //fprintf(stderr,"s_ln_comm\n");
         state = S_LN_COMM;              // prejdi na stav radkoveho komentare
       } else if (current_char == '*') { // /* - zacatek blokoveho komentare
+        //fprintf(stderr,"S_BL_COMM\n");
         state = S_BL_COMM;
-      } else if (current_char == '\n') { // pouze lomitko
-        // fprintf(stderr,"slash\n");
+      } else { // pouze lomitko
+        //fprintf(stderr,"t_slash\n");
+        //ungetc(current_char, file);
         tokenValue = T_SLASH;
         return E_OK; // /
       }
@@ -392,6 +418,7 @@ int getToken() {
             return E_OK;
           }
         }
+
         tokenValue = T_IDENT; // byl to identifikator
         return E_OK;
 
@@ -473,7 +500,9 @@ int getToken() {
       break;
     /*.........................CISLO......................*/
     case S_NUM: // cislo
+    //fprintf(stderr, "S_NUM %c\n", current_char);
       if (isdigit(current_char) != 0) {
+//fprintf(stderr, "je cislo\n");
         appendChar(string, current_char);
         // ERROR
         state = S_NUM;
@@ -488,7 +517,9 @@ int getToken() {
       }
 
       else {
+
         ungetc(current_char, file);
+        //fprintf(stderr,"skoncilo cislo: %c\n", current_char);
         tokenValue = T_NUMBER_I;
         return E_OK;
       }
