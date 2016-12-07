@@ -588,7 +588,7 @@ int expr(int until, int rel) {
   }
 
   if(tmp_rel!=rel)
-    return E_SYN;
+    return E_TYP;
 
   return E_OK;
 }
