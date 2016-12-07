@@ -2,6 +2,7 @@
 
 
 void dprint(struct tListItem *token){
+  return;
   struct String *data = token->data;
   int id = token->id;
 
@@ -195,6 +196,13 @@ void dprint(struct tListItem *token){
       fprintf(stderr, ",");
     break;
 
+    case T_APOSTROPHE:
+      fprintf(stderr, "'");
+    break;
+
+    case T_B_SLASH:
+      fprintf(stderr, "\\");
+    break;
 
     case T_DOT:
       fprintf(stderr, ".");
