@@ -562,7 +562,7 @@ int expr(int until, int rel) {
   int tmp_rel=0;
 
   while (token->id != until || brackets != 0) {
-
+    //tokeny ktere muzou byt ve vyrazu
     if (token->id == T_C_IDENT || token->id == T_IDENT ||
         (token->id >= T_NUMBER_I && token->id <= T_STRING_L) ||
         (token->id >= T_EQUAL && token->id <= T_SLASH) ||
@@ -572,7 +572,7 @@ int expr(int until, int rel) {
             brackets++;
           if (token->id == T_RBRACKET)
             brackets--;
-
+            //kontrola relacnich operatoru
           if(token->id==T_EQUAL || token->id==T_GREAT ||
               token->id==T_GEQUAL || token->id==T_LESS ||
               token->id==T_LEQUAL || token->id==T_EXCLAIM)
@@ -588,7 +588,7 @@ int expr(int until, int rel) {
   }
 
   if(tmp_rel!=rel)
-    return E_SYN;
+    return E_TYP;
 
   return E_OK;
 }
