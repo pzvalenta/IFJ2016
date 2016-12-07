@@ -205,6 +205,8 @@ int ifjreadDouble() {
 int function_rule() {
   fprintf(stderr, "entering function_rule()\n");
   int result = E_OK;
+  struct String *params = NULL;
+  int returnType = -1;
 
   dprint(token);
 
@@ -218,27 +220,34 @@ int function_rule() {
     if (!isFunction())
       return E_SEM;
 
-    fprintf(stderr, "NENI BUILTIN\n");
+    result = getFuncParams(&params);
+    if (result != E_OK) return result;
 
-    // check navratove hodnoty
-    //fprintf(stderr, "DEBUG, CurrentVar = %s\n", CurrentVar->name->data);
-    //fprintf(stderr, "DEBUG, CurrentVar type = %d\n", CurrentVar->type);
-    fprintf(stderr, "DEBUG, function return type = %d\n", getFuncReturn());
+    returnType = convertCharToType(params->data[0]);
 
-    if (CurrentVar == NULL){ //je to voidcall
-      if(getFuncReturn() != T_VOID) return E_SEM;
+    if (CurrentVar == NULL){ //musi to byt voidcall
+      if(returnType != T_VOID) return E_INIT;
     }
-    else if(getFuncReturn() != CurrentVar->type) return E_TYP;
+    else {
+      if(returnType != CurrentVar->type) return E_TYP;
+    }
   }
+
 
   token = token->next;
   if (token->id != T_LBRACKET)
     return E_SYN;
 
   token = token->next;
-  result = param();
+
+  int paramPos = 1;
+  result = param(params, &paramPos);
   if (result != E_OK)
     return result;
+
+  if (SECOND_RUN){
+    if (paramPos != params->len) return E_TYP;
+  }
 
   token = token->next;
   if (token->id != T_SEMICLN)
@@ -394,26 +403,41 @@ int void_func_call_rule() {
 // PARAM --> epsilon
 // PARAM --> id PARAM
 // PARAM --> , id PARAM
-int param() {
+int param(struct String *params, int *paramPos) {
   fprintf(stderr, "entering param()\n");
   dprint(token);
   int result = E_OK;
+  int paramType;
 
   if (token->id == T_RBRACKET)
     return result; // epsilon
 
-  if (token->id == T_IDENT || token->id == T_C_IDENT) {
-    // TODO zpracovani
-  } else if (token->id == T_INT || token->id == T_DOUBLE ||
-             token->id == T_STRING_L) {
-    // TODO zpracovani
-  } else
-    return E_SYN; // id
+  if (SECOND_RUN){
+    if (*paramPos >= params->len) return E_TYP;
+    if (token->id == T_IDENT || token->id == T_C_IDENT) {
+      paramType = getType();
+    } else if (token->id == T_NUMBER_D || token->id == T_NUMBER_I ||
+               token->id == T_STRING_L) {
+      paramType = token->id;
+    } else
+      return E_SYN; // id
+
+    if (paramType != convertCharToType(params->data[*paramPos])) return E_TYP;
+    *paramPos = *paramPos + 1;
+  } else { // FIRST RUN
+    if (token->id == T_IDENT || token->id == T_C_IDENT) {
+    } else if (token->id == T_NUMBER_D || token->id == T_NUMBER_I ||
+               token->id == T_STRING_L) {
+    } else
+      return E_SYN; // id
+  }
+
+
 
   token = token->next;
   if (token->id == T_COMMA) { // ,
     token = token->next;
-    return param();
+    return param(params, paramPos);
   }
 
   if (token->id == T_RBRACKET)

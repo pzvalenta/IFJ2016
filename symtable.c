@@ -19,20 +19,19 @@ struct varNode *findVar();
 int isCompleteIdent(struct String *str);
 
 
-int getFuncReturn(){
+int getFuncParams(struct String **ret){
   struct funNode *tmp = findFunction();
-  if (tmp == NULL) return -1;
 
-  // TODO types je delsi nez ma byt (debug, found function Game.play, name len = 9, types = v, types len = 2)
-  //printf("\n\n\n\ndebug, found function %s, name len = %d, types = %s, types len = %d\n\n\n\n", tmp->name->data, tmp->name->len, tmp->types->data, tmp->types->len);
+  if (tmp == NULL) return E_DEF;
+  if (tmp->types == NULL) return E_DEF;
+  if (tmp->types->len < 1) return E_SEM;
+  *ret = tmp->types;
+  return E_OK;
+}
 
 
-  if (tmp->types->len < 1) return -1;
-
-  char c = tmp->types->data[0];
-  printf("types data 0 = %c\n", c);
-  int ret = -1;
-
+int convertCharToType(char c){
+  int ret;
   switch (c) {
     case 's':
       ret = T_STRING_L;
