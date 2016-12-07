@@ -347,6 +347,11 @@ int newVar() {
       CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
     }
   } else {
+    if (token->id == T_C_IDENT){
+      destroyVN(tmp);
+      fprintf(stderr, "ERROR, deklarace promenne plnym identifikatorem ve funkci\n");
+      return E_DEF; // uz byla deklarovana, je v lokalni tabulce trid
+    }
     node = searchVT(CurrentMethod->lVarTable, tmp->name->data);
     if (node != NULL) {
       if (node->global != NULL){

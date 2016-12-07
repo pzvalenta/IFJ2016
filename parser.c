@@ -345,7 +345,7 @@ int declaration_rule() {
   // int type = token->id; TODO
 
   token = token->next;
-  if (token->id != T_IDENT && token->id != T_C_IDENT)
+  if (token->id != T_IDENT && token->id != T_C_IDENT) //&& token->id != T_C_IDENT //TODO
     return E_SYN;
 
   if (SECOND_RUN) {
