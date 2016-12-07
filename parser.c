@@ -422,7 +422,10 @@ int param(struct String *params, int *paramPos) {
     } else
       return E_SYN; // id
 
-    if (paramType != convertCharToType(params->data[*paramPos])) return E_TYP;
+    if (paramType != convertCharToType(params->data[*paramPos])){
+      fprintf(stderr, "debug, implicitni konverze, paramType = %d, params[] = %s\n", paramType,params->data);
+      if (paramType != T_NUMBER_I || convertCharToType(params->data[*paramPos]) != T_NUMBER_D) return E_TYP;
+    }
     *paramPos = *paramPos + 1;
   } else { // FIRST RUN
     if (token->id == T_IDENT || token->id == T_C_IDENT) {
@@ -460,7 +463,7 @@ int mparam() {
   // TYPE
   if (token->id == T_INT || token->id == T_DOUBLE || token->id == T_STRING) {
     if (!SECOND_RUN)
-      addMparam();
+      addMparam(token->id);
     token = token->next;
     if (token->id != T_IDENT && token->id != T_C_IDENT)
       return E_SYN; // id
