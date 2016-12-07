@@ -218,7 +218,7 @@ int function_rule() {
 
   if (SECOND_RUN){
     if (!isFunction())
-      return E_SEM;
+      return E_DEF;
 
     result = getFuncParams(&params);
     if (result != E_OK) return result;
