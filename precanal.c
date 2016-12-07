@@ -82,7 +82,7 @@ int insert_terminal_last(tList *l, int c) {
 
       tmp->c = getType();
       if (tmp->c == -1)
-        return E_SEM;
+        return E_DEF;
       // prida se offset
     } else {
       tmp->c = c;
@@ -107,7 +107,7 @@ int insert_terminal_last(tList *l, int c) {
 
       tmp->c = getType();
       if (tmp->c == -1)
-        return E_SEM;
+        return E_DEF;
       // prida se offset
     } else {
       tmp->c = c;
