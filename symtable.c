@@ -192,7 +192,7 @@ int newFunction() {
 
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
     destroyFN(tmp);
-    return E_SEM; // TODO uz byla deklarovana, je v tabulce
+    return E_DEF; // TODO uz byla deklarovana, je v tabulce
   }
 
   if (searchVT(GVRoot, tmp->name->data) != NULL) {
@@ -200,7 +200,7 @@ int newFunction() {
     fprintf(
         stderr,
         "ERROR, deklarace funkce se jmenem totoznym jako globalni promenna \n");
-    return E_SEM;
+    return E_DEF;
   }
 
   FTRoot = insertFN(FTRoot, tmp);
@@ -245,7 +245,7 @@ int newClass() {
 
   if (searchCT(CTRoot, tmp->name->data) != NULL) {
     destroyCN(tmp);
-    return E_SEM; // TODO uz byla deklarovana, je v tabulce
+    return E_DEF; // TODO uz byla deklarovana, je v tabulce
   }
 
   CTRoot = insertCN(CTRoot, tmp);
@@ -274,13 +274,13 @@ int newStaticVar() {
     destroyVN(tmp);
     fprintf(stderr, "ERROR, pokus o deklaraci static var, ktera uz byla "
                     "deklarovana jako lokalni\n");
-    return E_SEM; // uz byla deklarovana, je v lokalni tabulce tridy
+    return E_DEF; // uz byla deklarovana, je v lokalni tabulce tridy
   }
 
   if (searchVT(GVRoot, tmp->name->data) != NULL) {
     destroyVN(tmp);
     fprintf(stderr, "ERROR, redeklarace globalni promenne\n");
-    return E_SEM; // uz byla deklarovana, je v globalni tabulce promennych
+    return E_DEF; // uz byla deklarovana, je v globalni tabulce promennych
   }
 
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
@@ -288,7 +288,7 @@ int newStaticVar() {
     fprintf(
         stderr,
         "ERROR, deklarace globalni promenne se jmenem totoznym jako funkce\n");
-    return E_SEM;
+    return E_DEF;
   }
   // vytvoreni polozky v lokalni tabulce
   CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
@@ -341,7 +341,7 @@ int newVar() {
       } else {
         destroyVN(tmp);
         fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
-        return E_SEM; // uz byla deklarovana, je v lokalni tabulce trid
+        return E_DEF; // uz byla deklarovana, je v lokalni tabulce trid
       }
     } else {
       CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
@@ -357,7 +357,7 @@ int newVar() {
       } else {
         destroyVN(tmp);
         fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
-        return E_SEM; // uz byla deklarovana, je v lokalni tabulce trid
+        return E_DEF; // uz byla deklarovana, je v lokalni tabulce trid
       }
     } else {
       CurrentMethod->lVarTable = insertVN(CurrentMethod->lVarTable, tmp);
