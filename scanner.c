@@ -218,7 +218,7 @@ int getToken() {
         tokenValue = T_END;
         return E_OK;
       } else if (current_char == '\\'){
-        fprintf(stderr,"debug, {\n");
+        //fprintf(stderr,"debug, {\n");
         tokenValue = T_B_SLASH;
         return E_OK;
       } else if (current_char == '\''){
@@ -379,7 +379,8 @@ int getToken() {
                  current_char == '~' || current_char == '{' ||
                  current_char == '}' || current_char == '[' ||
                  current_char == ']' || current_char == EOF ||
-                 current_char == '\\') { //
+                 current_char == '\\'|| current_char == '!' ||
+                 current_char == '\'') { //
         // neni identifikator - testy na nepovolene znaky
         ungetc(current_char, file); // vrati posledni znak zpet do souboru,
                                     // takze dalsi funkce jej precte znovu
@@ -413,7 +414,8 @@ int getToken() {
                  current_char == '~' || current_char == '{' ||
                  current_char == '}' || current_char == '[' ||
                  current_char == ']' || current_char == EOF ||
-                 current_char == '\\') { //
+                 current_char == '\\'|| current_char == '!' ||
+                 current_char == '\'' ) { //
         // neni identifikator - testy na nepovolene znaky
         ungetc(current_char, file); // vrati posledni znak zpet do souboru,
                                     // takze dalsi funkce jej precte znovu
