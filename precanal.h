@@ -23,6 +23,7 @@
 #include "parser.h"
 
 extern int SECOND_RUN;
+extern struct varNode *CurrentVar;
 
 typedef struct item{
     int c;             //ID terminalu

@@ -553,6 +553,19 @@ int prec_anal(int until, int rel) {
   // mozna uvolnit list kde na konci bude jenom jeden neterminal a ter $
   //    dispose_list(l);
   //    free(l);
+  if(rel==0)
+  {
+    int typ=l->last->c;
+    if(CurrentVar->type!=typ)
+    {
+      if(CurrentVar->type==T_NUMBER_D && typ==T_NUMBER_I)
+        return E_OK;
+      else
+        return E_TYP;
+    }
+
+  }
+
   return E_OK;
 }
 ////////////////////////////////////////////////
@@ -562,7 +575,7 @@ int expr(int until, int rel) {
   int tmp_rel=0;
 
   while (token->id != until || brackets != 0) {
-    //tokeny ktere muzou byt ve vyrazu
+
     if (token->id == T_C_IDENT || token->id == T_IDENT ||
         (token->id >= T_NUMBER_I && token->id <= T_STRING_L) ||
         (token->id >= T_EQUAL && token->id <= T_SLASH) ||
@@ -572,7 +585,7 @@ int expr(int until, int rel) {
             brackets++;
           if (token->id == T_RBRACKET)
             brackets--;
-            //kontrola relacnich operatoru
+
           if(token->id==T_EQUAL || token->id==T_GREAT ||
               token->id==T_GEQUAL || token->id==T_LESS ||
               token->id==T_LEQUAL || token->id==T_EXCLAIM)
