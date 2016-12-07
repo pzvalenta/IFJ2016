@@ -37,8 +37,12 @@ int buildIn();
 void debugTablePrint();
 int function_rule();
 
+
+
 int isBuiltIn();
 int builtInCall();
+int checkMainRun();
+
 int ifjprint();
 int ifjsort();
 int ifjcompare();
@@ -1013,6 +1017,10 @@ int parse(struct tListItem *head) {
     if (result != E_OK)
       return result;
   }
+  else{ // second run
+    result = checkMainRun();
+    if (result != E_OK) return result;
+  }
 
   CurrentClass = NULL;
   CurrentMethod = NULL;
@@ -1060,4 +1068,36 @@ void debugTablePrint() {
   fprintf(stderr, "_______________________________\n\n");
   printSpecialV(GVRoot);
   fprintf(stderr, "\n");
+}
+
+int checkMainRun(){
+  struct classNode *tmpC = searchCT(CTRoot, "Main");
+  if (tmpC == NULL){
+    fprintf(stderr, "ERROR, Main doesn't exist\n");
+  return E_DEF;
+  }
+
+
+  struct funNode *tmpF = searchFT(FTRoot, "Main.run");
+  if (tmpF == NULL) {
+    fprintf(stderr, "ERROR, Main.run() doesn't exist\n");
+  return E_DEF;
+  }
+
+  if (tmpF->types == NULL){
+    fprintf(stderr, "ERROR, Main.run() has no params\n");
+  return E_DEF;
+  }
+
+  if (tmpF->types->len != 1){
+    fprintf(stderr, "ERROR, Main.run() has too many params\n");
+    return E_DEF;
+  }
+
+  if (tmpF->types->data[0] != 'v'){
+    fprintf(stderr, "ERROR, Main.run() has nonvoid return type\n");
+    return E_DEF;
+  }
+
+  return E_OK;
 }

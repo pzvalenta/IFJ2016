@@ -24,7 +24,7 @@ int getFuncReturn(){
   if (tmp == NULL) return -1;
 
   // TODO types je delsi nez ma byt (debug, found function Game.play, name len = 9, types = v, types len = 2)
-  printf("\n\n\n\ndebug, found function %s, name len = %d, types = %s, types len = %d\n\n\n\n", tmp->name->data, tmp->name->len, tmp->types->data, tmp->types->len);
+  //printf("\n\n\n\ndebug, found function %s, name len = %d, types = %s, types len = %d\n\n\n\n", tmp->name->data, tmp->name->len, tmp->types->data, tmp->types->len);
 
 
   if (tmp->types->len < 1) return -1;
