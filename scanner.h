@@ -69,6 +69,8 @@
 #define T_MUL            61 // *
 #define T_EXCLAIM        64 // !=
 #define T_SLASH          65 // /
+#define T_APOSTROPHE     66 // '''
+#define T_B_SLASH        67 // '\'
 
 #define T_LBRACKET       81 // (
 #define T_RBRACKET       82 // )
