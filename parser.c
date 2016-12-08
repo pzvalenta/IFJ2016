@@ -416,6 +416,7 @@ int param(struct String *params, int *paramPos) {
     if (*paramPos >= params->len) return E_TYP;
     if (token->id == T_IDENT || token->id == T_C_IDENT) {
       paramType = getType();
+      if (paramType == -1) return E_DEF;
     } else if (token->id == T_NUMBER_D || token->id == T_NUMBER_I ||
                token->id == T_STRING_L) {
       paramType = token->id;
