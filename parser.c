@@ -767,6 +767,7 @@ int method() {
     return E_SYN; // }
   token = token->next;
 
+  CurrentMethod = NULL;
   return result;
 }
 

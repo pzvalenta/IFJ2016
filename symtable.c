@@ -283,7 +283,9 @@ int newStaticVar() {
     return E_DEF; // uz byla deklarovana, je v globalni tabulce promennych
   }
 
-  if (searchFT(FTRoot, tmp->name->data) != NULL) {
+//  if (searchFT(FTRoot, tmp->name->data) != NULL) {
+//TODO
+  if (findFunction() != NULL) {
     destroyVN(tmp);
     fprintf(
         stderr,
