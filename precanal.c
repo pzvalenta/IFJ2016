@@ -574,7 +574,10 @@ int expr(int until, int rel) {
   int brackets = 0;
   int tmp_rel=0;
 
-  while (token->id != until || brackets != 0) {
+  fprintf(stderr, "PRECEDENCNI ANALYZA 1. run\n" );
+  while (token->id != until || brackets != 0)
+
+    dprint(token);
 
     if (token->id == T_C_IDENT || token->id == T_IDENT ||
         (token->id >= T_NUMBER_I && token->id <= T_STRING_L) ||
@@ -592,8 +595,9 @@ int expr(int until, int rel) {
               {
                 tmp_rel=1;
               }
-
+            fprintf(stderr, "token vyhovuje\n" );
     } else {
+      fprintf(stderr, "token nevyhovuje\n" );
       return E_SYN;
     }
 
