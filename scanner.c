@@ -79,6 +79,7 @@ int insertLastToken() {
     head->data = string;
     head->next = NULL;
     head->prev = NULL;
+    head->radek=radek;
     tail = head;
   } else {
 
@@ -91,10 +92,12 @@ int insertLastToken() {
     tmp->next = NULL;
     tmp->data = string;
     tmp->id = tokenValue;
+    tmp->radek=radek;
     tail->next = tmp;
     tail = tmp;
+
   }
-  tmp->radek=radek;
+
 
   return E_OK;
 }
