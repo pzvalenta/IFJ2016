@@ -356,7 +356,7 @@ int getToken() {
                                       Pokud ano, ukoncime cyklus*/
           current_char = getc(file);
           if(current_char=='\n')
-           radek++
+           radek++;
           if (current_char == '/') {
             break;
           }
