@@ -575,7 +575,7 @@ int expr(int until, int rel) {
   int tmp_rel=0;
 
   fprintf(stderr, "PRECEDENCNI ANALYZA 1. run\n" );
-  while (token->id != until || brackets != 0)
+  while (token->id != until || brackets != 0){
 
     dprint(token);
 
