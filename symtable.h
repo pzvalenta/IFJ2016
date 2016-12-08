@@ -39,7 +39,11 @@ int setCurrentClass();
 int setCurrentVar();
 
 
-int getFuncReturn();
+int getFuncParams(struct String **ret);
+
+int convertCharToType(char c);
+
+
 
 struct funNode *findFunction();
 

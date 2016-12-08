@@ -19,20 +19,19 @@ struct varNode *findVar();
 int isCompleteIdent(struct String *str);
 
 
-int getFuncReturn(){
+int getFuncParams(struct String **ret){
   struct funNode *tmp = findFunction();
-  if (tmp == NULL) return -1;
 
-  // TODO types je delsi nez ma byt (debug, found function Game.play, name len = 9, types = v, types len = 2)
-  //printf("\n\n\n\ndebug, found function %s, name len = %d, types = %s, types len = %d\n\n\n\n", tmp->name->data, tmp->name->len, tmp->types->data, tmp->types->len);
+  if (tmp == NULL) return E_DEF;
+  if (tmp->types == NULL) return E_DEF;
+  if (tmp->types->len < 1) return E_SEM;
+  *ret = tmp->types;
+  return E_OK;
+}
 
 
-  if (tmp->types->len < 1) return -1;
-
-  char c = tmp->types->data[0];
-  printf("types data 0 = %c\n", c);
-  int ret = -1;
-
+int convertCharToType(char c){
+  int ret;
   switch (c) {
     case 's':
       ret = T_STRING_L;
@@ -193,7 +192,7 @@ int newFunction() {
 
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
     destroyFN(tmp);
-    return E_SEM; // TODO uz byla deklarovana, je v tabulce
+    return E_DEF; // TODO uz byla deklarovana, je v tabulce
   }
 
   if (searchVT(GVRoot, tmp->name->data) != NULL) {
@@ -201,7 +200,7 @@ int newFunction() {
     fprintf(
         stderr,
         "ERROR, deklarace funkce se jmenem totoznym jako globalni promenna \n");
-    return E_SEM;
+    return E_DEF;
   }
 
   FTRoot = insertFN(FTRoot, tmp);
@@ -246,7 +245,7 @@ int newClass() {
 
   if (searchCT(CTRoot, tmp->name->data) != NULL) {
     destroyCN(tmp);
-    return E_SEM; // TODO uz byla deklarovana, je v tabulce
+    return E_DEF; // TODO uz byla deklarovana, je v tabulce
   }
 
   CTRoot = insertCN(CTRoot, tmp);
@@ -275,13 +274,13 @@ int newStaticVar() {
     destroyVN(tmp);
     fprintf(stderr, "ERROR, pokus o deklaraci static var, ktera uz byla "
                     "deklarovana jako lokalni\n");
-    return E_SEM; // uz byla deklarovana, je v lokalni tabulce tridy
+    return E_DEF; // uz byla deklarovana, je v lokalni tabulce tridy
   }
 
   if (searchVT(GVRoot, tmp->name->data) != NULL) {
     destroyVN(tmp);
     fprintf(stderr, "ERROR, redeklarace globalni promenne\n");
-    return E_SEM; // uz byla deklarovana, je v globalni tabulce promennych
+    return E_DEF; // uz byla deklarovana, je v globalni tabulce promennych
   }
 
   if (searchFT(FTRoot, tmp->name->data) != NULL) {
@@ -289,7 +288,7 @@ int newStaticVar() {
     fprintf(
         stderr,
         "ERROR, deklarace globalni promenne se jmenem totoznym jako funkce\n");
-    return E_SEM;
+    return E_DEF;
   }
   // vytvoreni polozky v lokalni tabulce
   CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
@@ -342,12 +341,17 @@ int newVar() {
       } else {
         destroyVN(tmp);
         fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
-        return E_SEM; // uz byla deklarovana, je v lokalni tabulce trid
+        return E_DEF; // uz byla deklarovana, je v lokalni tabulce trid
       }
     } else {
       CurrentClass->lVarTable = insertVN(CurrentClass->lVarTable, tmp);
     }
   } else {
+    if (token->id == T_C_IDENT){
+      destroyVN(tmp);
+      fprintf(stderr, "ERROR, deklarace promenne plnym identifikatorem ve funkci\n");
+      return E_DEF; // uz byla deklarovana, je v lokalni tabulce trid
+    }
     node = searchVT(CurrentMethod->lVarTable, tmp->name->data);
     if (node != NULL) {
       if (node->global != NULL){
@@ -358,7 +362,7 @@ int newVar() {
       } else {
         destroyVN(tmp);
         fprintf(stderr, "ERROR, redeklarace lokalni promenne\n");
-        return E_SEM; // uz byla deklarovana, je v lokalni tabulce trid
+        return E_DEF; // uz byla deklarovana, je v lokalni tabulce trid
       }
     } else {
       CurrentMethod->lVarTable = insertVN(CurrentMethod->lVarTable, tmp);

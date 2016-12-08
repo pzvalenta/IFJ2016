@@ -218,6 +218,7 @@ int getToken() {
         tokenValue = T_END;
         return E_OK;
       } else if (current_char == '\\'){
+        //fprintf(stderr,"debug, {\n");
         tokenValue = T_B_SLASH;
         return E_OK;
       } else if (current_char == '\''){
@@ -253,47 +254,56 @@ int getToken() {
     /*..............................................*/
 
     case S_GREATER:
-    ungetc(current_char, file);
+    //ungetc(current_char, file);
       if (current_char == '=') {
+        //fprintf(stderr,"T_GEQUAL %c\n", current_char);
         tokenValue = T_GEQUAL; // >=
         return E_OK;
       } else /*if (current_char == '\n')*/ {
+        ungetc(current_char, file);
+        //fprintf(stderr,"T_GREAT %c\n", current_char);
         tokenValue = T_GREAT; // >
         return E_OK;
       }
       break;
 
     case S_LESS:
-    ungetc(current_char, file);
+    //ungetc(current_char, file);
       if (current_char == '=') {
+        //fprintf(stderr,"T_LEQUAL %c\n", current_char);
         tokenValue = T_LEQUAL; // <=
         return E_OK;
       } else /*if (current_char == '\n')*/ {
+        //fprintf(stderr,"LESS %c\n", current_char);
+        ungetc(current_char, file);
         tokenValue = T_LESS; // <
         return E_OK;
       }
       break;
 
     case S_EXCLAIM:
-    ungetc(current_char, file);
+    //ungetc(current_char, file);
       if (current_char == '=') {
+        //fprintf(stderr,"T_EXCLAIM %c\n", current_char);
         tokenValue = T_EXCLAIM; // !=
         return E_OK;
       } else /*if (current_char == '\n')*/ {
-        tokenValue = E_LEX; // pokud za vykricnikem nic neni
-        return E_OK;
+        ungetc(current_char, file);
+        //fprintf(stderr,"spatne: %c\n", current_char);
+        return E_LEX;
       }
       break;
 
     case S_EQUAL:
-    ungetc(current_char, file);
+
     //fprintf(stderr,"ted: %c\n", current_char);
       if (current_char == '=') {
+        //fprintf(stderr, "T_EQUAL\n");
         tokenValue = T_EQUAL; // ==
         return E_OK;
       } else /*if (isWhiteSpace(current_char))*/ {
         //fprintf(stderr, "T_ADD\n");
-        //ungetc(current_char, file);
+        ungetc(current_char, file);
         tokenValue = T_ADD; // =
         return E_OK;
       }
@@ -368,7 +378,9 @@ int getToken() {
                  current_char == '^' || current_char == '=' ||
                  current_char == '~' || current_char == '{' ||
                  current_char == '}' || current_char == '[' ||
-                 current_char == ']') { //
+                 current_char == ']' || current_char == EOF ||
+                 current_char == '\\'|| current_char == '!' ||
+                 current_char == '\'') { //
         // neni identifikator - testy na nepovolene znaky
         ungetc(current_char, file); // vrati posledni znak zpet do souboru,
                                     // takze dalsi funkce jej precte znovu
@@ -401,7 +413,9 @@ int getToken() {
                  current_char == '^' || current_char == '=' ||
                  current_char == '~' || current_char == '{' ||
                  current_char == '}' || current_char == '[' ||
-                 current_char == ']') { //
+                 current_char == ']' || current_char == EOF ||
+                 current_char == '\\'|| current_char == '!' ||
+                 current_char == '\'' ) { //
         // neni identifikator - testy na nepovolene znaky
         ungetc(current_char, file); // vrati posledni znak zpet do souboru,
                                     // takze dalsi funkce jej precte znovu
