@@ -181,6 +181,8 @@ int getToken() {
         // TODO if NULL, handle error
         state = S_NUM;
         //fprintf(stderr, "go to S_NUM\n");
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file);
       } else if (current_char == '+') {
         tokenValue = T_PLUS;
@@ -265,6 +267,8 @@ int getToken() {
         tokenValue = T_GEQUAL; // >=
         return E_OK;
       } else /*if (current_char == '\n')*/ {
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file);
         //fprintf(stderr,"T_GREAT %c\n", current_char);
         tokenValue = T_GREAT; // >
@@ -280,6 +284,8 @@ int getToken() {
         return E_OK;
       } else /*if (current_char == '\n')*/ {
         //fprintf(stderr,"LESS %c\n", current_char);
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file);
         tokenValue = T_LESS; // <
         return E_OK;
@@ -293,6 +299,8 @@ int getToken() {
         tokenValue = T_EXCLAIM; // !=
         return E_OK;
       } else /*if (current_char == '\n')*/ {
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file);
         //fprintf(stderr,"spatne: %c\n", current_char);
         return E_LEX;
@@ -308,6 +316,8 @@ int getToken() {
         return E_OK;
       } else /*if (isWhiteSpace(current_char))*/ {
         //fprintf(stderr, "T_ADD\n");
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file);
         tokenValue = T_ADD; // =
         return E_OK;
@@ -315,6 +325,8 @@ int getToken() {
       break;
 
     case S_SLASH: // /
+    if(current_char=='\n')
+      radek--;
     ungetc(current_char, file);
     //fprintf(stderr,"s_slash\n");
     //fprintf(stderr,"ted: %c\n", current_char);
@@ -344,7 +356,7 @@ int getToken() {
                                       Pokud ano, ukoncime cyklus*/
           current_char = getc(file);
           if(current_char=='\n')
-           radek++;
+           radek++
           if (current_char == '/') {
             break;
           }
@@ -393,6 +405,8 @@ int getToken() {
                  current_char == '\\'|| current_char == '!' ||
                  current_char == '\'') { //
         // neni identifikator - testy na nepovolene znaky
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file); // vrati posledni znak zpet do souboru,
                                     // takze dalsi funkce jej precte znovu
         tokenValue = T_C_IDENT;     // byl to identifikator
@@ -428,6 +442,8 @@ int getToken() {
                  current_char == '\\'|| current_char == '!' ||
                  current_char == '\'' ) { //
         // neni identifikator - testy na nepovolene znaky
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file); // vrati posledni znak zpet do souboru,
                                     // takze dalsi funkce jej precte znovu
         // fprintf(stderr,"DEBUG %s\n", string->data);
@@ -546,7 +562,8 @@ int getToken() {
       }
 
       else {
-
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file);
         //fprintf(stderr,"skoncilo cislo: %c\n", current_char);
         tokenValue = T_NUMBER_I;
@@ -576,9 +593,13 @@ int getToken() {
       } else if ((current_char == '.') || (current_char == ',') ||
                  (current_char == '!') || (current_char == '/')) {
         // fprintf(stderr,"CHYBA S_NUM_DOT\n");
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file);
         return E_LEX;
       } else {
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file);
         tokenValue = T_NUMBER_D;
         return E_OK;
@@ -609,12 +630,16 @@ int getToken() {
                current_char == '-' || current_char == '/' ||
                current_char == '*' || current_char == '(' ||
                current_char == ')') {
+        if(current_char=='\n')
+           radek--;
         ungetc(current_char, file);
         tokenValue = T_NUMBER_D;
         return E_OK;
         // destroyString(string);
       } else {
         // fprintf(stderr,"CHYBA\n");
+        if(current_char=='\n')
+          radek--;
         ungetc(current_char, file);
         return E_LEX;
       }
