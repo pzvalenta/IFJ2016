@@ -218,9 +218,6 @@ int getToken() {
       } else if (current_char == ',') {
         tokenValue = T_COMMA;
         return E_OK;
-      } else if (current_char == '.') {
-        tokenValue = T_DOT;
-        return E_OK;
       } else if (current_char == EOF) {
         tokenValue = T_END;
         return E_OK;
