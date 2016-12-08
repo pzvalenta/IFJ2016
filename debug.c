@@ -2,7 +2,7 @@
 
 
 void dprint(struct tListItem *token){
-  return;
+  //return;
   struct String *data = token->data;
   int id = token->id;
 
@@ -212,7 +212,7 @@ void dprint(struct tListItem *token){
       fprintf(stderr, "??? not recognized by debugger, token No.: %d", id);
 
   }
-
+  fprintf(stderr, ", radek=%d",token->radek );
   fprintf(stderr, "\n");
 }
 

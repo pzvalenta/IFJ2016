@@ -40,6 +40,7 @@ int setCurrentVar();
 
 
 int getFuncParams(struct String **ret);
+int getFuncReturn(struct funNode *funkce);
 
 int convertCharToType(char c);
 

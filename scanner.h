@@ -23,7 +23,6 @@
 #include "ial.h"
 #include "main.h"
 
-
 #define START       		 255 // pocatecni nastaveni tokenu (id)
 
 #define T_IDENT          11
@@ -86,6 +85,7 @@ struct String;
 
 struct tListItem {
   int id;
+  int radek;
   struct String *data;
   struct tListItem *next;
   struct tListItem *prev;

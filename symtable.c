@@ -29,6 +29,29 @@ int getFuncParams(struct String **ret){
   return E_OK;
 }
 
+int getFuncReturn(struct funNode *funkce){
+  if(funkce->types->len<1)
+    return -1;
+
+  char c = funkce->types->data[0];
+  switch (c) {
+    case 'v':
+      return T_VOID;
+    break;
+    case 'd':
+      return T_NUMBER_D;
+    break;
+    case 'i':
+      return T_NUMBER_I;
+    break;
+    case 's':
+      return T_STRING_L;
+    break;
+    default:
+    return -1;
+  }
+}
+
 
 int convertCharToType(char c){
   int ret;
