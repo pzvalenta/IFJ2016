@@ -26,6 +26,7 @@ struct String *string = NULL;
 struct tListItem *head = NULL;
 struct tListItem *tail = NULL;
 int tokenValue = E_LEX;
+int radek=1;
 
 void set_file(FILE *source) { file = source; }
 
@@ -93,6 +94,7 @@ int insertLastToken() {
     tail->next = tmp;
     tail = tmp;
   }
+  tmp->radek=radek;
 
   return E_OK;
 }
@@ -147,14 +149,14 @@ int getToken() {
 
   //(*ret).id = START;
   //(*ret).data.s = NULL;
-
   while (1) {
     /*
      * v nekonecnem cyklu nacitame znaky
      */
     current_char = getc(file);
      //fprintf(stderr,"current_char: %c\n", current_char);
-
+     if(current_char=='\n')
+      radek++;
     switch (state) {
     case S_START:
     //fprintf(stderr,"case S_START\n");
@@ -331,11 +333,15 @@ int getToken() {
       // kdyz je komentar, scanner ho ignoruje -> rozpoznat a jit na start
       while (1) {                  // nekonecny cyklus nacitani dalsich znaku
         current_char = getc(file); // nacitani znaku
+        if(current_char=='\n')
+         radek++;
         if (current_char == '*') { /* pokud se dalsi nacteny znak bude rovnat
                                       hvezdicce,
                                       otestujeme, zda se dalsi znak rovna /.
                                       Pokud ano, ukoncime cyklus*/
           current_char = getc(file);
+          if(current_char=='\n')
+           radek++;
           if (current_char == '/') {
             break;
           }
@@ -356,6 +362,8 @@ int getToken() {
         }
         // fprintf(stderr,"KOMENT2\n");
         current_char = getc(file);
+        if(current_char=='\n')
+         radek++;
       } while (current_char != EOF && current_char != '\n');
       // fprintf(stderr,"KOMENT3\n");
       state = S_START;
@@ -485,12 +493,16 @@ int getToken() {
           int esc = (current_char - ASCII) * 8 * 8; // 8^2 (nejlevejsi cislo)
           // fprintf(stderr,"%d\n", esc);
           current_char = getc(file); // dalsi cislo v escape sekvenci
+          if(current_char=='\n')
+           radek++;
 
           if ((current_char < '8') && (current_char >= '0')) { // \0-30-7
             // fprintf(stderr,"prosel2\n");
             esc = esc + (current_char - ASCII) * 8; // 8^1 (prostredni cislo)
             // fprintf(stderr,"%d\n", esc);
             current_char = getc(file); // dalsi cislo v escape sekvenci
+            if(current_char=='\n')
+             radek++;
 
             if ((current_char < '8') && (current_char >= '0')) { // \0-30-70-7
               // fprintf(stderr,"prosel3\n");
