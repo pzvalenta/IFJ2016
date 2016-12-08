@@ -553,6 +553,19 @@ int prec_anal(int until, int rel) {
   // mozna uvolnit list kde na konci bude jenom jeden neterminal a ter $
   //    dispose_list(l);
   //    free(l);
+  if(rel==0)
+  {
+    int typ=l->last->c;
+    if(CurrentVar->type!=typ)
+    {
+      if(CurrentVar->type==T_NUMBER_D && typ==T_NUMBER_I)
+        return E_OK;
+      else
+        return E_TYP;
+    }
+
+  }
+
   return E_OK;
 }
 ////////////////////////////////////////////////
@@ -561,7 +574,10 @@ int expr(int until, int rel) {
   int brackets = 0;
   int tmp_rel=0;
 
-  while (token->id != until || brackets != 0) {
+  fprintf(stderr, "PRECEDENCNI ANALYZA 1. run\n" );
+  while (token->id != until || brackets != 0)
+
+    dprint(token);
 
     if (token->id == T_C_IDENT || token->id == T_IDENT ||
         (token->id >= T_NUMBER_I && token->id <= T_STRING_L) ||
@@ -579,8 +595,9 @@ int expr(int until, int rel) {
               {
                 tmp_rel=1;
               }
-
+            fprintf(stderr, "token vyhovuje\n" );
     } else {
+      fprintf(stderr, "token nevyhovuje\n" );
       return E_SYN;
     }
 
