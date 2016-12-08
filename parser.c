@@ -239,15 +239,22 @@ int function_rule() {
     return E_SYN;
 
   token = token->next;
+  if (token->id == T_RBRACKET){
+    fprintf(stderr, "INFO: call funkce bez parametru\n");
+    if(returnType != T_VOID) return E_TYP;
 
-  int paramPos = 1;
-  result = param(params, &paramPos);
-  if (result != E_OK)
-    return result;
+  }else{
+    int paramPos = 1;
+    result = param(params, &paramPos);
+    if (result != E_OK)
+      return result;
 
-  if (SECOND_RUN){
-    if (paramPos != params->len) return E_TYP;
+    if (SECOND_RUN){
+      if (paramPos != params->len) return E_TYP;
+    }
   }
+
+
 
   token = token->next;
   if (token->id != T_SEMICLN)
@@ -406,11 +413,11 @@ int void_func_call_rule() {
 int param(struct String *params, int *paramPos) {
   fprintf(stderr, "entering param()\n");
   dprint(token);
-  int result = E_OK;
+  //int result = E_OK;
   int paramType;
 
-  if (token->id == T_RBRACKET)
-    return result; // epsilon
+  /*if (token->id == T_RBRACKET)
+    return result; // epsilon*/
 
   if (SECOND_RUN){
     if (*paramPos >= params->len) return E_TYP;
