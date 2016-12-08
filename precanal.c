@@ -556,13 +556,28 @@ int prec_anal(int until, int rel) {
   if(rel==0)
   {
     int typ=l->last->c;
-    if(CurrentVar->type!=typ)
-    {
-      if(CurrentVar->type==T_NUMBER_D && typ==T_NUMBER_I)
-        return E_OK;
-      else
-        return E_TYP;
-    }
+    int type_req;
+
+    if(CurrentVar!=NULL)
+      type_req=CurrentVar->type;
+    else if(CurrentMethod!=NULL){
+        type_req=getFuncReturn(CurrentMethod);
+          if(type_req==-1)
+          return E_DEF;
+        }
+        else
+        {
+          fprintf(stderr, "nemelo by nastat, zjisti se u prvniho pruchodu\n");
+          return E_TYP;
+        }
+
+      if(type_req!=typ)
+      {
+        if(type_req==T_NUMBER_D && typ==T_NUMBER_I)
+          return E_OK;
+        else
+          return E_TYP;
+      }
 
   }
 

@@ -24,6 +24,7 @@
 
 extern int SECOND_RUN;
 extern struct varNode *CurrentVar;
+extern struct funNode *CurrentMethod;
 
 typedef struct item{
     int c;             //ID terminalu
