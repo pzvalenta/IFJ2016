@@ -135,34 +135,25 @@ struct String *copyString(struct String *old){
 }
 
 
-struct String *concatenate(struct String *str1, struct String *str2){
-	char *s1 = NULL;
-	char *s2 = NULL;
-	if(str1->type != T_STRING_L){
-		void* s = GetDataofString(str1);
-		s1 = (char*) s;
-		s2 = str2->data;
-	}
-	if(str2->type != T_STRING_L){
-		void* s = GetDataofString(str2);
-		s2 = (char*) s;
-		s1 = str2->data;
-	}
-	if((str1->type != T_STRING_L) && (str1->type != T_STRING_L)){
-		s1 = str1->data;
-		s2 = str2->data;
-	}
-	else{
-		return NULL;
-	}
 
-	s1 = (char*) realloc(s1, strlen(s1) + strlen(s2) + 1);
-	if(s1 == NULL){ //chyba pri realokaci pameti
-		return NULL;
-	}
-	strcat(s1, s2);
-	str1->data = s1;
-	str1->size = 0/*TODO*/;
-	str1->len = 0/*TODO*/;
-	return str1;
+struct String *concatenate(struct String *str1, struct String *str2){
+    char *s1 = NULL;
+    char *s2 = NULL;
+    char *s3 = NULL;
+    struct String *ret = newString();
+    s1 = str1->data;
+    s2 = str2->data;
+
+    s3 = (char*) realloc(s1, strlen(s1) + strlen(s2) + 1); //realokace pameti, aby se do s1 vlezlo s1+s2
+    if(s3 == NULL){ //chyba pri realokaci pameti
+        return NULL;
+    }
+    s3 = strcpy(s3, s1);
+    s3 = strcat(s3, s2); //konkatenace, ulozi se do s3
+
+    ret->data = s3;
+    ret->size = strlen(s1) + strlen(s2) + 1;
+    ret->len = strlen(s3);
+    return ret;
+
 }
