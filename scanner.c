@@ -23,6 +23,7 @@
 //=======
 FILE *file;
 struct String *string = NULL;
+struct String *helpstring = NULL;
 struct tListItem *head = NULL;
 struct tListItem *tail = NULL;
 int tokenValue = E_LEX;
@@ -157,7 +158,7 @@ int getToken() {
      * v nekonecnem cyklu nacitame znaky
      */
     current_char = getc(file);
-     //fprintf(stderr,"current_char: %c\n", current_char);
+     fprintf(stderr,"current_char: %c\n", current_char);
      if(current_char=='\n')
       radek++;
     switch (state) {
@@ -383,11 +384,14 @@ int getToken() {
 
     /*...............IDENTIFIKATOR x KLICOVE SLOVO...............*/
     case S_C_IDENT:
+    //fprintf(stderr, "S_C_IDENT %c\n", current_char);
+
       if ((isalnum(current_char)) != 0 || current_char == '$' ||
           current_char == '_') {
         // test, zda je to alfanumericky znak, dolar nebo podtrzitko - pak je to
         // identifikator
-        appendChar(string, current_char);
+        appendChar(helpstring, current_char);
+        //fprintf(stderr, "S_C_IDENT %s\n", helpstring->data);
         state = S_C_IDENT;
       } else if (current_char == ';' || current_char == '.' ||
                  current_char == '/' || current_char == '+' ||
@@ -406,6 +410,25 @@ int getToken() {
           radek--;
         ungetc(current_char, file); // vrati posledni znak zpet do souboru,
                                     // takze dalsi funkce jej precte znovu
+        //fprintf(stderr, "S_C_IDENT else if %c\n", current_char);
+        //fprintf(stderr, "S_C_IDENT: %s\n", helpstring->data);
+        for (int a = 0; a < KEYWORDS; a++) {
+          // fprintf(stderr,"Comparing with %s\n", klicova_slova[a]);
+
+          if ((strcmp(helpstring->data, klicova_slova[a])) ==
+              0) /****JAK POZNAT TO, CO MAM NACTENO***/
+          {      // je to klicove slovo
+            // destroyString(string);
+            // tokenValue =
+            //     T_KEY + a + 1; // vrati presny odkaz na dane klicove slovo
+            // return E_OK;
+            //fprintf(stderr, "je to klicove slovo\n");
+            return E_LEX;
+          }
+        }
+        //fprintf(stderr, "S_C_IDENT key: %s\n", helpstring->data);
+        concatenate(string, helpstring);
+        //fprintf(stderr, "S_C_IDENT key: %s\n", string->data);
         tokenValue = T_C_IDENT;     // byl to identifikator
         return E_OK;
       } else {
@@ -423,9 +446,17 @@ int getToken() {
         state = S_IDENT;
         // fprintf(stderr,"scanner, current state of indetificator = %s\n",
         // string->data);
-      } else if (current_char == '.') {
-        appendChar(string, current_char);
+      }  else if (current_char == '.') {
+              appendChar(string, current_char);
+              current_char = getc(file);
+              //fprintf(stderr, "S_IDENT_DOT %c\n", current_char);
+              if (isWhiteSpace(current_char))
+              return E_LEX;
+              else /*appendChar(string, current_char);*/
+        ungetc(current_char, file);
         state = S_C_IDENT;
+        helpstring = newString(); //pomocny string pro druhou cast identifikatoru
+
       } else if (current_char == ';' || current_char == '.' ||
                  current_char == '/' || current_char == '+' ||
                  current_char == '-' || (isspace(current_char) != 0) ||
@@ -549,8 +580,7 @@ int getToken() {
         // ERROR
         state = S_NUM;
       } else if (current_char == '.') { // desetinna tecka
-        appendChar(string, current_char);
-        // jinak error
+         // jinak error
         state = S_NUM_DOT;
       } else if (current_char == 'e' || current_char == 'E') { // exponent
         appendChar(string, current_char);
@@ -562,33 +592,38 @@ int getToken() {
         if(current_char=='\n')
           radek--;
         ungetc(current_char, file);
-        //fprintf(stderr,"skoncilo cislo: %c\n", current_char);
+
         tokenValue = T_NUMBER_I;
         return E_OK;
       }
       break;
 
-    // case S_NUM_DOT:                     // 0-9.
-    //   if (isdigit(current_char) != 0) { // test na cislo
-    //     appendChar(string, current_char);
-    //     // jinak error
-    //     state = S_NUM_DOT_NUM;
-    //   } else {
-    //     return E_LEX;
-    //   }
-    //   break;
-
-    case S_NUM_DOT:                     // 0-9.0-9
+    case S_NUM_DOT:                     // 0-9.
+    //fprintf(stderr, "S_NUM_DOT %c\n", current_char);
       if (isdigit(current_char) != 0) { // test na cislo
         appendChar(string, current_char);
         // jinak error
-        state = S_NUM_DOT;
+        state = S_NUM_DOT_NUM;
+      } else {
+        //fprintf(stderr,"skoncilo cislo: %s\n", string->data);
+        return E_LEX;
+      }
+      break;
+
+    case S_NUM_DOT_NUM:                     // 0-9.0-9
+    //fprintf(stderr, "S_NUM_DOT_NUM %c\n", current_char);
+      if (isdigit(current_char) != 0) { // test na cislo
+        appendChar(string, current_char);
+        // jinak error
+        state = S_NUM_DOT_NUM;
       } else if ((current_char == 'e') || (current_char == 'E')) {
         appendChar(string, current_char);
         // jinak error
         state = S_NUM_EX;
-      } else if ((current_char == '.') || (current_char == ',') ||
-                 (current_char == '!') || (current_char == '/')) {
+      } else if ( (current_char == '.') || (current_char == ',') ||
+                 (current_char == '!') || (current_char == '/') ||
+                 (current_char == 32)   || (current_char == 9) ||
+                (current_char == 0) ) {
         // fprintf(stderr,"CHYBA S_NUM_DOT\n");
         if(current_char=='\n')
           radek--;
@@ -605,18 +640,26 @@ int getToken() {
     /*......................................................*/
 
     case S_NUM_EX: // 0-9eE || 0-9.0-9Ee
+    //fprintf(stderr, "S_NUM_EX %c\n", current_char);
       if (current_char == '+' || current_char == '-' ||
           (isdigit(current_char)) != 0) {
         // dalsi znak je +,- nebo dalsi cislo
         appendChar(string, current_char);
+        //current_char = getc(file);
+        //fprintf(stderr, "S_NUM_EX getc %c\n", current_char);
+        if(current_char != '+' && current_char != '-' && (isdigit(current_char)) != 0) {
 
-        state = S_NUM_EX_NUM;
+          state = S_NUM_EX_NUM;
+          ungetc(current_char, file);
+        }
+        else return E_LEX;
       } else {
         return E_LEX;
       }
       break;
 
     case S_NUM_EX_NUM: // 0-9eE+-0-9 || 0-9.0-9Ee+-0-9
+    //fprintf(stderr, "S_NUM_EX_NUM %c\n", current_char);
       if (isdigit(current_char) != 0) {
         appendChar(string, current_char);
         state = S_NUM_EX_NUM; // dokud budou nacitana cisla - cyklus
