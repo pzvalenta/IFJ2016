@@ -588,8 +588,13 @@ int prec_anal(int until, int rel) {
 int expr(int until, int rel) {
   int brackets = 0;
   int tmp_rel=0;
+  int max_rel=0;
 
   fprintf(stderr, "PRECEDENCNI ANALYZA 1. run\n" );
+
+  if(token->id==until)
+    return E_SYN;
+
   while (token->id != until || brackets != 0){
 
     dprint(token);
@@ -609,6 +614,9 @@ int expr(int until, int rel) {
               token->id==T_LEQUAL || token->id==T_EXCLAIM)
               {
                 tmp_rel=1;
+                max_rel++;
+                if(max_rel>1)
+                  return E_SYN;
               }
             fprintf(stderr, "token vyhovuje\n" );
     } else {
