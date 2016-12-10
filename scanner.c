@@ -621,8 +621,8 @@ int getToken() {
         // jinak error
         state = S_NUM_EX;
       } else if ( (current_char == '.') || (current_char == ',') ||
-                 (current_char == '!') || (current_char == '/') ||
-                 (current_char == 32)   || (current_char == 9) ||
+                 (current_char == '!') || (current_char == '/') 
+                    || (current_char == 9) ||
                 (current_char == 0) ) {
         // fprintf(stderr,"CHYBA S_NUM_DOT\n");
         if(current_char=='\n')
