@@ -29,6 +29,7 @@ extern struct funNode *CurrentMethod;
 typedef struct item{
     int c;             //ID terminalu
     //tady bude offset zasobniku interpetu kde bude hodnota
+  //  int offset;
     bool terminal;      //pokud je terminal-> TRUE
     bool handle;        //pokud je to handle -> TRUE
     struct item *next;  //ukazatel na dalsi
@@ -49,7 +50,7 @@ bool is_handle(tList *l);
 int bracket_balance(tList *l);
 tItem * get_last_handle(tList *l);
 void find_last_terminal(tList *l);
-tItem * cut_item(tList *l, int *typ);
+tItem * cut_item(tList *l);
 void reduce (tList *l);
 int sem_correct (tList *l);
 int is_rule (tList*l);
