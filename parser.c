@@ -226,7 +226,7 @@ int function_rule() {
     returnType = convertCharToType(params->data[0]);
 
     if (CurrentVar == NULL){ //musi to byt voidcall
-      if(returnType != T_VOID) return E_INIT;
+      if(returnType != T_VOID) return E_TYP;
     }
     else {
       if(returnType != CurrentVar->type) return E_TYP;
