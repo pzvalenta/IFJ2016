@@ -241,7 +241,9 @@ int function_rule() {
   token = token->next;
   if (token->id == T_RBRACKET){
     fprintf(stderr, "INFO: call funkce bez parametru\n");
-    if (params->len > 1) return E_TYP;
+    if (SECOND_RUN){
+      if (params->len > 1) return E_TYP;
+    }
 
   }else{
     int paramPos = 1;
