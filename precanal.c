@@ -83,7 +83,7 @@ int insert_terminal_last(tList *l, int c) {
       tmp->c = getType();
       if (tmp->c == -1)
         return E_DEF;
-      // prida se offset
+      // TODO prida se offset: tmp->offset=getOffset();
     } else {
       tmp->c = c;
     }
@@ -108,7 +108,7 @@ int insert_terminal_last(tList *l, int c) {
       tmp->c = getType();
       if (tmp->c == -1)
         return E_DEF;
-      // prida se offset
+      // TODO prida se offset: tmp->offset=getOffset();
     } else {
       tmp->c = c;
     }
@@ -215,7 +215,7 @@ void find_last_terminal(tList *l) {
   // vzdy by melo najit aspon terminal $
 }
 /** vyjmuti operandu nebo operatoru pro poslani instrukce na spocitani vyrazu*/
-tItem *cut_item(tList *l, int *typ) {
+tItem *cut_item(tList *l) {
   tItem *tmp = get_last_handle(l); // redukovat vyrazy od nejvnorenejsiho handlu
 
   tmp = tmp->next;
@@ -225,16 +225,18 @@ tItem *cut_item(tList *l, int *typ) {
     return NULL; // nevim jestli je potreba
   }
 
-  tItem *tmpReturn = tmp; // tmp se uvolni ze zasobniku, tmpReturn se vrati dany
+  tItem *tmpReturn=malloc(sizeof(tItem));
+  tmpReturn = tmp; // tmp se uvolni ze zasobniku, tmpReturn se vrati dany
                           // operand/operator
-  *typ = tmp->c;
+// fprintf(stderr, "posilam prvek typ:%d\n",tmpReturn->c);
+
   if (tmp == l->last) {
     l->last = l->last->prev;
     l->last->next = NULL;
 
     find_last_terminal(l);
 
-    free(tmp);
+  //  free(tmp);
     return tmpReturn;
   } else {
     tmp->prev->next = tmp->next;
@@ -242,7 +244,7 @@ tItem *cut_item(tList *l, int *typ) {
 
     find_last_terminal(l);
 
-    free(tmp);
+  //  free(tmp);
     return tmpReturn;
   }
 }
@@ -252,28 +254,83 @@ void reduce(tList *l) {
   /// funkcnosti redukce
   tItem *tmp;
   tmp = get_last_handle(l);
-  int typ[3];
   int i = 0;
+  tItem **op=malloc(3*sizeof(tItem *));
+/*  for(int m=0;m<3;m++)
+  {
+    op[m]=malloc(sizeof(tItem));
+  }*/
+
   while (tmp->next != NULL) {
     /// z cut_item se budou brat operandy a operatory, vypocita se hodnota a
     /// vlozi se do neterminalu, ktery se vlozi na zasobnik po tom co se
     /// odstrani posledni handle
-    cut_item(l, &typ[i]);
+  op[i]=cut_item(l);
+    //  fprintf(stderr, "vyjmuti prvku, typ:%d\n",op[i]->c);
     i++;
   }
+
   //budou se volat funkce s offsetama prvku na vypocet neterminalu, ktery vyjde
   // po redukci
-
+// pripady pro ruzny instrukce
+//  if(i==1)
+//TODO  tmp->offset=op[1]->offset;
+  if(i==3)
+  {
+    switch(op[1]->c){
+      case T_EQUAL:
+        //instrukce TODO vysledek bude offset mezivysledku
+        fprintf(stderr, "volani instrukce: ==\n");
+        break;
+      case T_PLUS:
+        //instrukce
+        fprintf(stderr, "volani instrukce: +\n");
+        break;
+      case T_GREAT:
+        //instrukce
+        fprintf(stderr, "volani instrukce: >\n");
+        break;
+      case T_GEQUAL:
+        //instrukce
+        fprintf(stderr, "volani instrukce: >=\n");
+        break;
+      case T_MINUS:
+        //instrukce
+        fprintf(stderr, "volani instrukce: -\n");
+        break;
+      case T_LESS:
+        //instrukce
+        fprintf(stderr, "volani instrukce: <\n");
+        break;
+      case T_LEQUAL:
+        //instrukce
+        fprintf(stderr, "volani instrukce: <=\n");
+        break;
+      case T_MUL:
+        //instrukce
+        fprintf(stderr, "volani instrukce: *\n");
+        break;
+      case T_EXCLAIM:
+        //instrukce
+        fprintf(stderr, "volani instrukce: !=\n");
+        break;
+      case T_SLASH:
+        //instrukce
+        fprintf(stderr, "volani instrukce: /\n");
+        break;
+      //default nenastane overeno ze existuje pravidlo s operatorem
+  }
+}
   // pri konvertovani ma nejvetsi prioritu string pak double, nakonec int
   bool s = false, d = false, in = false;
   int j;
   for (j = 0; j < i; j++) {
-    if (typ[j] == T_STRING_L) {
+    if (op[j]->c == T_STRING_L) {
       s = true;
       break;
-    } else if (typ[j] == T_NUMBER_D) {
+    } else if (op[j]->c == T_NUMBER_D) {
       d = true;
-    } else if (typ[j] == T_NUMBER_I) {
+    } else if (op[j]->c == T_NUMBER_I) {
       in = true;
     }
   }
@@ -287,9 +344,16 @@ void reduce(tList *l) {
   else
     tmp->c = 0;
 
-
+  //prida se offset mezivysledku tmp->offset=TODO
   tmp->handle = false;
   tmp->terminal = false;
+
+  for(int m=i-1;m>=0;m--) //uvolneni vyjmutych prvku
+  {
+      free(op[m]);
+  }
+
+
 }
 /**kontrola semantiky (pokud je jeden z neterminalu string, muze se provest
  * pouze + ->konkatenace)*/
