@@ -509,6 +509,137 @@ void printSpecialC(struct classNode *node){
 	printSpecialC(node->right);
 }
 
+//kmp
+void kmpTabulka(char *text, int* tabulka)
+{
+    int index=0, pozice=2;
+
+    tabulka[0]=-1;
+    tabulka[1]=0;
+    int m=strlen(text);
+
+    while(pozice<m)
+    {
+
+        if(text[pozice-1]==text[index])
+        {
+            index++;
+            tabulka[pozice]=index;
+            pozice++;
+        }
+        else if(index>0)
+        {
+            index=tabulka[index];
+        }
+        else
+        {
+            tabulka[pozice]=0;
+            pozice++;
+        }
+    }
+}
+
+int kmp(char *text, char *prohledano)
+{
+    int m=strlen(text);
+    int n=strlen(prohledano);
+
+    if(m==0)
+    {
+        return 0;
+    }
+
+    int nalez=0, index=0, tabulka[m];
+
+    kmpTabulka(text, tabulka);
+
+    while((nalez+index)<m)
+    {
+        if(prohledano[index]==text[nalez+index])
+        {
+            if(index==n-1)
+            {
+                return nalez;
+            }
+            index++;
+        }
+        else
+        {
+            nalez+=index-tabulka[index];
+
+            if(tabulka[index]>-1)
+            {
+                index=tabulka[index];
+            }
+            else
+            {
+                index=0;
+            }
+        }
+    }
+    return -1;
+}
+
+
+//heapsort
+void sift(char *str, int left, int right)
+{
+    int a=left;
+    int b=a*2+1;
+    char tmp=str[a];
+
+    if(b<right&&str[b]<str[b+1])
+    {
+        b++;
+    }
+
+    while(b<=right&&tmp<str[b])
+    {
+        str[a]=str[b];
+        a=b;
+        b=(2*a)+1;
+
+        if(b<right&&str[b]<str[b+1])
+        {
+            b++;
+        }
+    }
+    str[a]=tmp;
+}
+
+char *sort(char *trash)
+{
+    char *randS=NULL;
+    int req=((strlen(trash)+1)/8)+1;
+
+    if((randS=(char*)malloc(sizeof(char)*req*8))==NULL)
+    {
+       // return E_INTERNAL;
+       return 0;
+    }
+
+    strcpy(randS, trash);
+    int left, right, a;
+    int len=strlen(randS);
+    char *str=randS;
+    left=(len-1)/2;
+    right=len-1;
+
+    for(a=left; a>=0; a--)
+    {
+        sift(str, a, right);
+    }
+
+    for(a=right; a>0; a--)
+    {
+        char tmp=str[0];
+        str[0]=str[a];
+        str[a]=tmp;
+        sift(str, 0, a-1);
+    }
+    return randS;
+}
+
 
 
 // STARE FUNKCE:
