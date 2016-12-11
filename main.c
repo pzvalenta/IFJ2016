@@ -21,14 +21,15 @@ int main(int argc, char **argv) {
     // TODO zpracovat vstupy + nastavit input streamu pro scanner
     fprintf(stderr, "opening: %s\n", argv[1]);
     FILE *source = fopen(argv[1], "r");
+    if (source == NULL) return E_INTERNAL;
     // errorcheck TODO
     set_file(source);
     fprintf(stderr, "opened: %p\n", source);
   } else /// REMOVE!!! TODO
   {
     FILE *source =
-        //fopen("/home/petr/Code/IFJ2016/testing/input/example3.java", "r");
-      fopen("C:\\example1.java", "r");
+        fopen("/home/petr/Code/IFJ2016/testing/input/example3.java", "r");
+      //fopen("C:\\example1.java", "r");
     set_file(source);
   }
 
