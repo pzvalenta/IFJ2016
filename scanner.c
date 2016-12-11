@@ -582,6 +582,7 @@ int getToken() {
         state = S_NUM_DOT;
       } else if (current_char == 'e' || current_char == 'E') { // exponent
         appendChar(string, current_char);
+        //fprintf(stderr, "E/e\n");
         // jinak error
         state = S_NUM_EX;
       }
@@ -644,14 +645,11 @@ int getToken() {
         // dalsi znak je +,- nebo dalsi cislo
         appendChar(string, current_char);
         //current_char = getc(file);
+        state = S_NUM_EX_NUM;
+        //ungetc(current_char, file);
         //fprintf(stderr, "S_NUM_EX getc %c\n", current_char);
-        if(current_char != '+' && current_char != '-' && (isdigit(current_char)) != 0) {
-
-          state = S_NUM_EX_NUM;
-          ungetc(current_char, file);
-        }
-        else return E_LEX;
-      } else {
+      }
+      else {
         return E_LEX;
       }
       break;
@@ -663,19 +661,18 @@ int getToken() {
         state = S_NUM_EX_NUM; // dokud budou nacitana cisla - cyklus
 
       }
-
-      else if (current_char == ';' || current_char == '+' ||
-               current_char == '-' || current_char == '/' ||
+      else if (current_char == ';'  || current_char == '/' ||
                current_char == '*' || current_char == '(' ||
                current_char == ')') {
         if(current_char=='\n')
            radek--;
+           //fprintf(stderr, "jsem tady\n");
         ungetc(current_char, file);
         tokenValue = T_NUMBER_D;
         return E_OK;
         // destroyString(string);
       } else {
-        // fprintf(stderr,"CHYBA\n");
+         //fprintf(stderr,"CHYBA\n");
         if(current_char=='\n')
           radek--;
         ungetc(current_char, file);
