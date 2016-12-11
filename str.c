@@ -154,6 +154,7 @@ struct String *concatenate(struct String *str1, struct String *str2){
     ret->data = s3;
     ret->size = strlen(s1) + strlen(s2) + 1;
     ret->len = strlen(s3);
+		//fprintf(stderr, "RET->LEN %d\n", ret->len);
     return ret;
 
 }

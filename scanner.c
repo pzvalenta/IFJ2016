@@ -424,8 +424,9 @@ int getToken() {
           }
         }
         //fprintf(stderr, "S_C_IDENT key: %s\n", helpstring->data);
-        concatenate(string, helpstring);
+        string = concatenate(string, helpstring);
         //fprintf(stderr, "S_C_IDENT key: %s\n", string->data);
+        //fprintf(stderr, "S_C_IDENT len: %d\n", string->len);
         tokenValue = T_C_IDENT;     // byl to identifikator
         return E_OK;
       } else {
