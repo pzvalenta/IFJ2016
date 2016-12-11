@@ -43,7 +43,6 @@ enum {
   S_EXCLAIM, // !=
   S_SLASH,
   S_EQUAL,
-  S_EOL,
   S_STRING,
   S_LN_COMM,
   S_BL_COMM, // /*..*/
@@ -229,8 +228,6 @@ int getToken() {
       } else if (current_char == '\''){
         tokenValue = T_APOSTROPHE;
         return E_OK;
-      } else if (current_char == '\n') {
-        state = S_EOL;
       }
 
       /*..............................................*/
@@ -621,7 +618,7 @@ int getToken() {
         // jinak error
         state = S_NUM_EX;
       } else if ( (current_char == '.') || (current_char == ',') ||
-                 (current_char == '!') || (current_char == '/') 
+                 (current_char == '!') || (current_char == '/')
                     || (current_char == 9) ||
                 (current_char == 0) ) {
         // fprintf(stderr,"CHYBA S_NUM_DOT\n");
