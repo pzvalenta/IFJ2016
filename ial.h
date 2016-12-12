@@ -91,14 +91,14 @@ void destroyCN (struct classNode *node);
 void destroyCT (struct classNode *root);
 void printInOrderC(struct classNode *node);
 void printSpecialC(struct classNode *node);
-
+/*
 //kmp a heap sort
 void kmpTabulka(char *text, int* tabulka)
 int kmp(char *text, char *prohledano)
 	
 void sift(char *str, int left, int right)
 char *sort(char *trash)
-
+*/
 
 
 //void printInorder(TableNode *node);
