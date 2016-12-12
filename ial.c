@@ -508,20 +508,20 @@ void printSpecialC(struct classNode *node){
 	fprintf(stderr, "_______________________________\n");
 	printSpecialC(node->right);
 }
-/*
+
 //kmp
-void kmpTabulka(char *text, int* tabulka)
+void kmpTabulka(char *substring, int* tabulka)
 {
     int index=0, pozice=2;
 
     tabulka[0]=-1;
     tabulka[1]=0;
-    int m=strlen(text);
+    int m=strlen(substring);
 
     while(pozice<m)
     {
 
-        if(text[pozice-1]==text[index])
+        if(substring[pozice-1]==substring[index])
         {
             index++;
             tabulka[pozice]=index;
@@ -538,10 +538,9 @@ void kmpTabulka(char *text, int* tabulka)
         }
     }
 }
-
-int kmp(char *text, char *prohledano)
+int kmp(char *substring, char *prohledano)
 {
-    int m=strlen(text);
+    int m=strlen(substring);
     int n=strlen(prohledano);
 
     if(m==0)
@@ -551,11 +550,11 @@ int kmp(char *text, char *prohledano)
 
     int nalez=0, index=0, tabulka[m];
 
-    kmpTabulka(text, tabulka);
+    kmpTabulka(substring, tabulka);
 
     while((nalez+index)<m)
     {
-        if(prohledano[index]==text[nalez+index])
+        if(prohledano[index]==substring[nalez+index])
         {
             if(index==n-1)
             {
@@ -580,31 +579,30 @@ int kmp(char *text, char *prohledano)
     return -1;
 }
 
-
 //heapsort
-void sift(char *str, int left, int right)
+void sift(char *str, int levy, int pravy)
 {
-    int a=left;
-    int b=a*2+1;
-    char tmp=str[a];
+    int promA=levy;
+    int promB=promA*2+1;
+    char tmp=str[promA];
 
-    if(b<right&&str[b]<str[b+1])
+    if(promB<pravy&&str[promB]<str[promB+1])
     {
-        b++;
+        promB++;
     }
 
-    while(b<=right&&tmp<str[b])
+    while(promB<=pravy&&tmp<str[promB])
     {
-        str[a]=str[b];
-        a=b;
-        b=(2*a)+1;
+        str[promA]=str[promB];
+        promA=promB;
+        promB=(2*promA)+1;
 
-        if(b<right&&str[b]<str[b+1])
+        if(promB<pravy&&str[promB]<str[promB+1])
         {
-            b++;
+            promB++;
         }
     }
-    str[a]=tmp;
+    str[promA]=tmp;
 }
 
 char *sort(char *trash)
@@ -619,27 +617,26 @@ char *sort(char *trash)
     }
 
     strcpy(randS, trash);
-    int left, right, a;
+    int levy, pravy, promA;
     int len=strlen(randS);
     char *str=randS;
-    left=(len-1)/2;
-    right=len-1;
+    levy=(len-1)/2;
+    pravy=len-1;
 
-    for(a=left; a>=0; a--)
+    for(promA=levy; promA>=0; promA--)
     {
-        sift(str, a, right);
+        sift(str, promA, pravy);
     }
 
-    for(a=right; a>0; a--)
+    for(promA=pravy; promA>0; promA--)
     {
         char tmp=str[0];
-        str[0]=str[a];
-        str[a]=tmp;
-        sift(str, 0, a-1);
+        str[0]=str[promA];
+        str[promA]=tmp;
+        sift(str, 0, promA-1);
     }
     return randS;
 }
-*/
 
 
 // STARE FUNKCE:
