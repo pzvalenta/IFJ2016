@@ -93,11 +93,11 @@ void printInOrderC(struct classNode *node);
 void printSpecialC(struct classNode *node);
 
 //kmp a heap sort
-void kmpTabulka(char *text, int* tabulka)
-int kmp(char *text, char *prohledano)
+void kmpTabulka(char *text, int* tabulka);
+int kmp(char *text, char *prohledano);
 	
-void sift(char *str, int levy, int pravy)
-char *sort(char *trash)
+void sift(char *str, int levy, int pravy);
+char *sort(char *trash);
 
 
 
