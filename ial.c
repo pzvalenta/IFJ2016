@@ -508,7 +508,7 @@ void printSpecialC(struct classNode *node){
 	fprintf(stderr, "_______________________________\n");
 	printSpecialC(node->right);
 }
-
+/*
 //kmp
 void kmpTabulka(char *text, int* tabulka)
 {
@@ -639,7 +639,7 @@ char *sort(char *trash)
     }
     return randS;
 }
-
+*/
 
 
 // STARE FUNKCE:
